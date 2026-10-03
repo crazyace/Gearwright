@@ -1,0 +1,32 @@
+{
+  "note": "GearwrightProbe /gwp items on the Forever beta (1.60.1 build 70205), 2026-10-03 17:40. Items the character does not own. stats = C_Item.GetItemStats; equip = the tooltip's Equip: lines; reqLevel from C_Item.GetItemInfo. Mask of the Unforgiven (13404) never loaded.",
+  "items": {
+    "276105": {"name": "Scoutmaster's Eyepatch", "reqLevel": 0, "class": 4, "subclass": 2, "equipLoc": "INVTYPE_HEAD",
+      "stats": {"ITEM_MOD_SPIRIT_SHORT": 13, "ITEM_MOD_STAMINA_SHORT": 16, "ITEM_MOD_HIT_RATING_SHORT": 7, "RESISTANCE0_NAME": 105},
+      "equip": ["Equip: Improves your chance to hit by 0.7%."]},
+    "7348": {"name": "Fletcher's Gloves", "reqLevel": 20, "class": 4, "subclass": 2, "equipLoc": "INVTYPE_HAND",
+      "stats": {"ITEM_MOD_PARRY_RATING_SHORT": -15, "ITEM_MOD_CRIT_RATING_SHORT": 14, "RESISTANCE0_NAME": 53},
+      "equip": ["Equip: Decreases your chance to Parry an attack by 1.0%.", "Equip: Improves your chance to get a critical strike by 1.0%."]},
+    "272395": {"name": "Assassin's Waistguard", "reqLevel": 60, "class": 4, "subclass": 2, "equipLoc": "INVTYPE_WAIST",
+      "stats": {"ITEM_MOD_AGILITY_SHORT": 21, "ITEM_MOD_STAMINA_SHORT": 11, "ITEM_MOD_HIT_RATING_SHORT": 20, "RESISTANCE0_NAME": 104},
+      "equip": ["Equip: Improves your chance to hit by 2.0%."]},
+    "240080": {"name": "Waywatcher Headdress", "reqLevel": 60, "class": 4, "subclass": 2, "equipLoc": "INVTYPE_HEAD",
+      "stats": {"ITEM_MOD_HASTE_RATING_SHORT": 10, "ITEM_MOD_AGILITY_SHORT": 13, "ITEM_MOD_STAMINA_SHORT": 41, "ITEM_MOD_DEFENSE_SKILL_RATING_SHORT": 21, "ITEM_MOD_EXPERTISE_RATING_SHORT": 10, "ITEM_MOD_STRENGTH_SHORT": 19, "RESISTANCE0_NAME": 343},
+      "equip": ["Equip: Increased Defense +21.", "Equip: Increases your attack speed and casting speed by 1.0%.", "Equip: Reduces chance to be Dodged or Parried by 1.0%."]},
+    "16711": {"name": "Shadowcraft Boots", "reqLevel": 54, "class": 4, "subclass": 2, "equipLoc": "INVTYPE_FEET",
+      "stats": {"ITEM_MOD_AGILITY_SHORT": 21, "ITEM_MOD_STAMINA_SHORT": 9, "ITEM_MOD_HIT_RATING_SHORT": 3, "RESISTANCE0_NAME": 115},
+      "equip": ["Equip: Improves your chance to hit by 0.3%."]},
+    "252504": {"name": "Brawler's Leather Hood", "reqLevel": 20, "class": 4, "subclass": 2, "equipLoc": "INVTYPE_HEAD",
+      "stats": {"ITEM_MOD_AGILITY_SHORT": 8, "ITEM_MOD_STAMINA_SHORT": 10, "RESISTANCE0_NAME": 76},
+      "equip": []},
+    "5540": {"name": "Pearl-handled Dagger", "reqLevel": 18, "class": 2, "subclass": 15, "equipLoc": "INVTYPE_WEAPON",
+      "stats": {"ITEM_MOD_DAMAGE_PER_SECOND_SHORT": 11.470588684082, "ITEM_MOD_AGILITY_SHORT": 2, "ITEM_MOD_STAMINA_SHORT": 2},
+      "equip": []},
+    "279899": {"name": "Catacomb Cloak", "reqLevel": 1, "class": 4, "subclass": 1, "equipLoc": "INVTYPE_CLOAK",
+      "stats": {"ITEM_MOD_ATTACK_POWER_VS_HUMANOID_SHORT": 4, "ITEM_MOD_ATTACK_POWER_SHORT": 3, "ITEM_MOD_STAMINA_SHORT": 2, "RESISTANCE0_NAME": 15},
+      "equip": ["Equip: +3 Attack Power.", "Equip: +4 Attack Power against Humanoids."]},
+    "21278": {"name": "Stormshroud Gloves", "reqLevel": 57, "class": 4, "subclass": 2, "equipLoc": "INVTYPE_HAND",
+      "stats": {"ITEM_MOD_CRIT_RATING_SHORT": 14, "ITEM_MOD_HIT_RATING_SHORT": 10, "RESISTANCE0_NAME": 109},
+      "equip": ["Equip: Improves your chance to hit by 1.0%.", "Equip: Improves your chance to get a critical strike by 1.0%."]}
+  }
+}

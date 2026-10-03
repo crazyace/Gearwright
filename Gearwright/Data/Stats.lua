@@ -32,10 +32,9 @@ Stats.TOKEN_TO_KEY = {
   ITEM_MOD_DAMAGE_PER_SECOND_SHORT = "dps",
 }
 
--- Rating per 1%, the same at every item level. From 40 Forever leather items on
--- Wowhead (2026-10-03), comparing each item's stored rating with its tooltip:
--- hit 10 -> "1.0%", 20 -> "2.0%", 3 -> "0.3%"; crit 14 -> "1.0%", 21 -> "1.5%";
--- haste and expertise 10 -> "1.0%". Not yet seen in the beta client itself.
+-- Rating per 1%, the same at every item level. Found on 40 Forever items on
+-- Wowhead, then confirmed in the beta client (/gwp items, 2026-10-03): hit 3 ->
+-- "0.3%", 20 -> "2.0%"; crit 14 -> "1.0%"; haste and expertise 10 -> "1.0%".
 Stats.RATING_PER_PERCENT = { hit = 10, crit = 14, haste = 10, expertise = 10 }
 
 -- English-only "Equip:" patterns. Forever writes "by 2.0%", Classic "by 2%".

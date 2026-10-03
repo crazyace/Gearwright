@@ -105,6 +105,8 @@ local API_PATHS = {
   "UnitDamage", "C_Item.RequestLoadItemDataByID", "C_TooltipInfo.GetItemByID",
   -- dungeon/raid loot tables, if this client has the Encounter Journal
   "EJ_SelectInstance", "EJ_GetNumLoot", "EJ_GetLootInfoByIndex", "C_EncounterJournal.GetLootInfoByIndex",
+  "EJ_GetNumTiers", "EJ_GetInstanceByIndex", "EJ_GetEncounterInfoByIndex", "EJ_GetLootFilter",
+  "C_TradeSkillUI.GetRecipeSchematic", "C_Spell.GetSpellDescription",
   -- character stats
   "UnitStat", "UnitAttackPower", "UnitAttackSpeed", "GetCritChance", "GetHitModifier",
   "GetSpellHitModifier", "GetExpertise", "GetHaste", "GetMeleeHaste", "GetCombatRating",
@@ -460,7 +462,16 @@ local function scanTradeSkill()
     for _, id in ipairs((ids.values and ids.values[1]) or {}) do
       local info = capture("C_TradeSkillUI.GetRecipeInfo", id)
       local v = info.values and info.values[1]
-      out.recipes[#out.recipes + 1] = { recipeID = id, name = type(v) == "table" and v.name or nil }
+      -- What it makes: an item (gear, rods) or an effect (enchants, described in text).
+      local schematic = capture("C_TradeSkillUI.GetRecipeSchematic", id, false)
+      local sv = schematic.values and schematic.values[1]
+      local desc = capture("C_Spell.GetSpellDescription", id)
+      out.recipes[#out.recipes + 1] = {
+        recipeID = id, name = type(v) == "table" and v.name or nil,
+        learned = type(v) == "table" and v.learned == true, -- false = not learned yet
+        outputItemID = type(sv) == "table" and sv.outputItemID or nil,
+        desc = desc.values and desc.values[1],
+      }
     end
     out.api = "C_TradeSkillUI"
   elseif GetNumTradeSkills then
@@ -687,9 +698,61 @@ function P.items(arg)
   pass(ids, 1)
 end
 
+-- Encounter Journal --------------------------------------------------------------
+-- Dungeon and raid loot tables, if this client fills them. Lists every instance
+-- in the current tier with its bosses, then reads loot a moment later (the
+-- client loads it on request).
+local function ejInstances()
+  local list = {}
+  for _, raid in ipairs({ false, true }) do
+    for i = 1, 60 do
+      local r = capture("EJ_GetInstanceByIndex", i, raid)
+      local id = r.values and r.values[1]
+      if type(id) ~= "number" then break end
+      list[#list + 1] = { id = id, name = r.values[2], raid = raid, bosses = {} }
+    end
+  end
+  return list
+end
+
+local function ejLoot(inst)
+  if EJ_SelectInstance then pcall(EJ_SelectInstance, inst.id) end
+  local n = capture("EJ_GetNumLoot")
+  inst.lootCount = n.values and n.values[1]
+  inst.loot = {}
+  local count = type(inst.lootCount) == "number" and math.min(inst.lootCount, 8) or 0
+  for k = 1, count do inst.loot[k] = capture("C_EncounterJournal.GetLootInfoByIndex", k) end
+end
+
+function P.ej()
+  if not EJ_GetInstanceByIndex then return say("no Encounter Journal API on this client") end
+  local out = { at = now(), tiers = capture("EJ_GetNumTiers"), filter = capture("EJ_GetLootFilter") }
+  out.instances = ejInstances()
+  for _, inst in ipairs(out.instances) do
+    if EJ_SelectInstance then pcall(EJ_SelectInstance, inst.id) end
+    for e = 1, 30 do
+      local r = capture("EJ_GetEncounterInfoByIndex", e, inst.id)
+      local name = r.values and r.values[1]
+      if type(name) ~= "string" or name == "<nil>" then break end
+      inst.bosses[#inst.bosses + 1] = { name = name, id = r.values[3] }
+    end
+  end
+  db().scans.ej = out
+  say("encounter journal: %d instances; reading loot...", #out.instances)
+  local function readAll()
+    local withLoot = 0
+    for _, inst in ipairs(out.instances) do
+      ejLoot(inst)
+      if (inst.lootCount or 0) > 0 then withLoot = withLoot + 1 end
+    end
+    say("encounter journal: loot listed for %d of %d instances", withLoot, #out.instances)
+  end
+  if C_Timer then C_Timer.After(2, readAll) else readAll() end
+end
+
 local COMMANDS = {
   env = P.env, api = P.api, talents = P.talents, gear = P.gear, stats = P.stats, export = P.export,
-  items = P.items,
+  items = P.items, ej = P.ej,
   sheet = function() P.sheet() end,
   all = function()
     P.env(); P.api(); P.talents(); P.gear(); P.stats(); P.sheet()
@@ -712,7 +775,7 @@ SlashCmdList.GEARWRIGHTPROBE = function(msg)
     local ok, err = pcall(fn, rest)
     if not ok then say("|cffff5050error:|r %s", tostring(err)) end
   else
-    say("usage: /gwp all | env | api | talents | gear | stats | sheet | items [ids] | inspect | persist | export | clear")
+    say("usage: /gwp all | env | api | talents | gear | stats | sheet | items [ids] | ej | inspect | persist | export | clear")
     say("passive: open your character sheet, a profession window or class trainer and it is recorded automatically")
   end
 end
