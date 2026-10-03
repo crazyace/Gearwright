@@ -88,15 +88,29 @@ From the character sheet's Agility tooltip: **66 Agility gives 8.7% crit, so abo
 1 AP, 2 ranged AP and 2 armor each. Classic's per-level crit conversion means this
 number changes with level; captures at more levels will show the curve.
 
-Character-sheet capture: the 16:58 run got only Armor (the other tooltips are built
-on hover), and the 17:04 run got nothing because the window was closed when `/gwp all`
-ran. The probe now opens the window itself, hovers each stat line, closes it again,
-and never replaces a real capture with an empty one.
+### From the character sheet (17:14 capture)
 
-The 17:11 run's diagnostics showed why only Armor ever appeared: with the window
-open, `CharacterStatsPane` had 6 frames and none visible. On Forever it's a hidden
-leftover; the visible stat lines live elsewhere in `CharacterFrame`. The probe now
-scans the whole window and records which visible frames hold text.
+The sheet capture works: the probe scans the whole `CharacterFrame` (503 frames,
+117 visible) and hovers each visible stat line. `CharacterStatsPane` is a hidden
+leftover on Forever; the real stat lines are unnamed frames elsewhere in the window.
+
+| Line | Tooltip says |
+|---|---|
+| Strength 33 (32+1) | +33 Attack Power (1 AP per Str) |
+| Agility 66 (49+17) | 8.7% crit, +66 AP, +132 ranged AP, +132 armor, 17.4% dodge |
+| Stamina 56 (32+24) | +380 Health: "every 1 Stamina adds 10 Health" |
+| Intellect 26 | Raises the rate at which weapon skills improve |
+| Spirit 29 (27+2) | 35 Health per 5 s out of combat, +33% while sitting |
+| Energy 105 | Regenerates 10 per second |
+| Main Hand | 1.70 speed, 27-41 damage, 20.0 DPS; **Daggers skill 95/95** |
+| Off Hand | 13-21 damage, 10.0 DPS |
+| Armor 487 | Reduces physical damage taken by 19.46% |
+| Movement speed | 7.0 yd/s run, 4.7 swim, 4.5 backpedal, 2.5 walk |
+
+**Weapon skill exists** (Classic style), so weapon-skill bonuses may matter for gear.
+
+The beta's level cap is currently 30. (An earlier note here claimed a Free Trial cap at
+19; that came from a hidden placeholder string on the level line, which the probe now ignores.)
 
 ## Enchants
 
@@ -127,4 +141,5 @@ committed as a separate capture.
 - [ ] Enchanting recipes and trainer services (open the windows; recorded automatically)
 - [ ] Other Rogues' gear and enchants (`/gwp inspect`)
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety
-- [ ] Agility-per-crit at more levels (open the character sheet, `/gwp all`, every few levels)
+- [ ] Agility-per-crit at more levels (`/gwp all` every few levels; beta cap is 30)
+- [ ] Does any gear carry weapon-skill bonuses ("+N Daggers")?
