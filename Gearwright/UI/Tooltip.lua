@@ -14,12 +14,19 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tool
   link = ns.API.clean(link)
   if not link then return end
 
-  local delta, slot = ns.Advisor.CompareToEquipped(link)
+  local delta, slot, _, _, reqLevel = ns.Advisor.CompareToEquipped(link)
+  if slot == "wrong-weapon-type" then
+    local ctx = ns.Advisor.Context()
+    local spec = ctx and ctx.class.specs[ctx.spec]
+    tooltip:AddLine(("|cff4fc3f7Gearwright|r |cffaaaaaa%s wants a dagger here|r"):format(spec and spec.label or "Your spec"))
+    return
+  end
   if type(delta) ~= "number" then return end
 
   local color = (delta > 0.05 and UP) or (delta < -0.05 and DOWN) or SAME
   local sign = delta > 0 and "+" or ""
   local spec = ns.Spec.Detect()
-  tooltip:AddLine(("|cff4fc3f7Gearwright|r %s%s%.1f|r vs %s (%s)"):format(
-    color, sign, delta, ns.Advisor.SLOT_NAMES[slot] or "equipped", spec or "?"))
+  local later = reqLevel and (" |cffff9900at level %d|r"):format(reqLevel) or ""
+  tooltip:AddLine(("|cff4fc3f7Gearwright|r %s%s%.1f|r vs %s (%s)%s"):format(
+    color, sign, delta, ns.Advisor.SLOT_NAMES[slot] or "equipped", spec or "?", later))
 end)

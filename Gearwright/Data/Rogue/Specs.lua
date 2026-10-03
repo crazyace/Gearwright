@@ -11,6 +11,20 @@ R.tabToSpec = { [1] = "assassination", [2] = "combat", [3] = "subtlety" }
 -- From the 2026-10-03 beta capture (data/probe/2026-10-03-assassination.json).
 R.traitTabGroups = { [11580] = 1, [11573] = 2, [11572] = 3 }
 
+-- What a Rogue can equip, by item class -> subclass (Enum.ItemClass /
+-- Enum.ItemWeaponSubclass / Enum.ItemArmorSubclass). From Classic; Forever
+-- may differ, e.g. if Rogues gain axes.
+R.proficiency = {
+  [2] = { -- weapons
+    [15] = true, -- dagger
+    [7] = true,  -- one-handed sword
+    [4] = true,  -- one-handed mace
+    [13] = true, -- fist weapon
+    [2] = true, [3] = true, [18] = true, [16] = true, -- bow, gun, crossbow, thrown
+  },
+  [4] = { [0] = true, [1] = true, [2] = true }, -- armor: misc (rings, necks, trinkets), cloth, leather
+}
+
 R.specs = {
   assassination = {
     label = "Assassination",

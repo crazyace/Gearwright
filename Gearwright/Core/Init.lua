@@ -36,6 +36,7 @@ end)
 local DEFAULTS = {
   schema = 1,
   showTooltip = true,
+  notices = true, -- chat lines for quest rewards, loot and rolls
   specOverride = false, -- false = auto-detect from talents
   debug = false,
 }

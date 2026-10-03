@@ -38,8 +38,18 @@ Each file gets the shared addon namespace `ns` via `local _, ns = ...`.
 
 ## Scoring model (v1)
 
-`score = sum(stat_value x weight)`, weights normalized to Agility = 1.0.
-A tooltip upgrade is `score(new) - score(weakest equipped item in a valid slot)`.
+`score = sum(stat_value x weight)`, in **attack-power equivalents** ("worth N AP").
+`Engine/Weights.lua` builds the weights for your level and current damage:
+
+- Strength and AP are 1 (confirmed on the beta); Agility is 1 + its share of crit,
+  using Agility-per-crit for your level (`Data/<CLASS>/Weights.lua: agiPerCrit`).
+- Weapon DPS is 14 on the main hand, 7 on the off hand (Classic: DPS = weapon DPS + AP/14).
+- Rating stats are per 1%, valued as a share of your damage: 1% is worth 0.14 x main-hand DPS in AP.
+
+An item is only scored for slots it can go in: the class's armor and weapon
+proficiencies (`Specs.lua: proficiency`) and the spec's weapon rules (`weapons`)
+come first. A tooltip upgrade is `score(new) - score(equipped)` in whichever valid slot
+gains the most; an item above your level still scores, with "at level N".
 
 Known gaps, deliberately deferred:
 - Stat caps (e.g. hit cap) - needs Forever combat formulas first

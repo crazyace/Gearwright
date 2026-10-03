@@ -51,15 +51,26 @@ function GetTalentTabInfo(t) return 100+t, TABS[t][1], "desc" end
 function GetNumTalents(t) return #TABS[t][2] end
 function GetTalentInfo(t,i) local x=TABS[t][2][i] return x[1], "icon", 1, i, x[2], x[3] end
 -- Items
+-- class/sub: Enum.ItemClass and subclass (4/2 leather, 4/4 plate, 2/15 dagger, 2/7 sword)
 local ITEMS = {
- ["item:1001:0:0"] = { equip="INVTYPE_HEAD", stats={ITEM_MOD_AGILITY_SHORT=10, ITEM_MOD_STAMINA_SHORT=8}, tip={"Cap", "Equip: Improves your chance to hit by 1%."} },
- ["item:1002:0:0"] = { equip="INVTYPE_HEAD", stats={ITEM_MOD_AGILITY_SHORT=14, ITEM_MOD_ATTACK_POWER_SHORT=20}, tip={"Better Cap"} },
- ["item:2001:1900:0"] = { equip="INVTYPE_WEAPON", stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=20}, tip={} },
+ ["item:1001:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=10, ITEM_MOD_STAMINA_SHORT=8}, tip={"Cap", "Equip: Improves your chance to hit by 1%."} },
+ ["item:1002:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=14, ITEM_MOD_ATTACK_POWER_SHORT=20}, tip={"Better Cap"}, sell=120 },
+ ["item:1003:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=30}, tip={"Future Cap"}, req=40, sell=500 },
+ ["item:3001:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=4, stats={ITEM_MOD_AGILITY_SHORT=50}, tip={"Plate Helm"}, sell=900 },
+ ["item:2001:1900:0"] = { equip="INVTYPE_WEAPON", class=2, sub=15, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=20}, tip={} },
+ ["item:2002:0:0"] = { equip="INVTYPE_WEAPON", class=2, sub=7, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=25}, tip={"Sword"} },
+ ["item:2003:0:0"] = { equip="INVTYPE_WEAPON", class=2, sub=15, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=22}, tip={"Dagger"} },
 }
 INV = { [1] = "item:1001:0:0", [16] = "item:2001:1900:0" }
 function GetInventoryItemLink(unit, slot) return INV[slot] end
+local function item(l) return ITEMS[l] or {} end
 C_Item = { GetItemStats = function(l) return ITEMS[l] and ITEMS[l].stats end,
-           GetItemInfoInstant = function(l) return 1, "Armor", "Cloth", ITEMS[l] and ITEMS[l].equip end }
+           GetItemInfoInstant = function(l) local i = item(l) return 1, "Armor", "Cloth", i.equip, 0, i.class, i.sub end,
+           GetItemInfo = function(l) local i = ITEMS[l] if not i then return nil end
+             return "name", l, 2, 20, i.req or 1, "Armor", "Leather", 1, i.equip, 0, i.sell or 0 end }
+-- Main hand 34 damage every 1.7 s: 20 DPS, so 1% of damage = 2.8 AP.
+function UnitDamage() return 34, 34, 17, 17, 0, 0, 1 end
+function UnitAttackSpeed() return 1.7, 1.7 end
 C_TooltipInfo = { GetHyperlink = function(l) local o={lines={}} for _,t in ipairs(ITEMS[l] and ITEMS[l].tip or {}) do o.lines[#o.lines+1]={leftText=t} end return o end }
 function UnitAttackPower() return 100, 0, 0 end
 function GetCritChance() return 5.5 end
@@ -86,7 +97,13 @@ print("spec:", spec, how)
 cmp = L.eval("function(ns) return ns.Advisor.CompareToEquipped('item:1002:0:0') end")(ns)
 print("compare better cap:", cmp)
 assert spec == "combat" and how == "talents"
-assert abs(cmp[0] - 1.6) < 1e-9, cmp
+# Combat at level 30, 20 main-hand DPS. Scores are in attack-power equivalents.
+PCT = 0.14 * 20                                   # AP worth 1% of damage
+AGI_PER_CRIT = 7.59 + (29.0 - 7.59) * (30 - 19) / (60 - 19)
+AGI = 1 + 1.0 * PCT / AGI_PER_CRIT                # 1 AP + its share of crit
+CAP = 10 * AGI + 8 * 0.2 + 1 * 1.2 * PCT          # agi, sta, 1% hit
+BETTER_CAP = 14 * AGI + 20
+assert abs(cmp[0] - (BETTER_CAP - CAP)) < 1e-9, (cmp, BETTER_CAP - CAP)
 print("enchant id:", L.eval("function(ns) return ns.API.GetEnchantID('item:2001:1900:0') end")(ns))
 L.globals().SlashCmdList.GEARWRIGHT("spec subtlety")
 print("override:", L.eval("function(ns) return ns.Spec.Detect() end")(ns))
@@ -108,7 +125,7 @@ r = L.eval("function(ns) return {ns.Advisor.CompareToEquipped('item:1002:0:0')} 
 assert r[1] is None and r[2] == "equipped-unreadable", list(r.values())
 L.execute("INV[1] = nil")
 r = L.eval("function(ns) return ns.Advisor.CompareToEquipped('item:1002:0:0') end")(ns)
-assert r[0] == 24 and r[3] == 0, r  # truly empty slot: full score is the upgrade
+assert abs(r[0] - BETTER_CAP) < 1e-9 and r[3] == 0, r  # truly empty slot: full score is the upgrade
 L.execute("INV[1] = 'item:1001:0:0'")
 
 # Regression: a bonus in both GetItemStats and an "Equip:" line counts once.
@@ -117,6 +134,69 @@ ap, hit = L.eval("""function(ns)
     {"Equip: +20 Attack Power.", "Equip: Improves your chance to hit by 1%."})
   return s.ap, s.hit end""")(ns)
 assert ap == 20 and hit == 1, (ap, hit)
+
+# Gear checks ------------------------------------------------------------------
+def compare(link):
+    r = L.eval("function(ns, l) return {ns.Advisor.CompareToEquipped(l)} end")(ns, link)
+    return [r[i] if i in r else None for i in range(1, 6)]
+# A Rogue can't wear plate, whatever its stats.
+assert compare("item:3001:0:0")[:2] == [None, "not-usable"]
+# A dagger goes where it helps most: the empty off hand (DPS at half value)
+# beats replacing the 20-DPS main-hand dagger.
+d = compare("item:2003:0:0")
+assert d[1] == 17 and abs(d[0] - 22 * 7) < 1e-9, d
+# Main hand: a 25-DPS sword over the 20-DPS dagger is worth 5 x 14 AP for Combat...
+L.execute("INV[17] = 'item:2003:0:0'")
+d = compare("item:2002:0:0")
+assert d[1] == 16 and abs(d[0] - 5 * 14) < 1e-9, d
+# ...but Assassination wants daggers in both hands.
+L.eval("function(ns) ns.db.specOverride = 'assassination' end")(ns)
+assert compare("item:2002:0:0")[:2] == [None, "wrong-weapon-type"]
+L.eval("function(ns) ns.db.specOverride = false end")(ns)
+L.execute("INV[17] = nil")
+# Items above your level still score, and say when you can wear them.
+d = compare("item:1003:0:0")
+assert d[0] > 0 and d[4] == 40, d
+assert compare("item:1002:0:0")[4] is None
+# Weights follow level: agility is worth more crit per point at 19 than at 60.
+lo, hi = L.eval("""function(ns)
+  local c = ns.Data.ROGUE
+  return ns.Weights.Build(c, "combat", {level = 19, mainHandDps = 20}).agi,
+         ns.Weights.Build(c, "combat", {level = 60, mainHandDps = 20}).agi end""")(ns)
+assert abs(lo - (1 + PCT / 7.59)) < 1e-9 and abs(hi - (1 + PCT / 29.0)) < 1e-9, (lo, hi)
+
+# Quest rewards: the upgrade is picked, the plate helm is ignored.
+L.execute("""
+QUEST = { "item:3001:0:0", "item:1002:0:0", "item:1003:0:0" }
+function GetNumQuestChoices() return #QUEST end
+function GetQuestItemLink(kind, i) return QUEST[i] end
+""")
+def last_print():
+    p = L.globals().printed
+    return p[len(p)]
+L.globals().fire("QUEST_COMPLETE")
+assert "take reward 2: item:1002:0:0" in last_print(), last_print()
+# No upgrade: say which reward sells for the most.
+L.execute('QUEST = { "item:3001:0:0", "item:1001:0:0" }')
+L.globals().fire("QUEST_DETAIL")
+assert "no upgrade among the rewards; item:3001:0:0 sells for the most (0g 9s 0c)" in last_print(), last_print()
+# Loot window and need/greed rolls.
+L.execute("""
+LOOT = { "item:1001:0:0", "item:1002:0:0", "item:1002:0:0" }
+function GetNumLootItems() return #LOOT end
+function GetLootSlotLink(i) return LOOT[i] end
+function GetLootRollItemLink() return "item:1002:0:0" end
+""")
+n = len(L.globals().printed)
+L.globals().fire("LOOT_OPENED")
+assert len(L.globals().printed) == n + 1 and "upgrade: item:1002:0:0" in last_print(), last_print()
+L.globals().fire("START_LOOT_ROLL", 7)
+assert "worth a Need" in last_print(), last_print()
+L.globals().SlashCmdList.GEARWRIGHT("notices")
+n = len(L.globals().printed)
+L.globals().fire("LOOT_OPENED")
+assert len(L.globals().printed) == n
+L.globals().SlashCmdList.GEARWRIGHT("notices")
 
 # Traits talents, replayed from a real Forever beta capture --------------------
 # Level 19 Rogue with 10 points in Assassination (Malice 5, Ruthlessness 3,

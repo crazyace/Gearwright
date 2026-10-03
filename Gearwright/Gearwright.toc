@@ -20,10 +20,12 @@ Data\Rogue\Talents.lua
 Data\Rogue\Enchants.lua
 
 Engine\Spec.lua
+Engine\Weights.lua
 Engine\Scoring.lua
 Engine\Advisor.lua
 
 UI\Tooltip.lua
 UI\MainFrame.lua
+UI\Notices.lua
 
 Core\Commands.lua

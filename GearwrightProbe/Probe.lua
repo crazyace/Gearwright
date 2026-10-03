@@ -99,7 +99,10 @@ local API_PATHS = {
   -- items
   "C_Item.GetItemStats", "GetItemStats", "C_Item.GetItemInfoInstant", "GetItemInfoInstant",
   "C_TooltipInfo.GetHyperlink", "C_TooltipInfo.GetInventoryItem", "TooltipDataProcessor.AddTooltipPostCall",
-  "GetInventoryItemLink", "C_PaperDollInfo.GetInspectItemLevel",
+  "GetInventoryItemLink", "C_PaperDollInfo.GetInspectItemLevel", "C_Item.GetItemInfo", "GetItemInfo",
+  -- quest rewards / loot (Gearwright's upgrade messages)
+  "GetNumQuestChoices", "GetQuestItemLink", "GetNumLootItems", "GetLootSlotLink", "GetLootRollItemLink",
+  "UnitDamage",
   -- character stats
   "UnitStat", "UnitAttackPower", "UnitAttackSpeed", "GetCritChance", "GetHitModifier",
   "GetSpellHitModifier", "GetExpertise", "GetHaste", "GetMeleeHaste", "GetCombatRating",

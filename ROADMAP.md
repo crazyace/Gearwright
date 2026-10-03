@@ -27,7 +27,11 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 
 - [x] Implement whichever talent reader Phase 0 says is right (`Core/API.lua`: Traits)
 - [ ] Spec detection verified on all three specs
-- [ ] First-pass stat weights per spec (clearly labelled as early)
+- [x] First-pass stat weights per spec (clearly labelled as early; AP equivalents, scaled by level)
+- [x] Skip items the class can't use; spec weapon rules (daggers for Assassination)
+- [x] Quest reward pick and loot/roll upgrade messages
+- [ ] Crafted upgrades from the open profession window (needs a profession capture)
+- [ ] Bag scan for upgrades you're carrying
 - [ ] One recommended build per spec (raid DPS)
 - [ ] Enchant list for the levelling/early-60 game
 - [ ] Tooltip upgrade line verified on weapons, rings, trinkets
