@@ -67,7 +67,7 @@ local function item(l) return ITEMS[l] or {} end
 C_Item = { GetItemStats = function(l) return ITEMS[l] and ITEMS[l].stats end,
            GetItemInfoInstant = function(l) local i = item(l) return 1, "Armor", "Cloth", i.equip, 0, i.class, i.sub end,
            GetItemInfo = function(l) local i = ITEMS[l] if not i or i.uncached then return nil end
-             return "name", l, 2, 20, i.req or 1, "Armor", "Leather", 1, i.equip, 0, i.sell or 0 end }
+             return "name", l, 2, 20, i.req or 1, "Armor", "Leather", 1, i.equip, 0, i.sell or 0, 4, 2, i.bind end }
 -- Main hand 34 damage every 1.7 s: 20 DPS, so 1% of damage = 2.8 AP.
 function UnitDamage() return 34, 34, 17, 17, 0, 0, 1 end
 function UnitAttackSpeed() return 1.7, 1.7 end
@@ -465,6 +465,21 @@ C_TradeSkillUI.GetBaseProfessionInfo = function() return { professionName = "Bla
 L.globals().fire("TRADE_SKILL_SHOW")
 L.execute("RECIPES = {}; printed = {}")
 assert sword()[0] == "learn", sword()
+# An alt on this realm who knows the recipe can make it for you; one on another
+# realm can't mail it, and a bind-on-pickup item can't be passed on at all.
+L.eval("""function(ns)
+  ns.db.recipes["Smithy-Realm"] = { Blacksmithing = { recipes = { { recipeID = 6, itemID = 2002, learned = true } } } }
+  ns.db.characters["Smithy-Realm"] = { name = "Smithy", realm = "Realm" }
+  ns.db.recipes["Faraway-Other"] = { Blacksmithing = { recipes = { { recipeID = 6, itemID = 2002, learned = true } } } }
+  ns.db.characters["Faraway-Other"] = { name = "Faraway", realm = "Other" } end""")(ns)
+assert sword() == ("alt", "Smithy can craft it (Blacksmithing)"), sword()
+L.eval("function(ns) ns.db.recipes['Smithy-Realm'].Blacksmithing.recipes[1].learned = false end")(ns)
+assert sword() == ("learn", "learn the recipe (Blacksmithing)"), sword()  # learning it yourself comes first
+L.eval("function(ns) ns.db.recipes['Smithy-Realm'].Blacksmithing.recipes[1].learned = true end")(ns)
+L.execute('ITEMS["item:2002"].bind = 1')
+assert sword()[0] == "learn", sword()
+L.execute('ITEMS["item:2002"].bind = nil')
+L.eval("function(ns) ns.db.recipes['Smithy-Realm'] = nil; ns.db.recipes['Faraway-Other'] = nil end")(ns)
 L.globals().SlashCmdList.GEARWRIGHT("craft")
 out = "\n".join(L.globals().printed.values())
 assert "learn the recipe (Blacksmithing)" in out and "learn the recipe (Leatherworking)" in out, out

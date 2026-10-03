@@ -273,9 +273,13 @@ local CRAFT_UPGRADE = 0.5
 -- the profession windows you've opened (Engine/Professions.lua).
 --   rows = { { recipeID, name, itemID, link, delta, slot, reqLevel, profession, status } }
 --   status: "craft"  your profession, recipe learned
+--           "alt"    one of your other characters knows the recipe (alt = their name)
 --           "learn"  your profession, recipe not learned yet
+--           "altlearn" an alt has the profession but not the recipe yet
 --           "yours"  your profession, but its window hasn't been opened to check
---           "order"  not your profession: have someone craft it
+--           "order"  nobody you have can make it: have someone craft it
+-- Alts count when they're on your realm and faction (you can mail the item)
+-- and the item doesn't bind on pickup.
 -- Returns rows, mine (sorted names of your professions), pending
 --   or nil, reason
 function Advisor.CraftReport()
@@ -283,6 +287,7 @@ function Advisor.CraftReport()
   if not ctx then return nil, reason end
 
   local known = ns.Professions.Known()          -- [prof] = { recipes } you've opened
+  local alts = ns.Professions.Alts()
   local have = ns.API.PlayerProfessions()        -- [prof] = skill
   for name in pairs(known) do have[name] = have[name] or true end
   local mine = {}
@@ -323,14 +328,20 @@ function Advisor.CraftReport()
       if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
         pending = pending + 1
       elseif type(delta) == "number" and delta > CRAFT_UPGRADE then
-        local status = "order"
+        local status, alt = "order", nil
         if have[r.prof] then
           status = (r.learned == true and "craft") or (r.learned == false and "learn") or "yours"
+        end
+        if status ~= "craft" and ns.API.BindsOnPickup(item) ~= true then
+          local who, rank = Advisor.AltFor(alts, r.prof, r.itemID)
+          if who and Advisor.CRAFT_STATUS_ORDER[rank] < Advisor.CRAFT_STATUS_ORDER[status] then
+            status, alt = rank, who
+          end
         end
         local row = {
           recipeID = r.recipeID, name = r.name, itemID = r.itemID, link = ns.API.GetItemLink(item),
           delta = delta, slot = slot, reqLevel = reqLevel > level and reqLevel or nil,
-          profession = r.prof, status = status,
+          profession = r.prof, status = status, alt = alt,
         }
         -- An item several professions make: keep the one you can do most about.
         local prev = best[r.itemID]
@@ -350,13 +361,34 @@ function Advisor.CraftReport()
   return rows, mine, pending
 end
 
-Advisor.CRAFT_STATUS_ORDER = { craft = 1, learn = 2, yours = 3, order = 4 }
+Advisor.CRAFT_STATUS_ORDER = { craft = 1, alt = 2, learn = 3, altlearn = 4, yours = 5, order = 6 }
+
+-- The alt best placed to make `itemID` with `prof`: one who knows the recipe
+-- ("alt"), else one with the profession ("altlearn"). Returns name, status.
+function Advisor.AltFor(alts, prof, itemID)
+  local learner
+  for _, a in ipairs(alts) do
+    local recipes = a.professions[prof]
+    if recipes then
+      for _, r in ipairs(recipes) do
+        if r.itemID == itemID then
+          if r.learned then return a.name, "alt" end
+          learner = learner or a.name
+        end
+      end
+      learner = learner or a.name
+    end
+  end
+  if learner then return learner, "altlearn" end
+end
 
 -- "you can craft this" / "learn it: Leatherworking" / "have it crafted: Blacksmithing"
 function Advisor.CraftStatusText(row)
   local s = row.status
   if s == "craft" then return "you can craft it (" .. row.profession .. ")" end
+  if s == "alt" then return row.alt .. " can craft it (" .. row.profession .. ")" end
   if s == "learn" then return "learn the recipe (" .. row.profession .. ")" end
+  if s == "altlearn" then return row.alt .. " could learn it (" .. row.profession .. ")" end
   if s == "yours" then return row.profession .. ": open it to check the recipe" end
   return "have it crafted (" .. row.profession .. ")"
 end

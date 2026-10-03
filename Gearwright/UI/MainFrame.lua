@@ -78,7 +78,7 @@ TABS.upgrades = {
   end,
 }
 
-local CRAFT_COLOR = { craft = "good", learn = "warn", yours = "warn", order = "muted" }
+local CRAFT_COLOR = { craft = "good", alt = "good", learn = "warn", altlearn = "warn", yours = "warn", order = "muted" }
 
 TABS.crafting = {
   label = "Crafting", icon = "Interface\\Icons\\Trade_BlackSmithing",

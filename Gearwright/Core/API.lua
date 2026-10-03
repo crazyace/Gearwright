@@ -53,6 +53,15 @@ function API.GetItemDetails(item)
   return API.clean(reqLevel), API.clean(sellPrice)
 end
 
+-- True when the item binds on pickup (so an alt can't craft it for you),
+-- false when it doesn't, nil when not known yet.
+function API.BindsOnPickup(item)
+  if not item or not getItemInfo then return nil end
+  local ok, name, _, _, _, _, _, _, _, _, _, _, _, _, bindType = pcall(getItemInfo, item)
+  if not ok or not name or bindType == nil then return nil end
+  return API.clean(bindType) == 1
+end
+
 -- What weights depend on: level, current main-hand DPS (buffs included) and
 -- weapon speeds (flat weapon damage from an enchant is worth more on a slow weapon).
 function API.CharacterSnapshot()

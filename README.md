@@ -11,7 +11,8 @@ stat weights, and tells you:
 - **Talents** - where does your build differ from the recommended one?
 - **Enchants** - the best stat enchant for each slot, and what it adds over the one you have
 - **Crafting** - crafted upgrades from every profession, yours or not: whether you can craft
-  it, need to learn the recipe, or should have someone craft it (`/gearwright` -> Crafting,
+  it, one of your other characters can (same realm and faction, not bind-on-pickup), you
+  need to learn the recipe, or should have someone craft it (`/gearwright` -> Crafting,
   `/gearwright craft`)
 - **Dungeons** - the boss drops and dungeon quest rewards that would be upgrades for you, and
   where they drop (window tab + tooltip line)
