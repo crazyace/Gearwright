@@ -1,4 +1,4 @@
--- Gearwright: the three advisors (gear, talents, enchants).
+-- Gearwright: the advisors (gear, talents, enchants, crafting).
 -- Each returns plain tables; the UI decides how to show them.
 local _, ns = ...
 
@@ -67,8 +67,9 @@ end
 -- Score delta of `link` vs what it would replace, in the slot where it helps most.
 -- Returns delta, slotID, newScore, oldScore, requiredLevel  (or nil, reason)
 -- requiredLevel is set only when it's above your level.
-function Advisor.CompareToEquipped(link)
-  local ctx, reason = Advisor.Context()
+function Advisor.CompareToEquipped(link, ctx)
+  local reason
+  if not ctx then ctx, reason = Advisor.Context() end
   if not ctx then return nil, reason end
 
   local slots, why = Advisor.CandidateSlots(link, ctx)
@@ -135,22 +136,113 @@ function Advisor.TalentReport()
 end
 
 -- Enchants --------------------------------------------------------------------
+-- Enchant effects come from Data/Enchants.lua (read from the beta's recipes);
+-- each is scored with the same weights as gear.
 
+local SLOT_ENCHANTS = {
+  [2] = { "neck" }, [5] = { "chest" }, [8] = { "boots" }, [9] = { "bracer" },
+  [10] = { "gloves" }, [15] = { "cloak" },
+}
+Advisor.ENCHANT_SLOTS = { 2, 15, 5, 9, 10, 8, 16, 17 }
+local GOOD_ENOUGH = 0.5 -- attack-power equivalents
+
+-- Enchant categories that fit the item in `slot`.
+function Advisor.EnchantCategories(slot, link)
+  if SLOT_ENCHANTS[slot] then return SLOT_ENCHANTS[slot] end
+  if slot ~= 16 and slot ~= 17 then return {} end
+  local _, equipLoc, classID = ns.API.GetItemBasics(link)
+  if equipLoc == "INVTYPE_SHIELD" then return { "shield" } end
+  if equipLoc == "INVTYPE_HOLDABLE" then return { "offhand" } end
+  if classID ~= 2 then return {} end
+  if equipLoc == "INVTYPE_2HWEAPON" then return { "weapon", "2h" } end
+  return { "weapon" }
+end
+
+-- Best-scoring enchant for `slot`, or nil.
+function Advisor.BestEnchant(slot, link, weights)
+  local fits = {}
+  for _, cat in ipairs(Advisor.EnchantCategories(slot, link)) do fits[cat] = true end
+  local best
+  for _, e in ipairs(ns.Data.ENCHANTS or {}) do
+    if fits[e.cat] then
+      local score = ns.Scoring.ScoreStats(e.stats, weights, slot)
+      if score > 0 and (not best or score > best.score) then
+        best = { name = e.name, id = e.id, score = score, stats = e.stats }
+      end
+    end
+  end
+  return best
+end
+
+-- One row per enchantable slot with an item in it:
+--   { slot, name, link, best = {name, id, score}, current = "<tooltip text>" or nil,
+--     currentScore (nil when the current enchant can't be scored), gain, ok }
 function Advisor.EnchantReport()
   local ctx, reason = Advisor.Context()
   if not ctx then return nil, reason end
-  local recs = ctx.class.enchants and ctx.class.enchants[ctx.spec]
-  if not recs or next(recs) == nil then return nil, "no-enchant-data" end
+  if not ns.Data.ENCHANTS then return nil, "no-enchant-data" end
 
   local rows = {}
-  for slot, rec in pairs(recs) do
+  for _, slot in ipairs(Advisor.ENCHANT_SLOTS) do
     local link = ns.API.GetEquippedLink(slot)
-    local current = link and ns.API.GetEnchantID(link) or 0
-    rows[#rows + 1] = {
-      slot = slot, name = Advisor.SLOT_NAMES[slot], current = current,
-      want = rec.enchantID, wantName = rec.name, ok = current == rec.enchantID,
-    }
+    local best = link and Advisor.BestEnchant(slot, link, ctx.weights)
+    if best then
+      local stats, text = ns.Stats.FromEnchantLine(ns.API.GetItemTooltipLines(link))
+      local currentScore = 0
+      if text then
+        currentScore = next(stats) and ns.Scoring.ScoreStats(stats, ctx.weights, slot) or nil
+      end
+      local gain = currentScore and best.score - currentScore
+      rows[#rows + 1] = {
+        slot = slot, name = Advisor.SLOT_NAMES[slot], link = link, best = best,
+        current = text, currentScore = currentScore, gain = gain,
+        ok = (gain and gain < GOOD_ENOUGH) or false,
+      }
+    end
   end
-  table.sort(rows, function(a, b) return a.slot < b.slot end)
+  if #rows == 0 then return nil, "nothing-to-enchant" end
   return rows, ctx
+end
+
+-- Crafting ----------------------------------------------------------------------
+
+Advisor.CRAFT_LOOKAHEAD = 5 -- also show items up to this many levels above you
+local CRAFT_UPGRADE = 0.5
+
+-- Upgrades among the recipes of the open profession window, best first:
+--   rows = { { recipeID, name, learned, itemID, link, delta, slot, reqLevel } }
+-- Returns rows, professionName, pending  (pending = items not cached yet)
+--   or nil, reason
+function Advisor.CraftReport()
+  local ctx, reason = Advisor.Context()
+  if not ctx then return nil, reason end
+  local recipes, profession = ns.API.ReadRecipes()
+  if not recipes then return nil, profession end
+
+  local level = ns.API.clean(UnitLevel("player")) or 1
+  local rows, pending = {}, 0
+  for _, r in ipairs(recipes) do
+    local item = r.itemID and ("item:" .. r.itemID)
+    local reqLevel = item and ns.API.GetItemDetails(item)
+    if item and not reqLevel then
+      -- Not cached yet, or not an item we can read; equippability works uncached.
+      if ns.API.GetItemBasics(item) and Advisor.CandidateSlots(item, ctx) then
+        pending = pending + 1
+        ns.API.RequestItem(r.itemID)
+      end
+    elseif item and reqLevel <= level + Advisor.CRAFT_LOOKAHEAD then
+      local delta, slot = Advisor.CompareToEquipped(item, ctx)
+      if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
+        pending = pending + 1
+      elseif type(delta) == "number" and delta > CRAFT_UPGRADE then
+        rows[#rows + 1] = {
+          recipeID = r.recipeID, name = r.name, learned = r.learned, itemID = r.itemID,
+          link = ns.API.GetItemLink(item), delta = delta, slot = slot,
+          reqLevel = reqLevel > level and reqLevel or nil,
+        }
+      end
+    end
+  end
+  table.sort(rows, function(a, b) return a.delta > b.delta end)
+  return rows, profession, pending
 end

@@ -53,18 +53,63 @@ function API.GetItemDetails(item)
   return API.clean(reqLevel), API.clean(sellPrice)
 end
 
--- What weights depend on: level and current main-hand DPS (buffs included).
+-- What weights depend on: level, current main-hand DPS (buffs included) and
+-- weapon speeds (flat weapon damage from an enchant is worth more on a slow weapon).
 function API.CharacterSnapshot()
   local char = { level = API.clean(UnitLevel("player")) }
   if UnitDamage and UnitAttackSpeed then
     local okD, low, high = pcall(UnitDamage, "player")
-    local okS, speed = pcall(UnitAttackSpeed, "player")
-    low, high, speed = API.clean(low), API.clean(high), API.clean(speed)
+    local okS, speed, offSpeed = pcall(UnitAttackSpeed, "player")
+    low, high, speed, offSpeed = API.clean(low), API.clean(high), API.clean(speed), API.clean(offSpeed)
     if okD and okS and low and high and speed and speed > 0 then
       char.mainHandDps = (low + high) / 2 / speed
     end
+    if okS and speed and speed > 0 then char.mainHandSpeed = speed end
+    if okS and offSpeed and offSpeed > 0 then char.offHandSpeed = offSpeed end
   end
   return char
+end
+
+-- The item's link once cached, else nil.
+function API.GetItemLink(item)
+  if not item or not getItemInfo then return nil end
+  local ok, name, link = pcall(getItemInfo, item)
+  if not ok or not name then return nil end
+  return API.clean(link)
+end
+
+-- Ask the client to cache an item; GET_ITEM_INFO_RECEIVED follows.
+function API.RequestItem(itemID)
+  if itemID and C_Item and C_Item.RequestLoadItemDataByID then
+    pcall(C_Item.RequestLoadItemDataByID, itemID)
+  end
+end
+
+-- Recipes -----------------------------------------------------------------------
+-- Every recipe of the open profession window, learned or not:
+--   { { recipeID=, name=, learned=, itemID= }, ... }, professionName   or nil, reason
+function API.ReadRecipes()
+  local ts = C_TradeSkillUI
+  if not (ts and ts.GetAllRecipeIDs and ts.GetRecipeInfo) then return nil, "no-tradeskill-api" end
+  local ok, ids = pcall(ts.GetAllRecipeIDs)
+  if not ok or type(ids) ~= "table" or #ids == 0 then return nil, "no-profession-open" end
+  local out = {}
+  for _, id in ipairs(ids) do
+    local okI, info = pcall(ts.GetRecipeInfo, id)
+    info = okI and type(info) == "table" and info or {}
+    local itemID
+    if ts.GetRecipeSchematic then
+      local okS, schematic = pcall(ts.GetRecipeSchematic, id, false)
+      itemID = okS and type(schematic) == "table" and API.clean(schematic.outputItemID) or nil
+    end
+    out[#out + 1] = { recipeID = id, name = API.clean(info.name), learned = info.learned == true, itemID = itemID }
+  end
+  local profession
+  if ts.GetBaseProfessionInfo then
+    local okP, prof = pcall(ts.GetBaseProfessionInfo)
+    profession = okP and type(prof) == "table" and API.clean(prof.professionName) or nil
+  end
+  return out, profession
 end
 
 function API.GetEquippedLink(slot, unit)

@@ -66,7 +66,7 @@ function GetInventoryItemLink(unit, slot) return INV[slot] end
 local function item(l) return ITEMS[l] or {} end
 C_Item = { GetItemStats = function(l) return ITEMS[l] and ITEMS[l].stats end,
            GetItemInfoInstant = function(l) local i = item(l) return 1, "Armor", "Cloth", i.equip, 0, i.class, i.sub end,
-           GetItemInfo = function(l) local i = ITEMS[l] if not i then return nil end
+           GetItemInfo = function(l) local i = ITEMS[l] if not i or i.uncached then return nil end
              return "name", l, 2, 20, i.req or 1, "Armor", "Leather", 1, i.equip, 0, i.sell or 0 end }
 -- Main hand 34 damage every 1.7 s: 20 DPS, so 1% of damage = 2.8 AP.
 function UnitDamage() return 34, 34, 17, 17, 0, 0, 1 end
@@ -111,7 +111,7 @@ L.globals().SlashCmdList.GEARWRIGHT("")  # open window -> OnShow -> buildText
 txt = L.eval("function(ns) return ns.UI.frame.text.text end")(ns)
 print("---- main window ----"); print(txt)
 for want in ("Spec:|r Subtlety", "(override)", "Stat weights are provisional", "Head", "item:1001:0:0",
-             "No recommended build for this spec yet.", "No enchant recommendations for this spec yet."):
+             "No recommended build for this spec yet.", "Main Hand  |cffff5050none|r - best: Superior Striking"):
     assert want in txt, want
 L.globals().SlashCmdList.GEARWRIGHT("spec auto")  # refreshes the open window
 txt = L.eval("function(ns) return ns.UI.frame.text.text end")(ns)
@@ -312,6 +312,85 @@ assert L.eval("""function(ns)
   return ns.Stats.AddTooltipEffects({}, {"Equip: +4 Attack Power against Humanoids."}).ap end""")(ns) is None
 # Enchant IDs parse out of the new-style colored links.
 assert L.eval("function(ns, l) return ns.API.GetEnchantID(l) end")(ns, gear["7"]["link"].replace("\\u007c", "|")) == 8481
+
+# Enchants ---------------------------------------------------------------------
+# GetItemStats leaves the enchant out; it's read from the "Enchanted:" line.
+ench = L.eval("""function(ns, tip) local s, t = ns.Stats.FromEnchantLine(tip) return s.sta, s.armor, t end""")(
+    ns, L.table_from(gear["7"]["tooltip"]))
+assert tuple(ench) == (2, 16, "Stamina +2 and Armor +16"), ench
+assert L.eval("""function(ns) return ns.Stats.FromEnchantLine({"Enchanted: +3 Agility"}).agi end""")(ns) == 3
+assert L.eval("""function(ns) return ns.Stats.FromEnchantLine({"Sword", "+2 Agility"}) end""")(ns) is None
+assert L.eval("""function(ns) local s, t = ns.Stats.FromEnchantLine({"Enchanted: Crusader"}) return next(s), t end""")(ns) == (None, "Crusader")
+
+# Flat weapon damage is DPS divided by the weapon's speed (1.7 s in the mock).
+wd = L.eval("""function(ns) local w = ns.Advisor.Context().weights
+  return ns.Weights.For(w, "weaponDamage", 16), ns.Weights.For(w, "weaponDamage", 17) end""")(ns)
+assert abs(wd[0] - 14 / 1.7) < 1e-9 and abs(wd[1] - 7 / 1.7) < 1e-9, wd
+
+# The data file is what the tool makes from the saved scan: nobody edited it by hand.
+import subprocess, sys
+gen = OUT / "Enchants.lua"
+subprocess.run([sys.executable, str(R / "tools" / "enchants_from_probe.py"),
+                str(R / "data" / "probe" / "2026-10-03-professions.json"), "-o", str(gen)],
+               check=True, capture_output=True)
+assert gen.read_text() == (R / "Gearwright" / "Data" / "Enchants.lua").read_text(), "rerun tools/enchants_from_probe.py"
+from importlib.util import spec_from_file_location, module_from_spec
+_m = spec_from_file_location("ench", R / "tools" / "enchants_from_probe.py"); ench_tool = module_from_spec(_m); _m.loader.exec_module(ench_tool)
+assert ench_tool.parse("Permanently enchant a cloak so that it increases the wearer's Agility by 3.") == {"agi": 3}
+assert ench_tool.parse("Permanently enchant a piece of chest armor to increase all stats by 4, and Nature Resistance by 15.")["agi"] == 4
+assert ench_tool.parse("Permanently enchant a Melee Weapon to do 6 additional points of damage to Beasts.") == {}
+assert ench_tool.parse("Permanently enchant a melee weapon so that often when attacking in melee it heals for 75 to 125 and increases Strength by 100 for 15 sec.") == {}
+
+# Report: the bracer's +3 Agility could be +9; the chest's armor kit could be
+# Greater Stats; the head takes no enchant; empty slots are skipped.
+L.execute("""
+ITEMS["item:5001:0:0"] = { equip="INVTYPE_WRIST", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=2}, tip={"Bracers", "Enchanted: Agility +3"} }
+ITEMS["item:5002:0:0"] = { equip="INVTYPE_CHEST", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=2}, tip={"Vest", "Enchanted: Stamina +2 and Armor +16"} }
+INV[9], INV[5] = "item:5001:0:0", "item:5002:0:0"
+""")
+rows = L.eval("""function(ns) local rows, ctx = ns.Advisor.EnchantReport() local out = {}
+  for i, r in ipairs(rows) do out[i] = {r.slot, r.best.name, r.best.score, r.current or false, r.gain, r.ok} end
+  return out, ctx.weights.agi, ctx.weights.sta, ctx.weights.str end""")(ns)
+rows, agi, sta, strw = [list(r.values()) for r in rows[0].values()], rows[1], rows[2], rows[3]
+print("enchant report:", rows)
+assert [r[0] for r in rows] == [5, 9, 16], rows
+chest, wrist, mh = rows
+assert chest[1] == "Greater Stats" and abs(chest[4] - (4 * agi + 4 * strw + 4 * sta - 2 * sta)) < 1e-9, chest
+assert wrist[1] == "Agility" and abs(wrist[4] - 6 * agi) < 1e-9 and wrist[5] is False, wrist
+assert mh[1] == "Superior Striking" and mh[3] is False and abs(mh[4] - 5 * 14 / 1.7) < 1e-9, mh
+# Already the best: OK.
+L.execute('ITEMS["item:5001:0:0"].tip = {"Bracers", "Enchanted: Agility +9"}')
+ok = L.eval("function(ns) local rows = ns.Advisor.EnchantReport() return rows[2].ok end")(ns)
+assert ok is True
+L.execute("INV[9], INV[5] = nil, nil")
+
+# Crafting ---------------------------------------------------------------------
+# Recipe 1 makes the better cap; 2 is above level 35; 3 is plate; 4 makes
+# nothing; 5's item isn't cached until asked for.
+L.execute("""
+for _, id in ipairs({1002, 1003, 3001}) do ITEMS["item:" .. id] = ITEMS["item:" .. id .. ":0:0"] end
+ITEMS["item:1005"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=40}, tip={"Crafted Cap"}, uncached=true }
+C_Item.RequestLoadItemDataByID = function(id) if ITEMS["item:" .. id] then ITEMS["item:" .. id].uncached = nil end end
+local OUTPUT = { 1002, 1003, 3001, false, 1005 }
+RECIPES = { 1, 2, 3, 4, 5 }
+C_TradeSkillUI = { GetAllRecipeIDs = function() return RECIPES end,
+  GetRecipeInfo = function(id) return { name = "recipe " .. id, learned = id == 1 } end,
+  GetRecipeSchematic = function(id) return { outputItemID = OUTPUT[id] or nil } end,
+  GetBaseProfessionInfo = function() return { professionName = "Leatherworking" } end }
+printed = {}
+""")
+crafted = L.eval("""function(ns) ns.Notices.Craft() local rows = ns.Advisor.CraftReport() local out = {}
+  for i, r in ipairs(rows) do out[i] = {r.recipeID, r.delta, r.learned} end return out end""")(ns)
+crafted = [list(r.values()) for r in crafted.values()]
+cap_delta = L.eval("function(ns) return ns.Advisor.CompareToEquipped('item:1002:0:0') end")(ns)[0]
+print("craft:", crafted)
+assert [r[0] for r in crafted] == [5, 1] and abs(crafted[1][1] - cap_delta) < 1e-9, crafted
+out = "\n".join(L.globals().printed.values())
+assert "reading 1 Leatherworking items" in out and "Leatherworking upgrades:" in out and "(not learned)" in out, out
+L.execute("RECIPES = {}; printed = {}")
+L.globals().SlashCmdList.GEARWRIGHT("craft")
+assert "open a profession window first" in L.globals().printed[1], L.globals().printed[1]
+L.execute("C_TradeSkillUI = nil")
 
 # Probe
 # Character sheet + stats, shaped like the Forever beta: no GetCritChanceFromAgility,

@@ -160,7 +160,10 @@ not as ground truth.
   `GetLootSlotLink`, `GetLootRollItemLink`.
 - Encounter Journal: `EJ_SelectInstance`, `EJ_GetNumLoot` and
   `C_EncounterJournal.GetLootInfoByIndex` exist (the old `EJ_GetLootInfoByIndex` doesn't).
-  Whether it lists Forever's dungeons and their loot: `/gwp ej`.
+  But it lists nothing: on 2026-10-03 (17:44) `/gwp ej` found 0 tiers and 0 instances
+  (`EJ_GetNumTiers` = 0, loot filter 4/0). That run predates the probe update that
+  loads the journal UI, selects a tier and tries 20 Classic instance IDs one by one,
+  so it isn't conclusive yet.
 
 ## Enchanting (skill 225/225)
 
@@ -177,8 +180,39 @@ The Enchanting window listed 270 recipes (`C_TradeSkillUI`), many new for Foreve
 | Weapon | Agility (23800), Crusader (20034), Lesser/Greater/Superior Striking |
 | 2H Weapon | Lesser Agility (1248510), Agility (27837) |
 
-That capture had names only. The probe now also records whether each recipe is learned,
-what item it makes and its description, which gives the enchant amounts.
+A second capture (2026-10-03 17:46) recorded each recipe's description, learned flag
+and output item. 179 of the 261 recipes are `Enchant <slot> - <name>`; the descriptions
+give exact amounts (e.g. "Permanently enchant bracers to give +9 Agility."), and
+`tools/enchants_from_probe.py` turns 114 of them into `Gearwright/Data/Enchants.lua`.
+The other 65 are procs (Crusader, Fiery Weapon), spell power, resistances, slayer
+damage, gathering skills or movement speed, which have no stat weight yet.
+
+Forever-specific amounts worth knowing:
+
+- Two different "Bracer - Agility" recipes: 1248497 gives +5, 1217203 gives +9
+  (the same as Superior Agility, 1248599).
+- Cloak - Lesser Agility (13882) gives +3, the same as Minor Agility (13419).
+- Chest - Minor Stats (13626) and Lesser Stats (13700) both give +2 to all stats.
+- Living Stats (1213616): +4 all stats and +15 Nature resistance.
+- Shield - Critical Strike (1220623): +1% crit.
+
+## Professions (2026-10-03, saved in `data/probe/2026-10-03-professions.json`)
+
+| Profession | Skill | Recipes | Learned | Make an item |
+|---|---|---|---|---|
+| Tailoring | 225/225 | 471 | 97 | 471 |
+| Leatherworking | 85/150 | 592 | 31 | 592 |
+| Enchanting | 225/225 | 261 | 74 | 82 |
+| First Aid | 83/150 | 32 | 7 | 32 |
+| Cooking | 15/75 | 132 | 4 | 132 |
+| Skinning | 133/150 | 3 | 1 | 3 |
+
+- `C_TradeSkillUI.GetAllRecipeIDs` lists every recipe of the profession, learned or not.
+- `GetRecipeSchematic(id, false).outputItemID` gives the crafted item, so crafted gear
+  can be scored like any other item (`/gearwright craft`).
+- Every profession has new Forever "camp" recipes (Camp Tent, Loom, Tanning Rack,
+  Basic Campfire...). They make items, not gear.
+- Recipes that make an item have an empty description, or "Craft a <name>.".
 
 ## Enchants
 
@@ -205,8 +239,10 @@ committed as a separate capture.
 
 ## Still open
 
-- [ ] Encounter Journal loot tables: `/gwp ej`
-- [ ] Enchanting again, for recipe effects and learned flags (open the window)
+- [ ] Encounter Journal loot tables: `/gwp ej` again with the updated probe
+- [x] Enchanting again, for recipe effects and learned flags (2026-10-03 17:46)
+- [ ] What the enchant tooltip line says for a stat enchant ("Enchanted: Agility +3"?
+      only armor kits seen so far)
 - [ ] Trainer services (open the trainer window; recorded automatically)
 - [ ] Other Rogues' gear and enchants (`/gwp inspect`)
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety

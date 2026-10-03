@@ -9,10 +9,11 @@ stat weights, and tells you:
 - **Quest rewards and loot** - which reward to take, and which drops or rolls are upgrades
   (chat messages; `/gearwright notices` turns them off)
 - **Talents** - where does your build differ from the recommended one?
-- **Enchants** - which slots are missing the recommended enchant?
+- **Enchants** - the best stat enchant for each slot, and what it adds over the one you have
+- **Crafting** - which items from the open profession window are upgrades (`/gearwright craft`)
 
 > Status: **pre-alpha.** v1 targets **Rogue** (Assassination, Combat, Subtlety).
-> Stat weights, builds and enchant lists are placeholders until beta data is in.
+> Stat weights and builds are early estimates. Enchant amounts are read from the beta's recipes.
 > See [ROADMAP.md](ROADMAP.md).
 
 ## Repo layout
@@ -20,11 +21,12 @@ stat weights, and tells you:
 ```
 Gearwright/            The addon players install
   Core/                Bootstrap, event bus, settings, slash commands, API wrapper
-  Data/                Stat definitions + per-class data (weights, builds, enchants)
-  Engine/              Spec detection, scoring, the three advisors (pure logic)
+  Data/                Stat definitions, enchant effects, per-class data (weights, builds)
+  Engine/              Spec detection, scoring, the advisors (pure logic)
   UI/                  Tooltip line + main window
 GearwrightProbe/       Dev-only addon: dumps what the Forever client exposes
 tools/                 probe_to_json.py - turns probe output into JSON + a summary
+                       enchants_from_probe.py - builds Data/Enchants.lua from a recipe scan
 tests/                 smoke_test.py - runs both addons against a mocked WoW API
 docs/                  Architecture, beta checklist
 data/probe/            Probe captures you commit (raw research data)
@@ -61,6 +63,8 @@ python tests/smoke_test.py
 | `/gearwright` or `/gwr` | Toggle the Gearwright window |
 | `/gearwright spec <assassination\|combat\|subtlety\|auto>` | Force or auto-detect spec |
 | `/gearwright tooltip` | Toggle the tooltip upgrade line |
+| `/gearwright notices` | Toggle quest reward / loot upgrade messages |
+| `/gearwright craft` | With a profession window open: upgrades you can craft, up to 5 levels ahead |
 | `/gwp all` | Probe: dump env, APIs, talents, gear, stats |
 | `/gwp sheet` | Probe: record the character sheet's stat lines and tooltips (also automatic when you open it) |
 | `/gwp export` | Probe: copyable JSON of everything recorded |

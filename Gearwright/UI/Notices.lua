@@ -118,3 +118,39 @@ end
 
 ns:On("LOOT_OPENED", function() Notices.Loot() end)
 ns:On("START_LOOT_ROLL", function(rollID) Notices.Roll(rollID) end)
+
+-- Crafting ---------------------------------------------------------------------
+-- /gearwright craft, with a profession window open.
+
+local CRAFT_REASONS = {
+  ["no-profession-open"] = "open a profession window first",
+  ["no-tradeskill-api"] = "this client has no profession API Gearwright knows",
+}
+local CRAFT_SHOWN = 8
+
+function Notices.Craft(retried)
+  local rows, profession, pending = ns.Advisor.CraftReport()
+  if not rows then
+    ns.util.print("craft: %s", CRAFT_REASONS[profession] or tostring(profession))
+    return
+  end
+  if pending > 0 and not retried and C_Timer then
+    ns.util.print("reading %d %s items...", pending, profession or "recipe")
+    C_Timer.After(2, function() Notices.Craft(true) end)
+    return
+  end
+  if #rows == 0 then
+    ns.util.print("no %s upgrades for you up to level %d", profession or "crafted",
+      (ns.API.clean(UnitLevel("player")) or 0) + ns.Advisor.CRAFT_LOOKAHEAD)
+  else
+    ns.util.print("%s upgrades:", profession or "crafted")
+    for i = 1, math.min(#rows, CRAFT_SHOWN) do
+      local r = rows[i]
+      local s = describe({ link = r.link or r.name or ("item " .. r.itemID), delta = r.delta, slot = r.slot, reqLevel = r.reqLevel })
+      print("  " .. s .. (r.learned and "" or " |cff999999(not learned)|r"))
+    end
+    if #rows > CRAFT_SHOWN then print(("  ...and %d more"):format(#rows - CRAFT_SHOWN)) end
+  end
+  if pending > 0 then ns.util.print("%d items still not cached; run it again in a moment", pending) end
+  return rows
+end

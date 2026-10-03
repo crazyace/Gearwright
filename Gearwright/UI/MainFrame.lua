@@ -6,7 +6,8 @@ ns.UI = UI
 
 local REASONS = {
   ["no-build-data"] = "No recommended build for this spec yet.",
-  ["no-enchant-data"] = "No enchant recommendations for this spec yet.",
+  ["no-enchant-data"] = "No enchant data loaded.",
+  ["nothing-to-enchant"] = "Nothing equipped that takes an enchant.",
   ["no-talent-points"] = "Spend some talent points so Gearwright can detect your spec.",
   ["no-talent-config"] = "Talents aren't loaded yet; try again in a moment.",
   ["no-trait-tab-map"] = "No talent tree layout for this class yet.",
@@ -52,7 +53,15 @@ local function buildText()
   if not enchants then add("  " .. why(eReason))
   else
     for _, r in ipairs(enchants) do
-      add("  %-10s %s", r.name, r.ok and "|cff40ff40OK|r" or ("|cffff5050missing:|r " .. r.wantName))
+      if r.ok then
+        add("  %-10s |cff40ff40OK|r %s", r.name, r.current)
+      elseif not r.current then
+        add("  %-10s |cffff5050none|r - best: %s (+%.1f)", r.name, r.best.name, r.best.score)
+      elseif not r.gain then
+        add("  %-10s %s (not scored) - best stat enchant: %s (+%.1f)", r.name, r.current, r.best.name, r.best.score)
+      else
+        add("  %-10s %s - better: %s (+%.1f)", r.name, r.current, r.best.name, r.gain)
+      end
     end
   end
 

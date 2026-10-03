@@ -14,10 +14,10 @@ Core\Util.lua
 Core\API.lua
 
 Data\Stats.lua
+Data\Enchants.lua
 Data\Rogue\Specs.lua
 Data\Rogue\Weights.lua
 Data\Rogue\Talents.lua
-Data\Rogue\Enchants.lua
 
 Engine\Spec.lua
 Engine\Weights.lua

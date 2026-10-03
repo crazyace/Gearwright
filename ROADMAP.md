@@ -15,7 +15,7 @@ Goal: replace every "unconfirmed" in the code with a fact. Data first, features 
 - [x] **Secret values**: which item/character-stat calls are blocked? (none so far)
 - [x] **SavedVariables**: do they survive a relog? (yes)
 - [x] Dump all three Rogue talent trees (names, ranks, tiers) -> `docs/BETA-FINDINGS.md`
-- [ ] Open Enchanting / a trainer to record recipes and enchant IDs
+- [x] Open Enchanting to record recipes and their effects (trainer still to do)
 - [ ] Inspect other Rogues (`/gwp inspect`) to collect real gear + enchant IDs
 - [ ] Decide: key talents/enchants by name or by ID
 
@@ -30,10 +30,11 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [x] First-pass stat weights per spec (clearly labelled as early; AP equivalents, scaled by level)
 - [x] Skip items the class can't use; spec weapon rules (daggers for Assassination)
 - [x] Quest reward pick and loot/roll upgrade messages
-- [ ] Crafted upgrades from the open profession window (needs a profession capture)
+- [x] Crafted upgrades from the open profession window (`/gearwright craft`)
 - [ ] Bag scan for upgrades you're carrying
 - [ ] One recommended build per spec (raid DPS)
-- [ ] Enchant list for the levelling/early-60 game
+- [x] Enchant advice: best stat enchant per slot, scored with the spec weights
+- [ ] Score proc enchants (Crusader, Fiery Weapon)
 - [ ] Tooltip upgrade line verified on weapons, rings, trinkets
 - [ ] Packaging: `.pkgmeta` + GitHub Action release to CurseForge and Wago
 - [ ] CurseForge page: screenshots, "provisional data" disclaimer
@@ -66,3 +67,4 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 | 2026-10-03 | Engine is pure Lua | Testable offline with `tests/smoke_test.py` |
 | 2026-10-03 | Interface 16001 | Confirmed on beta client 1.60.1 (70205). Classic-style number; whether the APIs are Mainline or Classic is still for the probe to answer |
 | 2026-10-03 | Read talents via Traits API, spec by group ID | Probe: Classic talent API absent; one tree, each node tagged 11580/11573/11572 |
+| 2026-10-03 | Score enchants instead of listing them per spec | Recipe descriptions give exact amounts; one table serves every class and spec |
