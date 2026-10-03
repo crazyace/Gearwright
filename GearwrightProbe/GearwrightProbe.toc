@@ -1,0 +1,8 @@
+## Interface: 120105
+## Title: Gearwright Probe
+## Notes: Beta data collector for Gearwright. Dumps APIs, talents, gear, stats, recipes. Dev tool, not for release.
+## Author: Jeff
+## Version: 0.1.0
+## SavedVariables: GearwrightProbeDB
+
+Probe.lua

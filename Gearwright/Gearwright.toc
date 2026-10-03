@@ -1,0 +1,29 @@
+## Interface: 120105
+## Title: Gearwright
+## Notes: Gear, talent and enchant advice for your build in World of Warcraft: Forever.
+## Author: Jeff
+## Version: 0.1.0-dev
+## SavedVariables: GearwrightDB
+## IconTexture: Interface\Icons\INV_Misc_Gear_01
+
+# Interface number is a placeholder (Mainline 12.1.5 API). Confirm the real
+# value on the Forever client with: /dump select(4, GetBuildInfo())
+
+Core\Init.lua
+Core\Util.lua
+Core\API.lua
+
+Data\Stats.lua
+Data\Rogue\Specs.lua
+Data\Rogue\Weights.lua
+Data\Rogue\Talents.lua
+Data\Rogue\Enchants.lua
+
+Engine\Spec.lua
+Engine\Scoring.lua
+Engine\Advisor.lua
+
+UI\Tooltip.lua
+UI\MainFrame.lua
+
+Core\Commands.lua
