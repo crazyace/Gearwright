@@ -273,7 +273,11 @@ def summarize(db):
     for key, scan in (db.get("scans") or {}).items():
         if key == "ej":
             insts = scan.get("instances") or []
-            lines.append(f"encounter journal: {len(insts)} instances")
+            diag = scan.get("diag") or {}
+            known = [k for k in diag.get("known") or [] if isinstance(k.get("name"), str) and k["name"] != "<nil>"]
+            lines.append(f"encounter journal: {len(insts)} instances, {diag.get('tiers')} tiers, "
+                         f"UI module {(diag.get('loadUI') or {}).get('loaded')}"
+                         + (f", {len(known)} of {len(diag['known'])} known IDs answered" if "known" in diag else ""))
             for inst in insts:
                 kind = "raid" if inst.get("raid") else "dungeon"
                 lines.append(f"   {inst.get('name')} ({kind}, {len(inst.get('bosses') or [])} bosses, "
