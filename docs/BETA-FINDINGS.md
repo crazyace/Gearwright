@@ -62,9 +62,34 @@ Cutthroat 462708.
   and the tooltip line "Equip: +3 Attack Power." Gearwright counts the stat once.
 - "Equip: +4 Attack Power against Humanoids." is a separate token and is not counted as AP.
 - Enchants are **not** in `GetItemStats`; they show as an "Enchanted: ..." tooltip line.
-- **Hit/crit units: still open.** No hit/crit/haste/expertise gear in the first capture.
-  The rating constants (`CR_HIT_MELEE` 6, `CR_CRIT_MELEE` 9, `CR_HASTE_MELEE` 18,
-  `CR_EXPERTISE` 24) exist and read 0.
+- **Hit/crit units: still open.** No hit/crit/haste/expertise gear in any capture yet.
+  The client defines the full Mainline set of 31 `CR_*` ratings (including Versatility,
+  Mastery, Avoidance, Lifesteal, Speed) and all read 0, so the rating system exists,
+  but whether items use it is unknown.
+
+## Character stats (level 19 Gnome Rogue, 16:58 capture)
+
+All stat calls are readable. Missing: `GetCritChanceFromAgility`,
+`GetSpellCritChanceFromIntellect`, `UnitDefense`, `UnitAttackBothHands`.
+
+| Stat | Value | Notes |
+|---|---|---|
+| Str / Agi / Sta / Int / Spi | 33 / 66 / 56 / 26 / 29 | Agi +17, Sta +24, Spi +2 from gear |
+| Health / Energy | 601 / 105 | Energy regen 10/s |
+| Attack Power | 117 (+3) | = 2 x level + Str + Agi - 20, the Classic Rogue formula |
+| Ranged AP | 131 (+3) | |
+| Crit: melee / ranged / spell | 13.69% / 13.53% / 5.00% | |
+| Dodge / Parry / Block | 17.29% / 4.92% / 0% | |
+| Armor | 487 | Sheet: reduces physical damage taken by 19.46% |
+| Weapon damage | MH 32.4-45.4, OH 16.2-22.7 | Off-hand at 50%; speeds 1.7 / 1.7, ranged 1.9 |
+
+From the character sheet's Agility tooltip: **66 Agility gives 8.7% crit, so about
+7.6 Agility per 1% crit at level 19** (base crit is about 5%). Agility also gives
+1 AP, 2 ranged AP and 2 armor each. Classic's per-level crit conversion means this
+number changes with level; captures at more levels will show the curve.
+
+The probe's character-sheet capture got only 1 line (Armor) from this client: most
+stat tooltips are built on hover. The probe now hovers each stat line to read them.
 
 ## Enchants
 
@@ -95,3 +120,4 @@ committed as a separate capture.
 - [ ] Enchanting recipes and trainer services (open the windows; recorded automatically)
 - [ ] Other Rogues' gear and enchants (`/gwp inspect`)
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety
+- [ ] Agility-per-crit at more levels (open the character sheet, `/gwp all`, every few levels)

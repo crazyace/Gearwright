@@ -143,6 +143,29 @@ def strip_codes(text):
     return text.replace("|r", "")
 
 
+def sheet_text(row):
+    """A sheet row's tooltip as plain lines: hover text if captured, else the stored text."""
+    if row.get("hover"):
+        raw = list(row["hover"])
+    else:
+        raw = [row.get("tooltip") or ""] + str(row.get("tooltip2") or "").split("\n")
+    return [strip_codes(str(t)) for t in raw if str(t).strip()]
+
+
+def agility_per_crit(sheet):
+    """Agility per 1% crit, from the Agility line's 'Critical Strike chance by X%'."""
+    for row in sheet:
+        text = sheet_text(row)
+        head = re.match(r"Agility (\d+)", text[0]) if text else None
+        if not head:
+            continue
+        for part in text[1:]:
+            m = re.search(r"Critical Strike chance by ([\d.]+)%", part)
+            if m and float(m.group(1)) > 0:
+                return int(head.group(1)) / float(m.group(1))
+    return None
+
+
 def summarize(db):
     lines = []
     snaps = db.get("snapshots") or []
@@ -206,6 +229,7 @@ def summarize(db):
             lines.append(f"   gear items: {len(gear)}   stat tokens: {', '.join(sorted(tokens)) or 'none'}")
 
         stats = sec.get("stats") or {}
+        agi = crit = None
         secret = sorted(k for k, v in stats.items() if isinstance(v, dict) and v.get("status") == "secret")
         if stats:
             lines.append(f"   stat calls: {len(stats)}   secret: {', '.join(secret) or 'none'}")
@@ -232,11 +256,13 @@ def summarize(db):
         if sheet:
             lines.append(f"   character sheet: {len(sheet)} stat lines")
             for row in sheet:
-                head = row.get("tooltip") or row.get("label") or "?"
-                lines.append(f"      {strip_codes(str(head))}")
-                if row.get("tooltip2"):
-                    for part in strip_codes(str(row["tooltip2"])).split("\n"):
-                        lines.append(f"         {part}")
+                text = sheet_text(row)
+                lines.append(f"      {text[0] if text else row.get('label') or '?'}")
+                for part in text[1:]:
+                    lines.append(f"         {part}")
+            per_crit = agility_per_crit(sheet)
+            if per_crit and not (isinstance(agi, (int, float)) and isinstance(crit, (int, float)) and crit > 0):
+                lines.append(f"   agility per 1% crit: {per_crit:.2f}  (from the sheet, level {snap.get('level')})")
 
     for key, scan in (db.get("scans") or {}).items():
         count = len(scan.get("recipes") or scan.get("services") or scan.get("gear") or [])
