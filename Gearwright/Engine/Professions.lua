@@ -35,7 +35,11 @@ local function store()
 end
 
 -- Read the open profession window and save the recipes that make an item.
--- Returns the profession name, or nil, reason.
+-- Any window adds to the account-wide catalog of what each profession makes
+-- (another player's linked profession too); only your own counts as yours,
+-- with its learned flags.
+-- Returns the profession name and whose window it was ("mine", "linked"...),
+-- or nil, reason.
 function Professions.Remember()
   local recipes, profession = ns.API.ReadRecipes()
   if not recipes then return nil, profession end
@@ -44,9 +48,25 @@ function Professions.Remember()
   for _, r in ipairs(recipes) do
     if r.itemID then keep[#keep + 1] = r end
   end
+  if ns.db then
+    ns.db.catalog = ns.db.catalog or {}
+    local cat = ns.db.catalog[profession] or {}
+    ns.db.catalog[profession] = cat
+    for _, r in ipairs(keep) do
+      cat[r.itemID] = cat[r.itemID] or { recipeID = r.recipeID, name = r.name }
+    end
+  end
+  local owner = ns.API.TradeSkillOwner(profession)
+  if owner ~= "mine" then return profession, owner end
   local saved = store()
   if saved then saved[profession] = { at = date and date("%Y-%m-%d %H:%M") or nil, recipes = keep } end
-  return profession
+  return profession, owner
+end
+
+-- Every item a profession is known to make, from windows opened on this
+-- account: { [profession] = { [itemID] = { recipeID, name } } }
+function Professions.Catalog()
+  return ns.db and ns.db.catalog or {}
 end
 
 -- { [professionName] = { recipes } } for this character, the open window

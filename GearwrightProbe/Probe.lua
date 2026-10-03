@@ -491,6 +491,19 @@ local function scanTradeSkill()
   local out = { at = now(), recipes = {} }
   if C_TradeSkillUI and C_TradeSkillUI.GetAllRecipeIDs then
     out.profession = capture("C_TradeSkillUI.GetBaseProfessionInfo")
+    -- Whose window is this? Yours, another player's link, a guild list, an NPC...
+    out.owner = {
+      linked = capture("C_TradeSkillUI.IsTradeSkillLinked"),
+      guild = capture("C_TradeSkillUI.IsTradeSkillGuild"),
+      npc = capture("C_TradeSkillUI.IsNPCCrafting"),
+      ready = capture("C_TradeSkillUI.IsTradeSkillReady"),
+      mine = capture("GetProfessions"),
+    }
+    local mine = out.owner.mine.values or {}
+    out.owner.mineInfo = {}
+    for i = 1, 6 do
+      if type(mine[i]) == "number" then out.owner.mineInfo[#out.owner.mineInfo + 1] = capture("GetProfessionInfo", mine[i]) end
+    end
     local ids = capture("C_TradeSkillUI.GetAllRecipeIDs")
     for _, id in ipairs((ids.values and ids.values[1]) or {}) do
       local info = capture("C_TradeSkillUI.GetRecipeInfo", id)
@@ -522,7 +535,9 @@ local function scanTradeSkill()
     name = tostring(n + 1)
   end
   db().scans["tradeskill:" .. name] = out
-  say("recorded %d recipes (%s)", #out.recipes, tostring(out.api))
+  local linked = out.owner and out.owner.linked.values or {}
+  say("recorded %d recipes (%s)%s", #out.recipes, tostring(out.api),
+    linked[1] == true and (" from " .. tostring(linked[2]) .. "'s linked profession") or "")
 end
 
 local function scanTrainer()

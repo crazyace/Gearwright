@@ -306,6 +306,9 @@ function Advisor.CraftReport()
   for prof, list in pairs(known) do
     for _, r in ipairs(list) do add(prof, r) end
   end
+  for prof, items in pairs(ns.Professions.Catalog()) do
+    for itemID, r in pairs(items) do add(prof, { recipeID = r.recipeID, itemID = itemID, name = r.name }) end
+  end
   local data = ns.Data.CRAFTED
   for _, r in ipairs(data and data.recipes or {}) do
     add(data.professions[r[1]], { recipeID = r[2], itemID = r[3], name = r[4] })

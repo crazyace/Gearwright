@@ -179,7 +179,7 @@ not as ground truth.
   Dungeon loot has to come from real drops instead: the probe now logs every loot
   window with the NPC (from its GUID) and the instance or zone it dropped in.
 
-## Enchanting (skill 225/225)
+## Enchanting (another player's window, skill 225/225)
 
 The Enchanting window listed 270 recipes (`C_TradeSkillUI`), many new for Forever
 (recipe IDs over 1,200,000). Agility enchants, the ones a Rogue cares about:
@@ -212,6 +212,13 @@ Forever-specific amounts worth knowing:
 
 ## Professions (2026-10-03, saved in `data/probe/2026-10-03-professions.json`)
 
+**These windows were found in game, not opened on Jeff's characters**: the skill
+levels and "learned" counts below belong to whoever's profession it was. The recipe
+lists (what each profession makes) are what's useful. How they were opened (a
+player's link, a crafting station...) isn't recorded; the probe now records
+`IsTradeSkillLinked` / `IsTradeSkillGuild` / `IsNPCCrafting` and your own
+`GetProfessions` with each scan to tell.
+
 | Profession | Skill | Recipes | Learned | Make an item |
 |---|---|---|---|---|
 | Tailoring | 225/225 | 471 | 97 | 471 |
@@ -224,6 +231,9 @@ Forever-specific amounts worth knowing:
 
 - Forever allows **two primary professions**. The API only lists the open profession's
   recipes, so Gearwright saves them per character whenever a profession window opens.
+- Gearwright only treats a window as yours when it isn't linked, a guild list or NPC
+  crafting, and (if `GetProfessions` answers) the profession is one of yours. Any window,
+  yours or not, adds to an account-wide catalog of what each profession makes.
 - Crafted gear from other professions comes from the probe scans (`Data/Crafted.lua`):
   Blacksmithing, Enchanting, Leatherworking and Tailoring so far; no Engineering scan yet.
   Which professions you have comes from `GetProfessions`/`GetProfessionInfo`, if the

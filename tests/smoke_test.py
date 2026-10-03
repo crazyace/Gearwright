@@ -480,11 +480,21 @@ L.execute('ITEMS["item:2002"].bind = 1')
 assert sword()[0] == "learn", sword()
 L.execute('ITEMS["item:2002"].bind = nil')
 L.eval("function(ns) ns.db.recipes['Smithy-Realm'] = nil; ns.db.recipes['Faraway-Other'] = nil end")(ns)
+# Another player's linked profession: its recipes join the catalog of what
+# Tailoring makes, but it isn't yours and its learned flags aren't yours.
+L.execute("""CRAFT_OUTPUT[7] = 1003; RECIPES = { 7 }
+C_TradeSkillUI.GetBaseProfessionInfo = function() return { professionName = "Tailoring" } end
+C_TradeSkillUI.IsTradeSkillLinked = function() return true, "Bob" end""")
+L.globals().fire("TRADE_SKILL_SHOW")
+linked = L.eval("""function(ns) local me = ns.db.recipes[ns.Professions.CharKey()]
+  return me.Tailoring == nil, ns.db.catalog.Tailoring[1003] ~= nil, me.Blacksmithing ~= nil end""")(ns)
+assert tuple(linked) == (True, True, True), tuple(linked)
+L.execute("C_TradeSkillUI.IsTradeSkillLinked = nil; RECIPES = {}")
 L.globals().SlashCmdList.GEARWRIGHT("craft")
 out = "\n".join(L.globals().printed.values())
 assert "learn the recipe (Blacksmithing)" in out and "learn the recipe (Leatherworking)" in out, out
 L.execute("GetProfessions, GetProfessionInfo = nil, nil; printed = {}")
-L.eval("function(ns) ns.db.recipes = nil; ns.Data.CRAFTED = nil end")(ns)
+L.eval("function(ns) ns.db.recipes = nil; ns.db.catalog = nil; ns.Data.CRAFTED = nil end")(ns)
 L.globals().SlashCmdList.GEARWRIGHT("craft")
 assert "no recipes known yet" in L.globals().printed[1], L.globals().printed[1]
 L.eval("function(ns) ns.Data.CRAFTED = SAVED_CRAFTED end")(ns)
