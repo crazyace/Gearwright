@@ -108,13 +108,26 @@ print("enchant id:", L.eval("function(ns) return ns.API.GetEnchantID('item:2001:
 L.globals().SlashCmdList.GEARWRIGHT("spec subtlety")
 print("override:", L.eval("function(ns) return ns.Spec.Detect() end")(ns))
 L.globals().SlashCmdList.GEARWRIGHT("")  # open window -> OnShow -> buildText
-txt = L.eval("function(ns) return ns.UI.frame.text.text end")(ns)
+L.execute("""
+function SCREEN(ns)
+  local out = { ns.UI.frame.spec.text or "" }
+  for _, tab in ipairs(ns.UI.TAB_ORDER) do
+    local rows, msg = ns.UI.BuildRows(tab)
+    out[#out + 1] = "[" .. tab .. "]" .. (msg and (" " .. msg) or "")
+    for _, r in ipairs(rows) do
+      out[#out + 1] = table.concat({ r.sub or "", r.title or "", r.value or "" }, "  ")
+    end
+  end
+  return table.concat(out, "\\n")
+end
+""")
+txt = L.globals().SCREEN(ns)
 print("---- main window ----"); print(txt)
 for want in ("Spec:|r Subtlety", "(override)", "Stat weights are provisional", "Head", "item:1001:0:0",
-             "No recommended build for this spec yet.", "Main Hand  |cffff5050none|r - best: Superior Striking"):
+             "No recommended build for this spec yet.", "Best: Superior Striking", "No dungeon loot known yet"):
     assert want in txt, want
 L.globals().SlashCmdList.GEARWRIGHT("spec auto")  # refreshes the open window
-txt = L.eval("function(ns) return ns.UI.frame.text.text end")(ns)
+txt = L.globals().SCREEN(ns)
 assert "Spec:|r Combat" in txt and "(talents)" in txt, txt
 L.globals().SlashCmdList.GEARWRIGHT("")  # toggle closed
 assert not L.eval("function(ns) return ns.UI.frame:IsShown() end")(ns)
@@ -295,7 +308,7 @@ assert rows == "Murder 0/2", rows
 # Window shows the detected spec and refreshes on a talent event.
 L.globals().SlashCmdList.GEARWRIGHT("")
 L.globals().fire("TRAIT_CONFIG_UPDATED")
-txt = L.eval("function(ns) return ns.UI.frame.text.text end")(ns)
+txt = L.globals().SCREEN(ns)
 assert "Spec:|r Assassination" in txt and "(talents)" in txt, txt
 L.globals().SlashCmdList.GEARWRIGHT("")
 
@@ -391,6 +404,42 @@ L.execute("RECIPES = {}; printed = {}")
 L.globals().SlashCmdList.GEARWRIGHT("craft")
 assert "open a profession window first" in L.globals().printed[1], L.globals().printed[1]
 L.execute("C_TradeSkillUI = nil")
+
+# Dungeons ------------------------------------------------------------------------
+# Forever Dungeon Journal's table, in its own shape: boss loot {id, name, slot,
+# quality}, quest rewards {id, name, quality}. Gearwright only reads it.
+L.execute("""
+function UnitFactionGroup() return "Alliance" end
+ForeverDungeonJournal_NS = { DB = {
+  ["Hall of Thanes"] = { level = "13-20",
+    bosses = { { name = "Faldrim Anvilmar", loot = { {1002, "Better Cap", "Head, Leather", 3}, {3001, "Plate Helm", "Head, Plate", 3} } },
+               { name = "Trash Drops", trash = true, loot = { {1003, "Future Cap", "Head, Leather", 3} } } },
+    quests = { { name = "The Restless Dead", faction = "Alliance", rewardItems = { {1005, "Crafted Cap", 3} } },
+               { name = "Horde Only", faction = "Horde", rewardItems = { {2003, "Dagger", 3} } } } },
+  ["The Deadmines"] = { level = "17-26", bosses = { { name = "Sneed", loot = { {1002, "Better Cap", "Head, Leather", 3} } } } },
+} }
+""")
+L.eval("function(ns) ns.Sources.Reset() end")(ns)
+dung = L.eval("""function(ns) local rows = ns.Advisor.DungeonReport() local out = {}
+  for i, r in ipairs(rows) do out[i] = {r.itemID, #r.sources, ns.Sources.Describe(r.sources[1])} end return out end""")(ns)
+dung = [list(r.values()) for r in dung.values()]
+print("dungeon upgrades:", dung)
+# 1005 (quest) and 1002 (two bosses) are upgrades; plate is unusable, 1003 is
+# level 40 (beyond 5 levels ahead), the Horde quest is for the other faction.
+assert [r[0] for r in dung] == [1005, 1002], dung
+assert dung[0][2] == "quest The Restless Dead, Hall of Thanes (13-20)", dung
+assert dung[1][1] == 2 and dung[1][2] == "Faldrim Anvilmar, Hall of Thanes (13-20)", dung
+upg = L.eval("function(ns) local rows = ns.UI.BuildRows('upgrades') return #rows, rows[1].value, rows[2].sub end")(ns)
+assert upg[0] == 2 and upg[1].startswith("+") and "(+1 more)" in upg[2], upg
+
+# Gearwright's own table (from probe loot logs) works without that addon.
+L.execute("ForeverDungeonJournal_NS = nil")
+L.execute('ns_own = { { itemID = 1002, name = "Better Cap", dungeon = "The Deadmines", from = "Rhahk\'Zor", count = 3 } }')
+own = L.eval("""function(ns) ns.Data.DUNGEON_LOOT = ns_own; ns.Sources.Reset()
+  local rows = ns.Advisor.DungeonReport() local s = ns.Sources.For(1002)[1]
+  ns.Data.DUNGEON_LOOT = {}; ns.Sources.Reset()
+  return #rows, ns.Sources.Describe(s), ns.Sources.All() end""")(ns)
+assert own[0] == 1 and own[1] == "Rhahk'Zor, The Deadmines" and own[2] is None, own
 
 # Probe
 # Character sheet + stats, shaped like the Forever beta: no GetCritChanceFromAgility,
@@ -570,6 +619,15 @@ print("---- probe export title ----"); print(L.globals().LASTTEXT)
 for p in L.globals().printed.values(): print("  >", p)
 
 open(OUT/"export.json","w").write(L.globals().EXPORTTEXT)
+# The probe's loot log turns into Gearwright's own dungeon loot table.
+gen = OUT / "DungeonLoot.lua"
+subprocess.run([sys.executable, str(R / "tools" / "loot_from_probe.py"), str(OUT / "export.json"), "-o", str(gen)],
+               check=True, capture_output=True)
+loot_lua = gen.read_text()
+assert 'itemID = 5540, name = "Pearl-handled Dagger", dungeon = "The Deadmines", from = "Defias Squallshaper", npcID = 1732, count = 2' in loot_lua, loot_lua
+assert subprocess.run([sys.executable, str(R / "tools" / "loot_from_probe.py"), *map(str, sorted((R / "data" / "probe").glob("*.json"))),
+                       "-o", str(OUT / "check.lua")], capture_output=True).returncode == 0
+assert (OUT / "check.lua").read_text() == (R / "Gearwright" / "Data" / "DungeonLoot.lua").read_text(), "rerun tools/loot_from_probe.py"
 # also write a SavedVariables-style Lua file
 L.execute(r"""
 local function ser(v, ind)

@@ -246,3 +246,51 @@ function Advisor.CraftReport()
   table.sort(rows, function(a, b) return a.delta > b.delta end)
   return rows, profession, pending
 end
+
+-- Dungeons ---------------------------------------------------------------------
+-- Upgrades among every dungeon boss drop, trash drop and dungeon quest reward
+-- that a source addon knows about (Engine/Sources.lua), best first:
+--   rows = { { itemID, name, link, delta, slot, reqLevel, sources = { ... } } }
+-- Returns rows, ctx, pending  (pending = items not cached yet)   or nil, reason
+function Advisor.DungeonReport()
+  local ctx, reason = Advisor.Context()
+  if not ctx then return nil, reason end
+  local list = ns.Sources.All()
+  if not list then return nil, "no-dungeon-data" end
+
+  local level = ns.API.clean(UnitLevel("player")) or 1
+  local faction = ns.API.PlayerFaction()
+  local rows, byID, pending, checked = {}, {}, 0, {}
+  for _, s in ipairs(list) do
+    local otherFaction = s.faction and s.faction ~= "Both" and faction and s.faction ~= faction
+    local item = "item:" .. s.itemID
+    if not otherFaction and (byID[s.itemID] or not checked[s.itemID]) then
+      if byID[s.itemID] then
+        table.insert(byID[s.itemID].sources, s)
+      else
+        checked[s.itemID] = true
+        if ns.API.GetItemBasics(item) and Advisor.CandidateSlots(item, ctx) then
+          local reqLevel = ns.API.GetItemDetails(item)
+          if not reqLevel then
+            pending = pending + 1
+            ns.API.RequestItem(s.itemID)
+          elseif reqLevel <= level + Advisor.CRAFT_LOOKAHEAD then
+            local delta, slot = Advisor.CompareToEquipped(item, ctx)
+            if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
+              pending = pending + 1
+            elseif type(delta) == "number" and delta > CRAFT_UPGRADE then
+              local row = {
+                itemID = s.itemID, name = s.name, link = ns.API.GetItemLink(item), delta = delta, slot = slot,
+                reqLevel = reqLevel > level and reqLevel or nil, sources = { s },
+              }
+              byID[s.itemID] = row
+              rows[#rows + 1] = row
+            end
+          end
+        end
+      end
+    end
+  end
+  table.sort(rows, function(a, b) return a.delta > b.delta end)
+  return rows, ctx, pending
+end

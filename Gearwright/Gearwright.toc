@@ -4,6 +4,7 @@
 ## Author: Jeff
 ## Version: 0.1.0-dev
 ## SavedVariables: GearwrightDB
+## OptionalDeps: ForeverDungeonJournal
 ## IconTexture: Interface\Icons\INV_Misc_Gear_01
 
 # Interface 16001 confirmed on the Forever beta (client 1.60.1, build 70205)
@@ -15,6 +16,7 @@ Core\API.lua
 
 Data\Stats.lua
 Data\Enchants.lua
+Data\DungeonLoot.lua
 Data\Rogue\Specs.lua
 Data\Rogue\Weights.lua
 Data\Rogue\Talents.lua
@@ -22,8 +24,10 @@ Data\Rogue\Talents.lua
 Engine\Spec.lua
 Engine\Weights.lua
 Engine\Scoring.lua
+Engine\Sources.lua
 Engine\Advisor.lua
 
+UI\Theme.lua
 UI\Tooltip.lua
 UI\MainFrame.lua
 UI\Notices.lua

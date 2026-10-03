@@ -43,9 +43,13 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 ## Phase 2 - Raid tier 1 (Nov 4 - Dec 9)
 
 - [ ] Refine weights from launch-week feedback and logs
-- [ ] Real UI: per-slot list, "why" breakdown (`Scoring.Breakdown`), talent tree view
+- [x] Real UI: tabbed window with item rows, icons and tooltips (UI/Theme.lua, UI/MainFrame.lua)
+- [ ] "Why" breakdown per item (`Scoring.Breakdown`), talent tree view
 - [ ] Weapon logic: daggers for Mutilate/Hemorrhage, main-hand vs off-hand speed
-- [ ] Gear source tagging (dungeon / quest / crafted / raid), built from the loot log
+- [x] Dungeon upgrades: own loot table from the probe's loot log, plus Forever Dungeon Journal's
+      tables when installed (read at runtime, optional dependency)
+- [ ] Ask Exehn (Forever Dungeon Journal) about sharing data both ways
+- [ ] Raid and quest-hub sources
 - [ ] Raid gear + enchants for Barrow Deeps, Hyjal Summit, Onyxia's Lair (Dec 9)
 - [ ] Multiple builds per spec (raid, dungeon, PvP)
 - [ ] Localization groundwork (IDs instead of English names)
@@ -68,5 +72,6 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 | 2026-10-03 | Engine is pure Lua | Testable offline with `tests/smoke_test.py` |
 | 2026-10-03 | Interface 16001 | Confirmed on beta client 1.60.1 (70205). Classic-style number; whether the APIs are Mainline or Classic is still for the probe to answer |
 | 2026-10-03 | Read talents via Traits API, spec by group ID | Probe: Classic talent API absent; one tree, each node tagged 11580/11573/11572 |
+| 2026-10-03 | Read Forever Dungeon Journal at runtime, don't copy it | It has no license file; its data stays its author's. Gearwright builds its own table from observed drops |
 | 2026-10-03 | Drop the Encounter Journal; log real drops | `LoadAddOn("Blizzard_EncounterJournal")` = WRONG_GAME_TYPE, no instance answers |
 | 2026-10-03 | Score enchants instead of listing them per spec | Recipe descriptions give exact amounts; one table serves every class and spec |

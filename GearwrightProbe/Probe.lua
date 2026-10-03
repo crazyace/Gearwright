@@ -525,7 +525,8 @@ local function recordLoot()
   db().scans.loot = log
   local inst = capture("GetInstanceInfo")
   local iv = inst.values or {}
-  local where = (iv[2] and iv[2] ~= "none" and iv[1]) or sanitize(GetRealZoneText and GetRealZoneText()) or "?"
+  local inInstance = iv[2] ~= nil and iv[2] ~= "none"
+  local where = (inInstance and iv[1]) or sanitize(GetRealZoneText and GetRealZoneText()) or "?"
   local added = 0
   for slot = 1, GetNumLootItems() or 0 do
     local link = sanitize(GetLootSlotLink(slot))
@@ -538,9 +539,10 @@ local function recordLoot()
           lootSeen[guid .. ":" .. itemID] = true
           local kind, id = sourceID(guid)
           local key = kind and (kind .. ":" .. id) or guid
-          local rec = log.items[tostring(itemID)] or { name = link:match("%[(.-)%]"), from = {} }
+          local quality = tonumber(link:match("|cnIQ(%d)")) -- Forever links carry the quality
+          local rec = log.items[tostring(itemID)] or { name = link:match("%[(.-)%]"), quality = quality, from = {} }
           log.items[tostring(itemID)] = rec
-          local e = rec.from[key] or { count = 0, where = where, name = sourceName(guid) }
+          local e = rec.from[key] or { count = 0, where = where, instance = inInstance or nil, name = sourceName(guid) }
           e.count = e.count + 1
           rec.from[key] = e
           added = added + 1

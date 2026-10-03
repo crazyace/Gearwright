@@ -78,6 +78,24 @@ function API.GetItemLink(item)
   return API.clean(link)
 end
 
+-- Icon file ID for a link or ID. Works for uncached items.
+function API.GetItemIcon(item)
+  if not item or not getItemInfoInstant then return nil end
+  local ok, _, _, _, _, icon = pcall(getItemInfoInstant, item)
+  return ok and API.clean(icon) or nil
+end
+
+-- "Alliance" / "Horde", or nil.
+function API.PlayerFaction()
+  return UnitFactionGroup and API.clean(UnitFactionGroup("player")) or nil
+end
+
+-- Forever Dungeon Journal's dungeon table when that addon is loaded, else nil.
+function API.DungeonJournalDB()
+  local fdj = rawget(_G, "ForeverDungeonJournal_NS")
+  return type(fdj) == "table" and type(fdj.DB) == "table" and fdj.DB or nil
+end
+
 -- Ask the client to cache an item; GET_ITEM_INFO_RECEIVED follows.
 function API.RequestItem(itemID)
   if itemID and C_Item and C_Item.RequestLoadItemDataByID then
