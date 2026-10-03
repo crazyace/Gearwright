@@ -12,7 +12,7 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 
 ## Once each
 
-- [ ] Fresh level-10 Rogue with talents in **Assassination** -> `/gwp all`
+- [x] Fresh level-10 Rogue with talents in **Assassination** -> `/gwp all`
 - [ ] Respec into **Combat** -> `/gwp talents`
 - [ ] Respec into **Subtlety** -> `/gwp talents`
 - [ ] Equip an item with an "Equip: +x% hit/crit" line -> `/gwp gear` (stat units)
@@ -28,10 +28,10 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 | Question | Answer | Capture |
 |---|---|---|
 | Interface number | 16001 (client 1.60.1, build 70205) | `/dump select(4, GetBuildInfo())` |
-| Talent API (classic / traits / none) | | |
-| Talent ranks readable or secret? | | |
-| Item stat tokens seen | | |
+| Talent API (classic / traits / none) | traits (one tree, spec by group ID) | 2026-10-03-assassination |
+| Talent ranks readable or secret? | readable | 2026-10-03-assassination |
+| Item stat tokens seen | see BETA-FINDINGS.md | 2026-10-03-assassination |
 | Hit/crit units (rating or %) | | |
-| Which stat calls are secret? | | |
+| Which stat calls are secret? | none so far | 2026-10-03-assassination |
 | SavedVariables persist? | | |
-| Tab order: Assassination / Combat / Subtlety? | | |
+| Tab order: Assassination / Combat / Subtlety? | n/a: groups 11580 / 11573 / 11572 | 2026-10-03-assassination |

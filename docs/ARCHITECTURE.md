@@ -33,7 +33,8 @@ Each file gets the shared addon namespace `ns` via `local _, ns = ...`.
 1. Create `Data/<CLASS_TOKEN>/` with `Specs.lua`, `Weights.lua`, `Talents.lua`, `Enchants.lua`
    (copy the Rogue files; `CLASS_TOKEN` is the second return of `UnitClass`, e.g. `WARRIOR`).
 2. Add the files to `Gearwright.toc`.
-3. Fill `tabToSpec` from probe output.
+3. Fill `tabToSpec` and `traitTabGroups` from probe output (`tools/probe_to_json.py` lists every
+   talent node; `docs/BETA-FINDINGS.md` shows how the Rogue groups were found).
 
 ## Scoring model (v1)
 

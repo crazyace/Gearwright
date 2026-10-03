@@ -1,8 +1,8 @@
 -- Gearwright: recommended Rogue talent builds.
 --
--- Keyed by talent NAME for now (English). Switch to talent/spell IDs once the
--- probe confirms which IDs the Forever client exposes, so locales work.
--- Fill these from /gwp talents output on a beta Rogue.
+-- Keyed by talent NAME for now (English). The Traits API also gives spell IDs
+-- (see docs/BETA-FINDINGS.md for the full tree), so switching to IDs for
+-- locales is possible later. Names must match the tree exactly.
 local _, ns = ...
 ns.Data.ROGUE = ns.Data.ROGUE or {}
 

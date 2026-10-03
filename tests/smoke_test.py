@@ -118,6 +118,83 @@ ap, hit = L.eval("""function(ns)
   return s.ap, s.hit end""")(ns)
 assert ap == 20 and hit == 1, (ap, hit)
 
+# Traits talents, replayed from a real Forever beta capture --------------------
+# Level 19 Rogue with 10 points in Assassination (Malice 5, Ruthlessness 3,
+# Remorseless Attacks 2). Classic talent API is absent on Forever.
+import json
+cap = json.loads((R / "data" / "probe" / "2026-10-03-assassination.json").read_text())
+traits = cap["snapshots"][0]["sections"]["talents"]["traits"]
+nodes = {n["nodeID"]: n for n in traits["trees"][0]["nodes"]}
+L.globals().TRAIT_NODES = L.table_from({k: n["node"] for k, n in nodes.items()}, recursive=True)
+# Fake entry -> definition -> spell chain keyed by entryID.
+L.globals().TRAIT_SPELLS = L.table_from({n["node"]["entryIDs"][0]: n["spellID"] for n in nodes.values()})
+L.globals().SPELL_NAMES = L.table_from({n["spellID"]: n["spellName"]["values"][0] for n in nodes.values()})
+L.globals().TRAIT_NODE_IDS = L.table_from(list(nodes))
+L.execute("""
+GetNumTalentTabs, GetTalentTabInfo, GetNumTalents, GetTalentInfo = nil, nil, nil, nil
+NODE_READS = 0
+C_ClassTalents = { GetActiveConfigID = function() return 9917893 end }
+C_Traits = {
+  GetConfigInfo = function() return { treeIDs = { 1111 } } end,
+  GetTreeNodes = function() return TRAIT_NODE_IDS end,
+  GetNodeInfo = function(_, id) NODE_READS = NODE_READS + 1; return TRAIT_NODES[id] end,
+  GetEntryInfo = function(_, id) return { definitionID = id } end,
+  GetDefinitionInfo = function(id) return { spellID = TRAIT_SPELLS[id] } end,
+}
+C_Spell = { GetSpellName = function(id) return SPELL_NAMES[id] end }
+""")
+L.globals().fire("TRAIT_CONFIG_UPDATED")  # drop the cached classic read
+spec, how = L.eval("function(ns) return ns.Spec.Detect() end")(ns)
+print("traits spec:", spec, how)
+assert spec == "assassination" and how == "talents", (spec, how)
+tabs = L.eval("""function(ns)
+  local t = ns.API.ReadTalents(ns.Data.ROGUE.traitTabGroups)
+  local o = {}
+  for i, tab in ipairs(t.tabs) do o[i] = { tab.points, #tab.talents, tab.talents[1].name } end
+  return t.source, o end""")(ns)
+source, tabs = tabs
+tabs = [tuple(t.values()) for t in tabs.values()]
+print("traits tabs:", source, tabs)
+assert source == "traits"
+assert tabs == [(10, 17, "Improved Gouge"), (0, 17, "Improved Eviscerate"), (0, 19, "Camouflage")], tabs
+# Cached: more reads don't touch the API until a talent event fires.
+reads = L.globals().NODE_READS
+L.eval("function(ns) ns.Spec.Detect(); ns.Spec.Detect() end")(ns)
+assert L.globals().NODE_READS == reads
+L.globals().fire("PLAYER_TALENT_UPDATE")
+L.eval("function(ns) ns.Spec.Detect() end")(ns)
+assert L.globals().NODE_READS == reads + len(nodes)
+# The talent advisor compares against a build by name.
+L.execute("""ROGUE_BUILD = { ["Malice"] = 5, ["Murder"] = 2, ["Ruthlessness"] = 3 }""")
+rows = L.eval("""function(ns)
+  ns.Data.ROGUE.builds.assassination.talents = ROGUE_BUILD
+  local rows = ns.Advisor.TalentReport()
+  ns.Data.ROGUE.builds.assassination.talents = {}
+  local o = {} for i, r in ipairs(rows) do o[i] = r.name .. " " .. r.have .. "/" .. r.want end
+  return table.concat(o, ", ") end""")(ns)
+print("talent report:", rows)
+assert rows == "Murder 0/2", rows
+# Window shows the detected spec and refreshes on a talent event.
+L.globals().SlashCmdList.GEARWRIGHT("")
+L.globals().fire("TRAIT_CONFIG_UPDATED")
+txt = L.eval("function(ns) return ns.UI.frame.text.text end")(ns)
+assert "Spec:|r Assassination" in txt and "(talents)" in txt, txt
+L.globals().SlashCmdList.GEARWRIGHT("")
+
+# Real beta cloak: "+3 Attack Power" is in GetItemStats AND an Equip: line,
+# and the humanoid-only AP line must not count.
+gear = cap["snapshots"][0]["sections"]["gear"]
+cloak = gear["15"]
+ap = L.eval("""function(ns, raw, tip)
+  return ns.Stats.AddTooltipEffects(ns.Stats.FromRaw(raw), tip).ap end""")(
+    ns, L.table_from(cloak["stats"]["values"][0]), L.table_from(cloak["tooltip"]))
+print("beta cloak AP:", ap)
+assert ap == 3, ap
+assert L.eval("""function(ns)
+  return ns.Stats.AddTooltipEffects({}, {"Equip: +4 Attack Power against Humanoids."}).ap end""")(ns) is None
+# Enchant IDs parse out of the new-style colored links.
+assert L.eval("function(ns, l) return ns.API.GetEnchantID(l) end")(ns, gear["7"]["link"].replace("\\u007c", "|")) == 8481
+
 # Probe
 load_addon("GearwrightProbe","GearwrightProbe.toc")
 L.globals().fire("ADDON_LOADED","GearwrightProbe"); L.globals().fire("PLAYER_LOGIN")
@@ -154,5 +231,5 @@ open(OUT/"GearwrightProbe.lua","w").write(L.globals().SVTEXT)
 import subprocess, sys  # noqa: E401
 for f in ("export.json", "GearwrightProbe.lua"):
     r = subprocess.run([sys.executable, str(R/"tools"/"probe_to_json.py"), str(OUT/f)], capture_output=True, text=True)
-    assert r.returncode == 0 and "Hack and Slash (5/5)" in r.stdout, r.stdout + r.stderr
+    assert r.returncode == 0 and "Malice (5/5)" in r.stdout and "10 points spent" in r.stdout, r.stdout + r.stderr
 print("\nALL SMOKE TESTS PASSED")

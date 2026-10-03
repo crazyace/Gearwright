@@ -8,7 +8,9 @@ local REASONS = {
   ["no-build-data"] = "No recommended build for this spec yet.",
   ["no-enchant-data"] = "No enchant recommendations for this spec yet.",
   ["no-talent-points"] = "Spend some talent points so Gearwright can detect your spec.",
-  ["traits-api-not-implemented"] = "Talent API not supported yet (run GearwrightProbe).",
+  ["no-talent-config"] = "Talents aren't loaded yet; try again in a moment.",
+  ["no-trait-tab-map"] = "No talent tree layout for this class yet.",
+  ["traits-error"] = "Couldn't read talents (turn on /gearwright debug for details).",
   ["no-talent-api"] = "This client exposes no talent API Gearwright knows.",
 }
 local function why(reason) return REASONS[reason] or ("Unavailable (" .. tostring(reason) .. ")") end
@@ -104,6 +106,9 @@ function UI.Toggle()
   f:SetShown(not f:IsShown())
 end
 
-ns:On("PLAYER_EQUIPMENT_CHANGED", function()
+local function refreshIfShown()
   if UI.frame and UI.frame:IsShown() then UI.Refresh() end
-end)
+end
+ns:On("PLAYER_EQUIPMENT_CHANGED", refreshIfShown)
+-- API.lua subscribed to these first, so its talent cache is already cleared.
+for _, event in ipairs(ns.API.TALENT_EVENTS) do ns:On(event, refreshIfShown) end

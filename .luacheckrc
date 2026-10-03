@@ -8,7 +8,7 @@ globals = {
 }
 read_globals = {
   "C_AddOns", "C_Item", "C_TooltipInfo", "C_ClassTalents", "C_Traits", "C_Spell",
-  "C_TradeSkillUI", "C_Timer", "TooltipDataProcessor", "Enum",
+  "C_TradeSkillUI", "C_Timer", "GetSpellInfo", "TooltipDataProcessor", "Enum",
   "CreateFrame", "UIParent", "UISpecialFrames", "GameTooltip", "ItemRefTooltip", "ChatFontNormal",
   "GetAddOnMetadata", "GetItemStats", "GetItemInfoInstant", "GetInventoryItemLink",
   "GetNumTalentTabs", "GetTalentTabInfo", "GetNumTalents", "GetTalentInfo",

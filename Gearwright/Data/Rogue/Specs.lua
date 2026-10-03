@@ -3,8 +3,13 @@ local _, ns = ...
 ns.Data.ROGUE = ns.Data.ROGUE or {}
 local R = ns.Data.ROGUE
 
--- Talent-frame tab index -> spec key. VERIFY with GearwrightProbe (/gwp talents).
+-- Talent tab index -> spec key.
 R.tabToSpec = { [1] = "assassination", [2] = "combat", [3] = "subtlety" }
+
+-- Forever puts all three specs in one Traits tree (treeID 1111). Every node
+-- carries exactly one of these group IDs, which says which spec it belongs to.
+-- From the 2026-10-03 beta capture (data/probe/2026-10-03-assassination.json).
+R.traitTabGroups = { [11580] = 1, [11573] = 2, [11572] = 3 }
 
 R.specs = {
   assassination = {

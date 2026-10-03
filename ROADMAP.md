@@ -7,14 +7,14 @@ launch **Nov 4**, first raids **Dec 9**, major update **Spring 2027**.
 
 Goal: replace every "unconfirmed" in the code with a fact. Data first, features later.
 
-- [ ] Run `GearwrightProbe` on a beta Rogue; commit captures to `data/probe/`
+- [x] Run `GearwrightProbe` on a beta Rogue; commit captures to `data/probe/`
 - [x] Confirm interface number; fix both `.toc` files (16001, client 1.60.1)
-- [ ] **Talent API**: Classic (`GetTalentInfo`) or Traits (`C_Traits`)? Readable or secret?
+- [x] **Talent API**: Classic (`GetTalentInfo`) or Traits (`C_Traits`)? Readable or secret? (Traits, readable)
 - [ ] **Stat units**: do items report hit/crit/expertise/haste as ratings or "Equip: +x%"?
       Record every `ITEM_MOD_*` token -> update `Data/Stats.lua`
-- [ ] **Secret values**: which item/character-stat calls are blocked?
+- [x] **Secret values**: which item/character-stat calls are blocked? (none so far)
 - [ ] **SavedVariables**: do they survive a relog? (probe reports on login)
-- [ ] Dump all three Rogue talent trees (names, ranks, tiers) -> `Data/ROGUE/Talents`
+- [x] Dump all three Rogue talent trees (names, ranks, tiers) -> `docs/BETA-FINDINGS.md`
 - [ ] Open Enchanting / a trainer to record recipes and enchant IDs
 - [ ] Inspect other Rogues (`/gwp inspect`) to collect real gear + enchant IDs
 - [ ] Decide: key talents/enchants by name or by ID
@@ -25,7 +25,7 @@ Exit criteria: `docs/BETA-FINDINGS.md` answers every question above.
 
 Goal: a Rogue can install Gearwright on day one and get useful advice.
 
-- [ ] Implement whichever talent reader Phase 0 says is right (`Core/API.lua`)
+- [x] Implement whichever talent reader Phase 0 says is right (`Core/API.lua`: Traits)
 - [ ] Spec detection verified on all three specs
 - [ ] First-pass stat weights per spec (clearly labelled as early)
 - [ ] One recommended build per spec (raid DPS)
@@ -61,3 +61,4 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 | 2026-10-03 | All WoW reads in `Core/API.lua` | API is unconfirmed; fix it in one place |
 | 2026-10-03 | Engine is pure Lua | Testable offline with `tests/smoke_test.py` |
 | 2026-10-03 | Interface 16001 | Confirmed on beta client 1.60.1 (70205). Classic-style number; whether the APIs are Mainline or Classic is still for the probe to answer |
+| 2026-10-03 | Read talents via Traits API, spec by group ID | Probe: Classic talent API absent; one tree, each node tagged 11580/11573/11572 |
