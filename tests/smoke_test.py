@@ -679,7 +679,7 @@ ITEMS[2002] = ITEMS["item:2002:0:0"]
 ITEMS[7777] = { equip="INVTYPE_HEAD", class=4, sub=2 }
 ITEMS["item:7777"] = { equip="INVTYPE_HEAD", class=4, sub=2, uncached=true }
 AH_ROWS = {
-  { "Sword", 1, 5000, 2002, "item:2002:0:0" }, { "Sword", 1, 4000, 2002, "item:2002:0:0" },
+  { "Sword", 1, 5000, 2002, "item:2002:0:0" }, { "", 1, 4000, 2002, "item:2002:0:0" },
   { "Linen Cloth", 20, 2000, 2589, "item:2589" }, { "Linen Cloth", 5, 1000, 2589, "item:2589" },
   { "Odd Cap", 1, 900, 7777, "item:7777" },
 }
@@ -696,7 +696,9 @@ L.globals().SlashCmdList.GEARWRIGHTPROBE("ah")
 assert "open the auction house first" in L.globals().printed[1], L.globals().printed[1]
 L.globals().fire("AUCTION_HOUSE_SHOW")
 L.globals().SlashCmdList.GEARWRIGHTPROBE("ah")
-ahs = L.eval("""function() local a = GearwrightProbeDB.scans.auction local g = a.gear["2002:Sword"]
+ahs = L.eval("""function() local a = GearwrightProbeDB.scans.auction local g, n = nil, 0
+  for _, v in pairs(a.gear) do n = n + 1; if v.id == 2002 then g = v end end
+  assert(n == 1, "listings with and without a name merge into one record")
   return a.listings, g.minBuyout, g.listings, g.stats.ITEM_MOD_DAMAGE_PER_SECOND_SHORT, g.equip, a.prices["2589"], a.missing,
     a.gear["7777:Odd Cap"] == nil end""")()
 assert tuple(ahs) == (5, 4000, 2, 25, "INVTYPE_WEAPON", 100, 1, True), tuple(ahs)
@@ -752,4 +754,7 @@ for f in ("export.json", "GearwrightProbe.lua"):
         assert want in r.stdout, (want, r.stdout)
     if f == "GearwrightProbe.lua":  # the SavedVariables file has the auction scan too
         assert "auction house scan 2026-10-03 16:00:00: 5 listings, 1 gear items, 1 other items priced" in r.stdout, r.stdout
+        r = subprocess.run([sys.executable, str(R/"tools"/"ah_report.py"), str(OUT/f), "--level", "30"],
+                           capture_output=True, text=True)
+        assert r.returncode == 0 and "One-hand\n" in r.stdout and "(level 1, 40s, 2 listed)" in r.stdout, r.stdout + r.stderr
 print("\nALL SMOKE TESTS PASSED")

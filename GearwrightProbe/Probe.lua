@@ -760,11 +760,21 @@ local function ahRetry(scan, todo, try)
   if not ah.open then return ahFinish(scan, #todo) end
   local left = {}
   for _, t in ipairs(todo) do
-    local rec = not scan.gear[t.key] and readGear(t.index, t.id)
+    local rec = not t.done and readGear(t.index, t.id)
     if rec then
-      rec.minBuyout, rec.listings = t.buyout, t.listings
-      scan.gear[t.key] = rec
-    elseif not scan.gear[t.key] then
+      -- The listing's name is empty until its data loads, so key by the real
+      -- name now and merge listings that were split by that.
+      t.done = true
+      local key = t.id .. ":" .. tostring(rec.name)
+      local prev = scan.gear[key]
+      if prev then
+        prev.listings = prev.listings + t.listings
+        if t.buyout and (not prev.minBuyout or t.buyout < prev.minBuyout) then prev.minBuyout = t.buyout end
+      else
+        rec.minBuyout, rec.listings = t.buyout, t.listings
+        scan.gear[key] = rec
+      end
+    elseif not t.done then
       left[#left + 1] = t
       if C_Item.RequestLoadItemDataByID then pcall(C_Item.RequestLoadItemDataByID, t.id) end
     end
@@ -792,7 +802,8 @@ local function ahProcess()
           and math.floor(buyout / count) or nil
         local key = tostring(itemID)
         if isGear(itemID) then
-          -- Random-suffix items share an ID: tell them apart by name.
+          -- Random-suffix items share an ID: tell them apart by name (empty
+          -- until the item's data loads; ahRetry re-keys by the real name).
           key = key .. ":" .. tostring(sanitize(info[1]))
           local t = byKey[key]
           if not t then

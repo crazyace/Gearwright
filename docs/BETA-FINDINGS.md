@@ -284,7 +284,27 @@ Auctionator 340 runs on Forever with its **modern** auction house code
 `GetNumReplicateItems` / `GetReplicateItemInfo(i)` / `GetReplicateItemLink(i)` (0-based)
 read it. Some listings come without item data and need `RequestLoadItemDataByID` first.
 Auctionator is "All Rights Reserved"; none of its code is used, only the API it shows.
-`/gwp ah` does that scan (not yet run on the beta).
+First scan, 2026-10-03 18:34 (`data/probe/2026-10-03-auction.json`, tooltips trimmed to
+effect lines): **109,889 listings, 5,295 distinct gear items, 1,177 other items priced.**
+Every gear item had data after the probe's retries. What it shows:
+
+- Mostly levels 10-29 (beta cap 30): required level 0-9: 1,309, 10-19: 2,823,
+  20-29: 2,049, 30+: 89. Quality: 5,224 green, 505 white, 346 grey, 195 blue.
+- Stat tokens seen: the six base stats, `ATTACK_POWER`, `RANGED_ATTACK_POWER`,
+  `ATTACK_POWER_VS_BEAST/HUMANOID/MECHANICAL`, spell power and per-school damage,
+  healing, defense, resistances, mana and health regen, fishing; `HIT_RATING` on 3
+  items (3 -> 0.3%), `CRIT_RATING` and `PARRY_RATING` on Fletcher's Gloves
+  (14 -> 1% crit, -15 -> "Decreases your chance to Parry by 1.0%"). No haste or
+  expertise gear listed yet.
+- Zircon Band of Eluding's "+1% dodge" exists only as a tooltip line, with no stat token.
+- Gearwright's reader (`Data/Stats.lua`) gets hit, crit and AP right on every item:
+  each counted once, each matching its tooltip.
+- An item listed both with and without its data loaded was split in two in this scan
+  (empty name in the key); the probe now merges them, and `tools/ah_report.py` merges
+  older scans.
+
+`python tools/ah_report.py data/probe/2026-10-03-auction.json --level 20 --spec combat`
+ranks what's listed for a character, per slot, with prices.
 
 ## Still open
 
