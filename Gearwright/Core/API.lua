@@ -130,6 +130,14 @@ function API.ReadRecipes()
   return out, profession
 end
 
+-- Whether the player knows a spell (weapon skills are passive spells).
+function API.KnowsSpell(spellID)
+  local f = IsPlayerSpell or (C_SpellBook and C_SpellBook.IsSpellKnown) or IsSpellKnown
+  if not f then return false end
+  local ok, known = pcall(f, spellID)
+  return ok and known == true
+end
+
 function API.GetEquippedLink(slot, unit)
   return API.clean(GetInventoryItemLink(unit or "player", slot))
 end

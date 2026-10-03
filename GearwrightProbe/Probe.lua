@@ -117,6 +117,8 @@ local API_PATHS = {
   "GetNumTradeSkills", "GetTradeSkillInfo", "GetNumTrainerServices", "GetTrainerServiceInfo",
   -- inspect
   "NotifyInspect", "CanInspect",
+  -- weapon skills (does a talent add axes?)
+  "IsPlayerSpell", "C_SpellBook.IsSpellKnown", "IsSpellKnown", "GetNumSkillLines", "GetSkillLineInfo",
 }
 
 function P.env()
@@ -193,6 +195,30 @@ local function talentsTraits()
   return out
 end
 
+-- Which weapon skill spells the player knows, and the Classic skill list if the
+-- client still has one. Says whether a talent (e.g. Hack and Slash) adds axes.
+local WEAPON_SKILL_SPELLS = {
+  [196] = "One-Handed Axes", [197] = "Two-Handed Axes", [198] = "One-Handed Maces",
+  [199] = "Two-Handed Maces", [200] = "Polearms", [201] = "One-Handed Swords",
+  [202] = "Two-Handed Swords", [227] = "Staves", [1180] = "Daggers", [15590] = "Fist Weapons",
+  [264] = "Bows", [266] = "Guns", [5011] = "Crossbows", [2567] = "Thrown", [5009] = "Wands",
+}
+local function weaponSkills()
+  local out = { spells = {} }
+  local known = IsPlayerSpell or (C_SpellBook and C_SpellBook.IsSpellKnown) or IsSpellKnown
+  for id, name in pairs(WEAPON_SKILL_SPELLS) do
+    local ok, v = pcall(known or function() return nil end, id)
+    out.spells[name] = ok and sanitize(v) or "error"
+  end
+  if GetNumSkillLines and GetSkillLineInfo then
+    out.skillLines = {}
+    for i = 1, GetNumSkillLines() do
+      out.skillLines[#out.skillLines + 1] = sanitize(pack(GetSkillLineInfo(i)))
+    end
+  end
+  return out
+end
+
 function P.talents()
   local s = snapshot()
   local out = {}
@@ -211,6 +237,7 @@ function P.talents()
   else
     say("traits API: not present")
   end
+  out.weaponSkills = weaponSkills()
   s.sections.talents = out
 end
 

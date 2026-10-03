@@ -12,8 +12,8 @@ R.tabToSpec = { [1] = "assassination", [2] = "combat", [3] = "subtlety" }
 R.traitTabGroups = { [11580] = 1, [11573] = 2, [11572] = 3 }
 
 -- What a Rogue can equip, by item class -> subclass (Enum.ItemClass /
--- Enum.ItemWeaponSubclass / Enum.ItemArmorSubclass). From Classic; Forever
--- may differ, e.g. if Rogues gain axes.
+-- Enum.ItemWeaponSubclass / Enum.ItemArmorSubclass). From Classic, plus what
+-- R.unlocks below adds.
 R.proficiency = {
   [2] = { -- weapons
     [15] = true, -- dagger
@@ -23,6 +23,14 @@ R.proficiency = {
     [2] = true, [3] = true, [18] = true, [16] = true, -- bow, gun, crossbow, thrown
   },
   [4] = { [0] = true, [1] = true, [2] = true }, -- armor: misc (rings, necks, trinkets), cloth, leather
+}
+
+-- Weapon types a Rogue only gets later. Forever's Combat talent Hack and Slash
+-- has an Axe/Sword bonus, so taking it should let Rogues use one-handed axes.
+-- Unlocked when the talent has a point in it, or when the player knows the
+-- weapon skill spell (One-Handed Axes, 196), whichever the client shows first.
+R.unlocks = {
+  { class = 2, subclass = 0, talent = "Hack and Slash", spell = 196 }, -- one-handed axe
 }
 
 R.specs = {

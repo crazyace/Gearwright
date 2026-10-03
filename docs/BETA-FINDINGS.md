@@ -53,6 +53,14 @@ New or reworked IDs: Mutilate 1310707, Venom 1310703, Flawless Execution 1310711
 Thousand Cuts 1310721, Quietus 1310728, Puncturing Wounds 1224716, Dirty Tricks 1224782,
 Cutthroat 462708.
 
+**Hack and Slash** (Combat row 5, 5 ranks, 20 points in Combat) replaces Classic's
+Sword and Mace Specialization. Per rank: Axe/Sword 1% chance on a melee hit to get
+an extra attack; Dagger/Fist 1% crit; Mace ignores 3% of the target's armor
+(screenshot, 2026-10-03). Its Axe bonus suggests Rogues can use one-handed axes
+here. Gearwright allows them once Hack and Slash has a point or the One-Handed
+Axes skill (spell 196) is known. The probe now records which weapon skills are
+known, to confirm.
+
 ## Items and stats
 
 - `C_Item.GetItemStats` works and returns `ITEM_MOD_*_SHORT` tokens. Seen so far:
@@ -270,3 +278,5 @@ committed as a separate capture.
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety
 - [ ] Agility-per-crit at more levels (`/gwp all` every few levels; beta cap is 30)
 - [ ] Does any gear carry weapon-skill bonuses ("+N Daggers")?
+- [ ] Can a Rogue equip one-handed axes, and only with Hack and Slash? (`/gwp talents`
+      before and after putting a point in it; try equipping an axe)

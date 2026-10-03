@@ -33,11 +33,38 @@ function Advisor.Context()
     class = classData,
     spec = spec,
     specHow = how,
+    proficiency = Advisor.Proficiency(classData),
     weights = ns.Weights.Build(classData, spec, ns.API.CharacterSnapshot()),
   }
 end
 
 -- Gear ------------------------------------------------------------------------
+
+-- The class's proficiency table plus any weapon types unlocked by a talent with
+-- points in it or a known weapon skill spell.
+function Advisor.Proficiency(classData)
+  local base = classData.proficiency
+  if not base or not classData.unlocks then return base end
+  local talents = ns.API.ReadTalents(classData.traitTabGroups)
+  local ranks = {}
+  for _, tab in ipairs(talents and talents.tabs or {}) do
+    for _, t in ipairs(tab.talents or {}) do
+      if t.name then ranks[t.name] = math.max(ranks[t.name] or 0, t.rank or 0) end
+    end
+  end
+  local out = {}
+  for classID, subs in pairs(base) do
+    out[classID] = {}
+    for sub, ok in pairs(subs) do out[classID][sub] = ok end
+  end
+  for _, u in ipairs(classData.unlocks) do
+    if (u.talent and (ranks[u.talent] or 0) > 0) or (u.spell and ns.API.KnowsSpell(u.spell)) then
+      out[u.class] = out[u.class] or {}
+      out[u.class][u.subclass] = true
+    end
+  end
+  return out
+end
 
 local DAGGER = 15
 
@@ -48,7 +75,7 @@ function Advisor.CandidateSlots(link, ctx)
   local slots = equipLoc and EQUIP_LOC_TO_SLOTS[equipLoc]
   if not slots then return nil, "not-equippable" end
 
-  local prof = ctx.class.proficiency
+  local prof = ctx.proficiency or ctx.class.proficiency
   if prof and classID and prof[classID] and not prof[classID][subclassID] then
     return nil, "not-usable"
   end

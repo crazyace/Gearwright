@@ -14,7 +14,8 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 ## Once each
 
 - [x] Fresh level-10 Rogue with talents in **Assassination** -> `/gwp all`
-- [ ] Respec into **Combat** -> `/gwp talents`
+- [ ] Respec into **Combat** -> `/gwp talents`; again after a point in **Hack and Slash**
+      (records known weapon skills: are one-handed axes added?)
 - [ ] Respec into **Subtlety** -> `/gwp talents`
 - [x] `/gwp items` -> reads six reference items by ID (hit, crit, haste/expertise gear) without
       owning them. Settles the stat units. `/gwp items 1234 5678` reads any other IDs.

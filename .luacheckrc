@@ -15,7 +15,7 @@ read_globals = {
   "GetNumTradeSkills", "GetTradeSkillLine", "GetNumTrainerServices", "NotifyInspect", "GetLocale", "WOW_PROJECT_ID",
   "UnitClass", "UnitFullName", "UnitLevel", "UnitName", "UnitExists",
   "UnitDamage", "UnitAttackSpeed", "GetItemInfo", "GetCoinTextureString",
-  "GetNumQuestChoices", "GetQuestItemLink", "GetNumLootItems", "GetLootSlotLink", "GetLootRollItemLink", "GetLootSourceInfo", "UnitGUID", "GetRealZoneText", "UnitFactionGroup", "IsModifiedClick", "ChatEdit_InsertLink",
+  "GetNumQuestChoices", "GetQuestItemLink", "GetNumLootItems", "GetLootSlotLink", "GetLootRollItemLink", "GetLootSourceInfo", "UnitGUID", "GetRealZoneText", "UnitFactionGroup", "IsModifiedClick", "ChatEdit_InsertLink", "IsPlayerSpell", "IsSpellKnown", "C_SpellBook", "GetNumSkillLines", "GetSkillLineInfo",
   "EJ_GetInstanceByIndex", "EJ_SelectInstance", "EJ_SelectTier", "LoadAddOn",
   "issecretvalue", "InCombatLockdown", "geterrorhandler", "tinsert", "date",
 }

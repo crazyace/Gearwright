@@ -45,7 +45,7 @@ function UnitFullName() return "Tester","Realm" end
 function UnitName() return "Tester" end
 function UnitExists() return true end
 -- Classic-style talents: 3 tabs, combat has most points
-local TABS = { {"Assassination", {{"Malice",0,5},{"Mutilate",0,1}}}, {"Combat", {{"Hack and Slash",5,5},{"Restless Blades",1,1}}}, {"Subtlety", {{"Hemorrhage",0,1}}} }
+TABS = { {"Assassination", {{"Malice",0,5},{"Mutilate",0,1}}}, {"Combat", {{"Hack and Slash",5,5},{"Restless Blades",1,1}}}, {"Subtlety", {{"Hemorrhage",0,1}}} }
 function GetNumTalentTabs() return #TABS end
 function GetTalentTabInfo(t) return 100+t, TABS[t][1], "desc" end
 function GetNumTalents(t) return #TABS[t][2] end
@@ -171,6 +171,17 @@ L.execute("ITEMS['item:2004:0:0'] = { equip='INVTYPE_WEAPONMAINHAND', class=2, s
 assert compare("item:2004:0:0")[:2] == [None, "wrong-weapon-type"]
 L.eval("function(ns) ns.db.specOverride = false end")(ns)
 L.execute("INV[17] = nil")
+# One-handed axes: unlocked by Hack and Slash (5/5 in the mock), or by
+# knowing the One-Handed Axes skill; otherwise a Rogue can't use them.
+L.execute("ITEMS['item:2005:0:0'] = { equip='INVTYPE_WEAPON', class=2, sub=0, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")
+assert compare("item:2005:0:0")[0] > 0
+L.execute("TABS[2][2][1][2] = 0")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
+assert compare("item:2005:0:0")[:2] == [None, "not-usable"]
+L.execute("function IsPlayerSpell(id) return id == 196 end")
+assert compare("item:2005:0:0")[0] > 0
+L.execute("IsPlayerSpell = nil; TABS[2][2][1][2] = 5")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
 # Items above your level still score, and say when you can wear them.
 d = compare("item:1003:0:0")
 assert d[0] > 0 and d[4] == 40, d
