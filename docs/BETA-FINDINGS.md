@@ -93,6 +93,11 @@ on hover), and the 17:04 run got nothing because the window was closed when `/gw
 ran. The probe now opens the window itself, hovers each stat line, closes it again,
 and never replaces a real capture with an empty one.
 
+The 17:11 run's diagnostics showed why only Armor ever appeared: with the window
+open, `CharacterStatsPane` had 6 frames and none visible. On Forever it's a hidden
+leftover; the visible stat lines live elsewhere in `CharacterFrame`. The probe now
+scans the whole window and records which visible frames hold text.
+
 ## Enchants
 
 The enchant ID parses out of the item link as expected.

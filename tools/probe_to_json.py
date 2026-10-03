@@ -252,6 +252,12 @@ def summarize(db):
             if isinstance(agi, (int, float)) and isinstance(crit, (int, float)) and crit > 0:
                 lines.append(f"   agility per 1% crit: {agi / crit:.2f}  (level {snap.get('level')})")
 
+        dbg = sec.get("sheetDebug") or {}
+        if dbg:
+            lines.append(f"   sheet capture: {dbg.get('how')}, window visible {dbg.get('windowVisible')}, root {dbg.get('root')}, "
+                         f"{dbg.get('scanned')} frames, {dbg.get('visible')} visible, {dbg.get('hovered')} hovered")
+            for entry in dbg.get("map") or []:
+                lines.append(f"      frame {strip_codes(str(entry))}")
         sheet = sec.get("sheet") or []
         if sheet:
             lines.append(f"   character sheet: {len(sheet)} stat lines")

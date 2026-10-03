@@ -224,18 +224,29 @@ local function frame(children, fields, regions, scripts)
   f.GetScript = function(_, name) return (scripts or {})[name] end
   return f
 end
-local agility = frame(nil, nil, { text("Agility:"), text("66") }, {
+local agility = frame(nil, { GetName = function() return "StatsPaneAgility" end }, { text("Agility:"), text("66") }, {
   OnEnter = function()
     GameTooltip:AddLine("|cffffffffAgility 66 (49|cff20ff20+17|r)|r")
     GameTooltip:AddLine("Increases Critical Strike chance by 8.7%")
     GameTooltip:AddLine("Increases Attack Power by 66")
   end,
   OnLeave = function() GameTooltip:Hide() end })
+-- Like Forever: CharacterStatsPane is a hidden leftover holding only Armor's
+-- stored text; the stats you see are in another panel; item slots have no text.
 local armor = frame(nil, { Label = text("Armor:"), Value = text("487"),
   tooltip = "|cffffffffArmor 487|r", tooltip2 = "Reduces Physical Damage taken by 19.46%" })
-CharacterStatsPane = frame({ frame({ agility, armor }) })
-PaperDollFrame = frame({ CharacterStatsPane }, {
+armor.IsVisible = function() return false end
+CharacterStatsPane = frame({ armor })
+CharacterStatsPane.IsVisible = function() return false end
+local slot = frame(nil, nil, nil, { OnEnter = function()
+  GameTooltip:AddLine("Pearl-handled Dagger"); GameTooltip.item = "item:5540" end })
+GameTooltip.GetItem = function(self) return self.item end
+local hide = GameTooltip.Hide
+GameTooltip.Hide = function(self) self.item = nil; hide(self) end
+local statsPane = frame({ agility })
+PaperDollFrame = frame({ CharacterStatsPane, statsPane, slot }, {
   HookScript = function(self, _, fn) self.onShow = fn end })
+CharacterFrame = frame({ PaperDollFrame })
 -- Like the beta client: right after ToggleCharacter the window doesn't report
 -- visible yet; it does a moment later.
 SHOW_LAG = 0
@@ -256,13 +267,15 @@ L.globals().fire("ADDON_LOADED","GearwrightProbe"); L.globals().fire("PLAYER_LOG
 L.globals().SlashCmdList.GEARWRIGHTPROBE("all")  # window closed: /gwp all opens it, reads it, closes it
 assert L.eval("function() return TOGGLES, SHEET_OPEN end")() == (2, False)
 dbg = L.eval("""function() local d = GearwrightProbeDB.snapshots[1].sections.sheetDebug
-  return d.how, d.hovered, d.stored end""")()
-assert tuple(dbg) == ("opened by probe", 1, 1), tuple(dbg)
+  return d.how, d.hovered, d.stored, d.map[1] end""")()
+assert tuple(dbg) == ("opened by probe", 1, 1, "3 StatsPaneAgility: Agility: | 66"), tuple(dbg)
 # With the window closed and no way to open it, an empty read keeps the earlier capture.
 L.execute("local t = ToggleCharacter; ToggleCharacter = nil; SlashCmdList.GEARWRIGHTPROBE('sheet'); ToggleCharacter = t")
 sheet = L.eval("""function() local s = GearwrightProbeDB.snapshots[1].sections.sheet
-  return #s, s[1].label, s[1].value, #s[1].hover, s[2].label, s[2].tooltip2 end""")()
-assert tuple(sheet) == (2, "Agility:", "66", 3, "Armor:", "Reduces Physical Damage taken by 19.46%"), tuple(sheet)
+  local by = {} for _, r in ipairs(s) do by[r.label] = r end
+  return #s, by["Agility:"].value, #by["Agility:"].hover, by["Armor:"].tooltip2 end""")()
+# Agility hovered in the visible pane, Armor's stored text from the hidden one, item slot skipped.
+assert tuple(sheet) == (2, "66", 3, "Reduces Physical Damage taken by 19.46%"), tuple(sheet)
 
 # Regression: two professions' recipe scans must not overwrite each other.
 L.execute("""

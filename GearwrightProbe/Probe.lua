@@ -328,7 +328,8 @@ local function hoverTooltip(frame)
   tip:Hide()
   if not pcall(onEnter, frame) then return nil end
   local lines = {}
-  if tip:IsShown() then
+  local isItem = type(tip.GetItem) == "function" and tip:GetItem() ~= nil
+  if tip:IsShown() and not isItem then
     for i = 1, tip:NumLines() do
       local left = fontText(_G["GameTooltipTextLeft" .. i])
       local right = fontText(_G["GameTooltipTextRight" .. i])
@@ -344,20 +345,26 @@ local function hoverTooltip(frame)
 end
 
 local function collectSheet(frame, out, seen, depth, diag)
-  if depth > 10 or #out >= 150 or type(frame) ~= "table" or type(frame.GetChildren) ~= "function" then return end
+  if depth > 14 or #out >= 150 or type(frame) ~= "table" or type(frame.GetChildren) ~= "function" then return end
   diag.scanned = diag.scanned + 1
   local visible = type(frame.IsVisible) ~= "function" or frame:IsVisible()
   if visible then diag.visible = diag.visible + 1 end
   local static = type(frame.tooltip) == "string" or type(frame.tooltip2) == "string"
   if static then diag.stored = diag.stored + 1 end
   -- Stored text is readable even with the window closed; hovering needs it on screen.
-  local hover = visible and hoverTooltip(frame) or nil
+  local texts = regionTexts(frame)
+  if visible and #texts > 0 and #diag.map < 60 then
+    -- Where the visible text lives, so a failed capture still shows the window's structure.
+    local name = type(frame.GetName) == "function" and frame:GetName() or nil
+    diag.map[#diag.map + 1] = ("%d %s: %s"):format(depth, tostring(name or "?"), table.concat(texts, " | "))
+  end
+  -- Only frames that show text are stat lines; this skips item slots, tabs and buttons.
+  local hover = visible and #texts > 0 and hoverTooltip(frame) or nil
   if hover then diag.hovered = diag.hovered + 1 end
   do
     local key = hover and hover[1] or (static and tostring(frame.tooltip))
     if key and not seen[key] then
       seen[key] = true
-      local texts = regionTexts(frame)
       out[#out + 1] = {
         label = fontText(frame.Label) or fontText(frame.Name) or texts[1],
         value = fontText(frame.Value) or texts[2],
@@ -371,9 +378,10 @@ local function collectSheet(frame, out, seen, depth, diag)
 end
 
 local function recordSheet(quiet, how)
-  local root = _G.CharacterStatsPane or _G.PaperDollFrame or _G.CharacterFrame
+  -- The whole character window: on Forever the visible stats are not in CharacterStatsPane.
+  local root = _G.CharacterFrame or _G.PaperDollFrame
   if not root then return say("no character sheet frame found") end
-  local lines, diag = {}, { scanned = 0, visible = 0, stored = 0, hovered = 0 }
+  local lines, diag = {}, { scanned = 0, visible = 0, stored = 0, hovered = 0, map = {} }
   collectSheet(root, lines, {}, 0, diag)
   local paperDoll = _G.PaperDollFrame
   diag.how = how or "already open"
