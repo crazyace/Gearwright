@@ -365,24 +365,57 @@ local function collectSheet(frame, out, seen, depth)
   for _, child in ipairs({ frame:GetChildren() }) do collectSheet(child, out, seen, depth + 1) end
 end
 
-function P.sheet(quiet)
+local function recordSheet(quiet)
   local root = _G.CharacterStatsPane or _G.PaperDollFrame or _G.CharacterFrame
   if not root then return say("no character sheet frame found") end
-  if InCombatLockdown and InCombatLockdown() then return say("leave combat first") end
   local lines = {}
   collectSheet(root, lines, {}, 0)
   local s = snapshot()
+  local old = s.sections.sheet
+  if #lines == 0 and type(old) == "table" and #old > 0 then
+    -- Never let an empty read (window closed) replace a real capture.
+    if not quiet then say("character sheet: nothing visible, kept the %d lines recorded earlier", #old) end
+    return
+  end
   s.level = sanitize(UnitLevel("player"))
   s.sections.sheet = lines
-  if not quiet or #lines > 0 then say("character sheet: %d stat lines recorded", #lines) end
+  if #lines == 0 then
+    say("character sheet: 0 stat lines; open it with C, expand every category, then /gwp sheet")
+  elseif not quiet then
+    say("character sheet: %d stat lines recorded", #lines)
+  end
+end
+
+-- Records the sheet, opening the character window first if it is closed and
+-- closing it again afterwards, so /gwp all doesn't depend on it being open.
+function P.sheet(quiet)
+  if InCombatLockdown and InCombatLockdown() then return say("leave combat first") end
+  local frame = _G.PaperDollFrame
+  if frame and not frame:IsVisible() and type(_G.ToggleCharacter) == "function" then
+    P.sheetOpening = true
+    local opened = pcall(_G.ToggleCharacter, "PaperDollFrame") and frame:IsVisible()
+    if opened then
+      -- Stat lines fill in after the window shows.
+      C_Timer.After(0.5, function()
+        P.sheetOpening = false
+        recordSheet(quiet)
+        if frame:IsVisible() then pcall(_G.ToggleCharacter, "PaperDollFrame") end
+      end)
+      return
+    end
+    P.sheetOpening = false
+  end
+  recordSheet(quiet)
 end
 
 local function hookSheet()
   local frame = _G.PaperDollFrame or _G.CharacterFrame
   if not frame or P.sheetHooked then return end
   P.sheetHooked = true
-  -- Stat lines update on show; give them a moment.
-  frame:HookScript("OnShow", function() C_Timer.After(0.5, function() P.sheet(true) end) end)
+  -- Opening the window yourself records it too (unless P.sheet opened it).
+  frame:HookScript("OnShow", function()
+    if not P.sheetOpening then C_Timer.After(0.5, function() recordSheet(true) end) end
+  end)
 end
 
 -- Event-driven scans (open the window, the probe records it) -----------------------
@@ -560,7 +593,7 @@ local COMMANDS = {
   env = P.env, api = P.api, talents = P.talents, gear = P.gear, stats = P.stats, export = P.export,
   sheet = function() P.sheet() end,
   all = function()
-    P.env(); P.api(); P.talents(); P.gear(); P.stats(); P.sheet(true)
+    P.env(); P.api(); P.talents(); P.gear(); P.stats(); P.sheet()
     say("done. /reload to flush SavedVariables, or /gwp export to copy it out.")
   end,
   inspect = function()
