@@ -31,14 +31,16 @@ data/probe/            Probe captures you commit (raw research data)
 ## Development setup
 
 1. Clone the repo.
-2. Find your Forever `AddOns` folder. Reports disagree on where it lives
-   (`_classic_beta_\Interface\AddOns` vs the retail folder), so check which
-   folder sits next to the Forever executable.
-3. Link both addon folders into it (Windows, run as admin):
+2. Find your Forever `AddOns` folder. The beta uses
+   `<WoW>\_classic_beta_\Interface\AddOns`.
+3. Link both addon folders into it. In PowerShell from the repo root (junctions
+   don't need admin):
 
-   ```
-   mklink /J "<WoW>\<forever folder>\Interface\AddOns\Gearwright"      "<repo>\Gearwright"
-   mklink /J "<WoW>\<forever folder>\Interface\AddOns\GearwrightProbe" "<repo>\GearwrightProbe"
+   ```powershell
+   $addons = "<WoW>\_classic_beta_\Interface\AddOns"
+   New-Item -ItemType Directory -Force -Path $addons | Out-Null
+   New-Item -ItemType Junction -Path "$addons\Gearwright"      -Target "$PWD\Gearwright"
+   New-Item -ItemType Junction -Path "$addons\GearwrightProbe" -Target "$PWD\GearwrightProbe"
    ```
 
 4. In game, `/reload` after edits.

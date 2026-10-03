@@ -1,4 +1,4 @@
-## Interface: 120105
+## Interface: 16001
 ## Title: Gearwright Probe
 ## Notes: Beta data collector for Gearwright. Dumps APIs, talents, gear, stats, recipes. Dev tool, not for release.
 ## Author: Jeff

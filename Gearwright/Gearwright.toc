@@ -1,4 +1,4 @@
-## Interface: 120105
+## Interface: 16001
 ## Title: Gearwright
 ## Notes: Gear, talent and enchant advice for your build in World of Warcraft: Forever.
 ## Author: Jeff
@@ -6,8 +6,8 @@
 ## SavedVariables: GearwrightDB
 ## IconTexture: Interface\Icons\INV_Misc_Gear_01
 
-# Interface number is a placeholder (Mainline 12.1.5 API). Confirm the real
-# value on the Forever client with: /dump select(4, GetBuildInfo())
+# Interface 16001 confirmed on the Forever beta (client 1.60.1, build 70205)
+# with: /dump select(4, GetBuildInfo())
 
 Core\Init.lua
 Core\Util.lua

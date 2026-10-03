@@ -8,7 +8,7 @@ launch **Nov 4**, first raids **Dec 9**, major update **Spring 2027**.
 Goal: replace every "unconfirmed" in the code with a fact. Data first, features later.
 
 - [ ] Run `GearwrightProbe` on a beta Rogue; commit captures to `data/probe/`
-- [ ] Confirm interface number; fix both `.toc` files
+- [x] Confirm interface number; fix both `.toc` files (16001, client 1.60.1)
 - [ ] **Talent API**: Classic (`GetTalentInfo`) or Traits (`C_Traits`)? Readable or secret?
 - [ ] **Stat units**: do items report hit/crit/expertise/haste as ratings or "Equip: +x%"?
       Record every `ITEM_MOD_*` token -> update `Data/Stats.lua`
@@ -60,3 +60,4 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 | 2026-10-03 | Mainline API, not Classic | Forever uses Mainline 12.1.5 UI + Midnight restrictions |
 | 2026-10-03 | All WoW reads in `Core/API.lua` | API is unconfirmed; fix it in one place |
 | 2026-10-03 | Engine is pure Lua | Testable offline with `tests/smoke_test.py` |
+| 2026-10-03 | Interface 16001 | Confirmed on beta client 1.60.1 (70205). Classic-style number; whether the APIs are Mainline or Classic is still for the probe to answer |
