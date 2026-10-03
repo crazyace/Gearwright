@@ -129,6 +129,14 @@ for want in ("Spec:|r Subtlety", "(override)", "Stat weights are provisional", "
 L.globals().SlashCmdList.GEARWRIGHT("spec auto")  # refreshes the open window
 txt = L.globals().SCREEN(ns)
 assert "Spec:|r Combat" in txt and "(talents)" in txt, txt
+# No talent points yet (the first comes at level 10): advise for the leveling spec.
+L.execute("SAVED_TABS = TABS; TABS = { {'Assassination', {}}, {'Combat', {}}, {'Subtlety', {}} }")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
+assert list(L.eval("function(ns) return {ns.Spec.Detect()} end")(ns).values()) == ["combat", "leveling"]
+txt = L.globals().SCREEN(ns)
+assert "Spec:|r Combat" in txt and "the first comes at level 10" in txt, txt
+L.execute("TABS = SAVED_TABS")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
 L.globals().SlashCmdList.GEARWRIGHT("")  # toggle closed
 assert not L.eval("function(ns) return ns.UI.frame:IsShown() end")(ns)
 
@@ -405,11 +413,11 @@ L.execute("""
 for _, id in ipairs({1002, 1003, 3001}) do ITEMS["item:" .. id] = ITEMS["item:" .. id .. ":0:0"] end
 ITEMS["item:1005"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=40}, tip={"Crafted Cap"}, uncached=true }
 C_Item.RequestLoadItemDataByID = function(id) if ITEMS["item:" .. id] then ITEMS["item:" .. id].uncached = nil end end
-local OUTPUT = { 1002, 1003, 3001, false, 1005 }
+CRAFT_OUTPUT = { 1002, 1003, 3001, false, 1005 }
 RECIPES = { 1, 2, 3, 4, 5 }
 C_TradeSkillUI = { GetAllRecipeIDs = function() return RECIPES end,
   GetRecipeInfo = function(id) return { name = "recipe " .. id, learned = id == 1 } end,
-  GetRecipeSchematic = function(id) return { outputItemID = OUTPUT[id] or nil } end,
+  GetRecipeSchematic = function(id) return { outputItemID = CRAFT_OUTPUT[id] or nil } end,
   GetBaseProfessionInfo = function() return { professionName = "Leatherworking" } end }
 printed = {}
 """)
@@ -421,9 +429,28 @@ print("craft:", crafted)
 assert [r[0] for r in crafted] == [5, 1] and abs(crafted[1][1] - cap_delta) < 1e-9, crafted
 out = "\n".join(L.globals().printed.values())
 assert "reading 1 Leatherworking items" in out and "Leatherworking upgrades:" in out and "(not learned)" in out, out
+assert "only Leatherworking seen so far" in out, out
+# Two primary professions: opening Blacksmithing adds its recipes to the
+# remembered Leatherworking ones; both still count once the window is closed.
+L.execute("""
+ITEMS["item:2002"] = ITEMS["item:2002:0:0"]
+CRAFT_OUTPUT[6] = 2002; RECIPES = { 6 }
+C_TradeSkillUI.GetBaseProfessionInfo = function() return { professionName = "Blacksmithing" } end
+""")
+L.globals().fire("TRADE_SKILL_SHOW")
 L.execute("RECIPES = {}; printed = {}")
+both = L.eval("""function(ns) local rows, names = ns.Advisor.CraftReport() local o = {}
+  for _, r in ipairs(rows) do o[#o + 1] = r.profession .. ":" .. r.recipeID end
+  return table.concat(names, ","), table.concat(o, ",") end""")(ns)
+print("two professions:", both)
+assert both[0] == "Blacksmithing,Leatherworking" and "Blacksmithing:6" in both[1] and "Leatherworking:1" in both[1], both
 L.globals().SlashCmdList.GEARWRIGHT("craft")
-assert "open a profession window first" in L.globals().printed[1], L.globals().printed[1]
+out = "\n".join(L.globals().printed.values())
+assert "Blacksmithing and Leatherworking upgrades:" in out and "[Blacksmithing]" in out, out
+L.execute("printed = {}")
+L.eval("function(ns) ns.db.recipes = nil end")(ns)
+L.globals().SlashCmdList.GEARWRIGHT("craft")
+assert "open each of your professions once" in L.globals().printed[1], L.globals().printed[1]
 L.execute("C_TradeSkillUI = nil")
 
 # Dungeons ------------------------------------------------------------------------

@@ -53,6 +53,9 @@ New or reworked IDs: Mutilate 1310707, Venom 1310703, Flawless Execution 1310711
 Thousand Cuts 1310721, Quietus 1310728, Puncturing Wounds 1224716, Dirty Tricks 1224782,
 Cutthroat 462708.
 
+The first talent point comes at **level 10**. Until a point is spent Gearwright
+advises for the leveling spec (Combat for Rogues: any weapon in either hand).
+
 **Hack and Slash** (Combat row 5, 5 ranks, 20 points in Combat) replaces Classic's
 Sword and Mace Specialization. Per rank: Axe/Sword 1% chance on a melee hit to get
 an extra attack; Dagger/Fist 1% crit; Mace ignores 3% of the target's armor
@@ -219,6 +222,8 @@ Forever-specific amounts worth knowing:
 | Skinning | 133/150 | 3 | 1 | 3 |
 | Blacksmithing | 208/225 | 507 | 91 | 507 |
 
+- Forever allows **two primary professions**. The API only lists the open profession's
+  recipes, so Gearwright saves them per character whenever a profession window opens.
 - `C_TradeSkillUI.GetAllRecipeIDs` lists every recipe of the profession, learned or not.
 - `GetRecipeSchematic(id, false).outputItemID` gives the crafted item, so crafted gear
   can be scored like any other item (`/gearwright craft`).

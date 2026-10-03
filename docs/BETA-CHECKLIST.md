@@ -23,7 +23,7 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 - [x] Open your **class trainer** (recorded automatically)
 - [x] Open **Enchanting** on any character (recorded automatically)
 - [ ] Run a dungeon with the probe loaded: every loot window is logged with what dropped it
-- [ ] Open a profession and run `/gearwright craft`; check `/gearwright` -> Enchants
+- [ ] Open both your professions once, then run `/gearwright craft`; check `/gearwright` -> Enchants
 - [ ] Target another Rogue -> `/gwp inspect`
 - [ ] Hover items with **Gearwright** loaded: does the tooltip line appear?
 - [ ] Open `/gearwright`: does spec detection match what you specced?

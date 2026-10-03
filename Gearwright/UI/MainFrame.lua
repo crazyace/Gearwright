@@ -127,11 +127,16 @@ function UI.BuildRows(tab)
 end
 
 -- "Spec: Combat (talents)", plus warnings. Returns text or nil, reason.
+local HOW = {
+  leveling = "leveling: no talent points spent; the first comes at level 10",
+}
+
 function UI.HeaderText()
   local ctx, reason = ns.Advisor.Context()
   if not ctx then return nil, reason end
   local spec = ctx.class.specs[ctx.spec]
-  local text = Theme.Hex("title") .. "Spec:|r " .. spec.label .. " " .. Theme.Hex("muted") .. "(" .. ctx.specHow .. ")|r"
+  local how = HOW[ctx.specHow] or ctx.specHow
+  local text = Theme.Hex("title") .. "Spec:|r " .. spec.label .. " " .. Theme.Hex("muted") .. "(" .. how .. ")|r"
   if ctx.class.weights._status == "provisional" then
     text = text .. "   " .. Theme.Hex("warn") .. "Stat weights are provisional placeholders.|r"
   end

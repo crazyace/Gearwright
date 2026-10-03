@@ -37,6 +37,10 @@ R.unlocks = {
 -- only go in the main hand.
 R.dualWield = { level = 10, spell = 674 }
 
+-- Spec to advise for before any talent point is spent (the first comes at
+-- level 10). Combat takes any weapon in either hand, so nothing is ruled out.
+R.levelingSpec = "combat"
+
 R.specs = {
   assassination = {
     label = "Assassination",

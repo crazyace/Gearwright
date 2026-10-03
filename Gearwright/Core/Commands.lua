@@ -7,7 +7,7 @@ local function help()
   print("  /gearwright spec <assassination|combat|subtlety|auto>")
   print("  /gearwright tooltip    toggle the tooltip line")
   print("  /gearwright notices    toggle quest reward / loot upgrade messages")
-  print("  /gearwright craft      upgrades you can craft (open a profession first)")
+  print("  /gearwright craft      upgrades you can craft (open each profession once first)")
   print("  /gearwright debug      toggle debug output")
 end
 

@@ -256,42 +256,51 @@ end
 Advisor.CRAFT_LOOKAHEAD = 5 -- also show items up to this many levels above you
 local CRAFT_UPGRADE = 0.5
 
--- Upgrades among the recipes of the open profession window, best first:
---   rows = { { recipeID, name, learned, itemID, link, delta, slot, reqLevel } }
--- Returns rows, professionName, pending  (pending = items not cached yet)
+-- Upgrades among the recipes of every profession this character has opened
+-- (Engine/Professions.lua; Forever allows two primary professions), best first:
+--   rows = { { recipeID, name, learned, itemID, link, delta, slot, reqLevel, profession } }
+-- Returns rows, professions (sorted names), pending  (pending = items not cached yet)
 --   or nil, reason
 function Advisor.CraftReport()
   local ctx, reason = Advisor.Context()
   if not ctx then return nil, reason end
-  local recipes, profession = ns.API.ReadRecipes()
-  if not recipes then return nil, profession end
+  local known = ns.Professions.Known()
+  local names = {}
+  for name in pairs(known) do names[#names + 1] = name end
+  if #names == 0 then
+    local _, why = ns.API.ReadRecipes()
+    return nil, why or "no-profession-open"
+  end
+  table.sort(names)
 
   local level = ns.API.clean(UnitLevel("player")) or 1
   local rows, pending = {}, 0
-  for _, r in ipairs(recipes) do
-    local item = r.itemID and ("item:" .. r.itemID)
-    local reqLevel = item and ns.API.GetItemDetails(item)
-    if item and not reqLevel then
-      -- Not cached yet, or not an item we can read; equippability works uncached.
-      if ns.API.GetItemBasics(item) and Advisor.CandidateSlots(item, ctx) then
-        pending = pending + 1
-        ns.API.RequestItem(r.itemID)
-      end
-    elseif item and reqLevel <= level + Advisor.CRAFT_LOOKAHEAD then
-      local delta, slot = Advisor.CompareToEquipped(item, ctx)
-      if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
-        pending = pending + 1
-      elseif type(delta) == "number" and delta > CRAFT_UPGRADE then
-        rows[#rows + 1] = {
-          recipeID = r.recipeID, name = r.name, learned = r.learned, itemID = r.itemID,
-          link = ns.API.GetItemLink(item), delta = delta, slot = slot,
-          reqLevel = reqLevel > level and reqLevel or nil,
-        }
+  for _, profession in ipairs(names) do
+    for _, r in ipairs(known[profession]) do
+      local item = r.itemID and ("item:" .. r.itemID)
+      local reqLevel = item and ns.API.GetItemDetails(item)
+      if item and not reqLevel then
+        -- Not cached yet, or not an item we can read; equippability works uncached.
+        if ns.API.GetItemBasics(item) and Advisor.CandidateSlots(item, ctx) then
+          pending = pending + 1
+          ns.API.RequestItem(r.itemID)
+        end
+      elseif item and reqLevel <= level + Advisor.CRAFT_LOOKAHEAD then
+        local delta, slot = Advisor.CompareToEquipped(item, ctx)
+        if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
+          pending = pending + 1
+        elseif type(delta) == "number" and delta > CRAFT_UPGRADE then
+          rows[#rows + 1] = {
+            recipeID = r.recipeID, name = r.name, learned = r.learned, itemID = r.itemID,
+            link = ns.API.GetItemLink(item), delta = delta, slot = slot,
+            reqLevel = reqLevel > level and reqLevel or nil, profession = profession,
+          }
+        end
       end
     end
   end
   table.sort(rows, function(a, b) return a.delta > b.delta end)
-  return rows, profession, pending
+  return rows, names, pending
 end
 
 -- Dungeons ---------------------------------------------------------------------

@@ -25,6 +25,7 @@ Engine\Spec.lua
 Engine\Weights.lua
 Engine\Scoring.lua
 Engine\Sources.lua
+Engine\Professions.lua
 Engine\Advisor.lua
 
 UI\Theme.lua
