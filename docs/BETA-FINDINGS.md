@@ -62,8 +62,11 @@ Cutthroat 462708.
   and the tooltip line "Equip: +3 Attack Power." Gearwright counts the stat once.
 - "Equip: +4 Attack Power against Humanoids." is a separate token and is not counted as AP.
 - Enchants are **not** in `GetItemStats`; they show as an "Enchanted: ..." tooltip line.
-- **Hit/crit units: ratings shown as a fixed %** (from Wowhead, see below; not yet seen
-  in a beta capture). The client defines the full Mainline set of 31 `CR_*` ratings
+- **Hit/crit units: ratings, shown as a fixed %.** `/gwp items` on the beta (2026-10-03)
+  returned `ITEM_MOD_CRIT_RATING_SHORT`, `ITEM_MOD_HASTE_RATING_SHORT`,
+  `ITEM_MOD_EXPERTISE_RATING_SHORT`, plus `ITEM_MOD_PARRY_RATING_SHORT` and
+  `ITEM_MOD_DEFENSE_SKILL_RATING_SHORT`, for items the character doesn't own.
+  The hit token and the exact values (rating per 1%, from Wowhead below) still need the export. The client defines the full Mainline set of 31 `CR_*` ratings
   (including Versatility, Mastery, Avoidance, Lifesteal, Speed), all 0 so far.
 
 ## Character stats (level 19 Gnome Rogue, 16:58 and 17:04 captures)
