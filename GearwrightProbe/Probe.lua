@@ -627,7 +627,11 @@ end)
 -- Default set: Forever items that Wowhead lists with ratings, to see how the
 -- client itself reports them, plus a few to compare against known data.
 local DEFAULT_ITEMS = {
-  13404,  -- Mask of the Unforgiven: 20 hit + 14 crit rating ("2.0%" / "1.0%")
+  13404,  -- Mask of the Unforgiven: 20 hit + 14 crit rating ("2.0%" / "1.0%"); didn't load on the beta
+  21278,  -- Stormshroud Gloves: 10 hit + 14 crit rating
+  16711,  -- Shadowcraft Boots: 3 hit rating ("0.3%")
+  272395, -- Assassin's Waistguard: 20 hit rating, new for Forever
+  276105, -- Scoutmaster's Eyepatch: 7 hit rating, new for Forever
   7348,   -- Fletcher's Gloves: 14 crit rating, level 20
   240080, -- Waywatcher Headdress: haste + expertise rating
   279899, -- Catacomb Cloak: Wowhead and the beta disagree on its stats
@@ -672,11 +676,13 @@ function P.items(arg)
     for _, id in ipairs(ids) do
       local r = out[tostring(id)]
       local st = r and r.stats.values and r.stats.values[1]
-      if type(st) == "table" then for token in pairs(st) do tokens[#tokens + 1] = token end end
+      if type(st) == "table" then for token in pairs(st) do tokens[token] = true end end
     end
-    table.sort(tokens)
+    local names = {}
+    for token in pairs(tokens) do names[#names + 1] = token end
+    table.sort(names)
     say("items: read %d of %d%s", read, #ids, #missing > 0 and (" (no data for " .. table.concat(missing, ", ") .. ")") or "")
-    if #tokens > 0 then say("item stat tokens: %s", table.concat(tokens, ", ")) end
+    if #names > 0 then say("item stat tokens: %s", table.concat(names, ", ")) end
   end
   pass(ids, 1)
 end
