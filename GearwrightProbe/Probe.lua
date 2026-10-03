@@ -293,8 +293,17 @@ local function scanTradeSkill()
     for i = 1, GetNumTradeSkills() do out.recipes[i] = capture("GetTradeSkillInfo", i) end
     out.api = "classic"
   end
-  local key = "tradeskill:" .. tostring(#db().scans + 1)
-  db().scans[key] = out
+  -- scans is keyed by string, so "#" is always 0: key by profession name, or
+  -- count existing tradeskill scans so a second profession can't overwrite the first.
+  local info = out.profession and out.profession.values and out.profession.values[1]
+  local name = type(info) == "table" and info.professionName
+  if type(name) ~= "string" and GetTradeSkillLine then name = sanitize(GetTradeSkillLine()) end
+  if type(name) ~= "string" or name:find("^<") then
+    local n = 0
+    for k in pairs(db().scans) do if k:find("^tradeskill:") then n = n + 1 end end
+    name = tostring(n + 1)
+  end
+  db().scans["tradeskill:" .. name] = out
   say("recorded %d recipes (%s)", #out.recipes, tostring(out.api))
 end
 

@@ -50,11 +50,17 @@ function Stats.FromRaw(raw)
   return out
 end
 
+-- Classic-style clients often report an "Equip:" bonus in GetItemStats too
+-- (e.g. "+20 Attack Power" as ITEM_MOD_ATTACK_POWER_SHORT = 20), so a stat
+-- already present in `stats` is not added again from the tooltip.
+-- UNCONFIRMED for Forever: revisit once probe captures show both sources.
 function Stats.AddTooltipEffects(stats, lines)
+  local fromRaw = {}
+  for key in pairs(stats) do fromRaw[key] = true end
   for _, line in ipairs(lines or {}) do
     if line:find("^Equip:") then
       for _, p in ipairs(Stats.TOOLTIP_PATTERNS) do
-        local n = tonumber(line:match(p.pattern))
+        local n = not fromRaw[p.key] and tonumber(line:match(p.pattern))
         if n then stats[p.key] = (stats[p.key] or 0) + n end
       end
     end

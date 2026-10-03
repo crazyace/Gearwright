@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """Smoke test: load both addons against a mocked WoW API and exercise them.
 
-    pip install lupa
+    pip install "lupa>=2.0"
     python tests/smoke_test.py
 
 The mock is intentionally small. It checks syntax, load order, spec detection,
 scoring, the slash commands and the probe's export path, not real game data.
 """
-import lupa, json, subprocess, os
 import tempfile
+from lupa import lua51  # WoW runs Lua 5.1; test on the same version
 from pathlib import Path
 R = Path(__file__).resolve().parent.parent
 OUT = Path(tempfile.mkdtemp())
-L = lupa.LuaRuntime(unpack_returned_tuples=True)
+L = lua51.LuaRuntime(unpack_returned_tuples=True)
 print("Lua:", L.eval("_VERSION"))
+assert L.eval("_VERSION") == "Lua 5.1"
 L.execute(r'''
 unpack = unpack or table.unpack
 printed = {}
@@ -24,6 +25,10 @@ local frames = {}
 function CreateFrame(kind, name) local f = stub(); f.SetText=function(self,t) self.text=t; EXPORTTEXT=t end; f._events={}; f.RegisterEvent=function(self,e) self._events[e]=true end
   f.SetScript=function(self,k,fn) self["_"..k]=fn end; f.CreateFontString=function() local fs=stub(); fs.GetStringHeight=function() return 10 end; fs.SetText=function(self,t) self.text=t; LASTTEXT=t end; return fs end
   f.GetStringHeight=function() return 10 end
+  f._shown=false; f.IsShown=function(self) return self._shown end
+  f.Show=function(self) if not self._shown then self._shown=true; if self._OnShow then self._OnShow(self) end end end
+  f.Hide=function(self) self._shown=false end
+  f.SetShown=function(self, v) if v then self:Show() else self:Hide() end end
   frames[#frames+1]=f; if name then _G[name]=f end; return f end
 function fire(event, ...) for _,f in ipairs(frames) do if f._events[event] and f._OnEvent then f._OnEvent(f, event, ...) end end end
 function geterrorhandler() return function(e) error(e) end end
@@ -69,8 +74,7 @@ def load_addon(folder, toc):
         line=line.strip()
         if not line or line.startswith("#"): continue
         p = R/folder/line.replace("\\","/")
-        L.execute("local f = assert(load(...)); return f", p.read_text())  # syntax check
-        fn = L.eval("function(src, name) return assert(load(src, '@'..name)) end")(p.read_text(), str(p))
+        fn = L.eval("function(src, name) return assert(loadstring(src, '@'..name)) end")(p.read_text(), str(p))
         fn(folder, ns)
     return ns
 
@@ -86,18 +90,53 @@ assert abs(cmp[0] - 1.6) < 1e-9, cmp
 print("enchant id:", L.eval("function(ns) return ns.API.GetEnchantID('item:2001:1900:0') end")(ns))
 L.globals().SlashCmdList.GEARWRIGHT("spec subtlety")
 print("override:", L.eval("function(ns) return ns.Spec.Detect() end")(ns))
-L.globals().SlashCmdList.GEARWRIGHT("")  # open window → buildText
-txt = L.eval("function(ns) return ns.UI.frame and 'ok' end")(ns)
-print("window:", txt)
-# build text directly
-L.globals().SlashCmdList.GEARWRIGHT("spec auto")
+L.globals().SlashCmdList.GEARWRIGHT("")  # open window -> OnShow -> buildText
+txt = L.eval("function(ns) return ns.UI.frame.text.text end")(ns)
+print("---- main window ----"); print(txt)
+for want in ("Spec:|r Subtlety", "(override)", "Stat weights are provisional", "Head", "item:1001:0:0",
+             "No recommended build for this spec yet.", "No enchant recommendations for this spec yet."):
+    assert want in txt, want
+L.globals().SlashCmdList.GEARWRIGHT("spec auto")  # refreshes the open window
+txt = L.eval("function(ns) return ns.UI.frame.text.text end")(ns)
+assert "Spec:|r Combat" in txt and "(talents)" in txt, txt
+L.globals().SlashCmdList.GEARWRIGHT("")  # toggle closed
+assert not L.eval("function(ns) return ns.UI.frame:IsShown() end")(ns)
+
+# Regression: an equipped item whose stats can't be read is not an empty slot.
+L.execute("INV[1] = 'item:9999:0:0'")
+r = L.eval("function(ns) return {ns.Advisor.CompareToEquipped('item:1002:0:0')} end")(ns)
+assert r[1] is None and r[2] == "equipped-unreadable", list(r.values())
+L.execute("INV[1] = nil")
+r = L.eval("function(ns) return ns.Advisor.CompareToEquipped('item:1002:0:0') end")(ns)
+assert r[0] == 24 and r[3] == 0, r  # truly empty slot: full score is the upgrade
+L.execute("INV[1] = 'item:1001:0:0'")
+
+# Regression: a bonus in both GetItemStats and an "Equip:" line counts once.
+ap, hit = L.eval("""function(ns)
+  local s = ns.Stats.AddTooltipEffects(ns.Stats.FromRaw({ITEM_MOD_ATTACK_POWER_SHORT=20}),
+    {"Equip: +20 Attack Power.", "Equip: Improves your chance to hit by 1%."})
+  return s.ap, s.hit end""")(ns)
+assert ap == 20 and hit == 1, (ap, hit)
 
 # Probe
 load_addon("GearwrightProbe","GearwrightProbe.toc")
 L.globals().fire("ADDON_LOADED","GearwrightProbe"); L.globals().fire("PLAYER_LOGIN")
 L.globals().SlashCmdList.GEARWRIGHTPROBE("all")
+
+# Regression: two professions' recipe scans must not overwrite each other.
+L.execute("""
+PROF = "Enchanting"
+C_TradeSkillUI = { GetAllRecipeIDs = function() return {1, 2} end,
+  GetRecipeInfo = function(id) return {name = "r"..id} end,
+  GetBaseProfessionInfo = function() return {professionName = PROF} end }
+""")
+L.globals().fire("TRADE_SKILL_SHOW")
+L.execute("PROF = 'Leatherworking'"); L.globals().fire("TRADE_SKILL_SHOW")
+L.execute("C_TradeSkillUI.GetBaseProfessionInfo = function() return nil end"); L.globals().fire("TRADE_SKILL_SHOW")
+keys = sorted(L.eval("function() local o={} for k in pairs(GearwrightProbeDB.scans) do o[#o+1]=k end return o end")().values())
+assert keys == ["tradeskill:3", "tradeskill:Enchanting", "tradeskill:Leatherworking"], keys
 L.globals().SlashCmdList.GEARWRIGHTPROBE("export")
-print("---- window text ----"); print(L.globals().LASTTEXT)
+print("---- probe export title ----"); print(L.globals().LASTTEXT)
 for p in L.globals().printed.values(): print("  >", p)
 
 open(OUT/"export.json","w").write(L.globals().EXPORTTEXT)
@@ -112,7 +151,7 @@ SVTEXT = "\nGearwrightProbeDB = " .. ser(GearwrightProbeDB) .. "\n"
 """)
 open(OUT/"GearwrightProbe.lua","w").write(L.globals().SVTEXT)
 
-import subprocess, sys
+import subprocess, sys  # noqa: E401
 for f in ("export.json", "GearwrightProbe.lua"):
     r = subprocess.run([sys.executable, str(R/"tools"/"probe_to_json.py"), str(OUT/f)], capture_output=True, text=True)
     assert r.returncode == 0 and "Hack and Slash (5/5)" in r.stdout, r.stdout + r.stderr
