@@ -34,6 +34,8 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [x] Crafted upgrades from every scanned profession, yours or not: craft it, learn it, or have it
       crafted (`Data/Crafted.lua` from `tools/crafted_from_probe.py`; Crafting tab)
 - [ ] Engineering recipes (needs a probe scan from an engineer)
+- [x] Probe: auction house full scan (`/gwp ah`) for gear stats and prices in bulk
+- [ ] Auction house upgrades in Gearwright itself: gear on the AH that beats yours, with prices
 - [x] Advice before level 10 (no talent points yet): scored as the leveling spec, Combat
 - [ ] Bag scan for upgrades you're carrying
 - [ ] One recommended build per spec (raid DPS)

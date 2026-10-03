@@ -86,7 +86,8 @@ python tests/smoke_test.py
 | `/gearwright craft` | Crafted upgrades up to 5 levels ahead, and who can make them |
 | `/gwp all` | Probe: dump env, APIs, talents, gear, stats |
 | `/gwp sheet` | Probe: record the character sheet's stat lines and tooltips (also automatic when you open it) |
-| `/gwp export` | Probe: copyable JSON of everything recorded |
+| `/gwp ah` | Probe, at the auction house: full scan; records every gear item listed (stats, level, slot, lowest buyout) |
+| `/gwp export` | Probe: copyable JSON of everything recorded, except the auction scan (`/gwp export ah` for that) |
 
 ## License
 

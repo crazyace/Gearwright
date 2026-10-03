@@ -17,5 +17,5 @@ read_globals = {
   "UnitDamage", "UnitAttackSpeed", "GetItemInfo", "GetCoinTextureString",
   "GetNumQuestChoices", "GetQuestItemLink", "GetNumLootItems", "GetLootSlotLink", "GetLootRollItemLink", "GetLootSourceInfo", "UnitGUID", "GetRealZoneText", "UnitFactionGroup", "IsModifiedClick", "ChatEdit_InsertLink", "IsPlayerSpell", "IsSpellKnown", "C_SpellBook", "GetNumSkillLines", "GetSkillLineInfo", "GetProfessions", "GetProfessionInfo",
   "EJ_GetInstanceByIndex", "EJ_SelectInstance", "EJ_SelectTier", "LoadAddOn",
-  "issecretvalue", "InCombatLockdown", "geterrorhandler", "tinsert", "date",
+  "issecretvalue", "InCombatLockdown", "geterrorhandler", "tinsert", "date", "time", "C_AuctionHouse",
 }

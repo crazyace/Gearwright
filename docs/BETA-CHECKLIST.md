@@ -25,6 +25,9 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 - [ ] Run a dungeon with the probe loaded: every loot window is logged with what dropped it
 - [ ] Open both your professions once, then check `/gearwright` -> Crafting and Enchants
 - [ ] On an engineer (any character): open Engineering with the probe loaded
+- [ ] At the auction house: `/gwp ah` and keep the window open until it says done (once per
+      15 minutes, server rule). Send the SavedVariables file (`WTF/Account/<ACCOUNT>/SavedVariables/
+      GearwrightProbe.lua`, after `/reload` or logout), or `/gwp export ah` if it's small enough
 - [ ] Target another Rogue -> `/gwp inspect`
 - [ ] Hover items with **Gearwright** loaded: does the tooltip line appear?
 - [ ] Open `/gearwright`: does spec detection match what you specced?

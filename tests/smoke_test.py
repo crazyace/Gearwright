@@ -671,11 +671,51 @@ drop = L.eval("""function() local e = GearwrightProbeDB.scans.loot.items["5540"]
   local f = e.from["Creature:1732"] return e.name, f.count, f.where, f.name end""")()
 assert tuple(drop) == ("Pearl-handled Dagger", 2, "The Deadmines", "Defias Squallshaper"), tuple(drop)
 L.execute("LOOT = {}; GetLootSourceInfo, GetInstanceInfo, UnitGUID = nil, nil, nil; function UnitName() return 'Tester' end")
+# Auction house full scan: gear gets its full record and lowest buyout; other
+# items only a unit price; a gear item whose data never loads is counted.
+L.execute("""
+function time() return NOW or 100000 end
+ITEMS[2002] = ITEMS["item:2002:0:0"]
+ITEMS[7777] = { equip="INVTYPE_HEAD", class=4, sub=2 }
+ITEMS["item:7777"] = { equip="INVTYPE_HEAD", class=4, sub=2, uncached=true }
+AH_ROWS = {
+  { "Sword", 1, 5000, 2002, "item:2002:0:0" }, { "Sword", 1, 4000, 2002, "item:2002:0:0" },
+  { "Linen Cloth", 20, 2000, 2589, "item:2589" }, { "Linen Cloth", 5, 1000, 2589, "item:2589" },
+  { "Odd Cap", 1, 900, 7777, "item:7777" },
+}
+C_AuctionHouse = {
+  ReplicateItems = function() fire("REPLICATE_ITEM_LIST_UPDATE") end,
+  GetNumReplicateItems = function() return #AH_ROWS end,
+  GetReplicateItemInfo = function(i) local r = AH_ROWS[i + 1]
+    return r[1], 0, r[2], 2, true, 20, 0, 0, 0, r[3], 0, false, nil, "Seller", "Seller-Realm", 0, r[4], true end,
+  GetReplicateItemLink = function(i) return AH_ROWS[i + 1][5] end,
+}
+printed = {}
+""")
+L.globals().SlashCmdList.GEARWRIGHTPROBE("ah")
+assert "open the auction house first" in L.globals().printed[1], L.globals().printed[1]
+L.globals().fire("AUCTION_HOUSE_SHOW")
+L.globals().SlashCmdList.GEARWRIGHTPROBE("ah")
+ahs = L.eval("""function() local a = GearwrightProbeDB.scans.auction local g = a.gear["2002:Sword"]
+  return a.listings, g.minBuyout, g.listings, g.stats.ITEM_MOD_DAMAGE_PER_SECOND_SHORT, g.equip, a.prices["2589"], a.missing,
+    a.gear["7777:Odd Cap"] == nil end""")()
+assert tuple(ahs) == (5, 4000, 2, 25, "INVTYPE_WEAPON", 100, 1, True), tuple(ahs)
+out = "\n".join(L.globals().printed.values())
+assert "5 listings, 1 gear items recorded, 1 other items priced, 1 gear items had no data" in out, out
+assert "Seller" not in L.eval("function() local b = {} for k, v in pairs(GearwrightProbeDB.scans.auction.gear) do b[#b+1] = v.link end return table.concat(b) end")()
+L.execute("printed = {}")
+L.globals().SlashCmdList.GEARWRIGHTPROBE("ah")
+assert "one full scan every 15 minutes; try again in 15 min" in L.globals().printed[1], L.globals().printed[1]
+L.globals().SlashCmdList.GEARWRIGHTPROBE("export ah")
+assert '"auction"' in L.globals().EXPORTTEXT and '"snapshots"' not in L.globals().EXPORTTEXT
+L.globals().fire("AUCTION_HOUSE_CLOSED")
+L.execute("C_AuctionHouse = nil")
 L.globals().SlashCmdList.GEARWRIGHTPROBE("export")
 print("---- probe export title ----"); print(L.globals().LASTTEXT)
 for p in L.globals().printed.values(): print("  >", p)
 
 open(OUT/"export.json","w").write(L.globals().EXPORTTEXT)
+assert '"auction"' not in L.globals().EXPORTTEXT  # the big auction scan has its own export
 # The probe's loot log turns into Gearwright's own dungeon loot table.
 gen = OUT / "DungeonLoot.lua"
 subprocess.run([sys.executable, str(R / "tools" / "loot_from_probe.py"), str(OUT / "export.json"), "-o", str(gen)],
@@ -710,4 +750,6 @@ for f in ("export.json", "GearwrightProbe.lua"):
                  "Equip: Improves your chance to hit by 2.0%.",
                  "encounter journal: 1 instances, 1 tiers", "1 of 20 known IDs answered", "The Deadmines (dungeon, 2 bosses, loot"):
         assert want in r.stdout, (want, r.stdout)
+    if f == "GearwrightProbe.lua":  # the SavedVariables file has the auction scan too
+        assert "auction house scan 2026-10-03 16:00:00: 5 listings, 1 gear items, 1 other items priced" in r.stdout, r.stdout
 print("\nALL SMOKE TESTS PASSED")

@@ -275,6 +275,17 @@ Gearwright's settings (`GearwrightDB`) can rely on this; `/gwp export` is a conv
 not a workaround. The second snapshot (gear only) matched the first, so it wasn't
 committed as a separate capture.
 
+## Auction house
+
+Auctionator 340 runs on Forever with its **modern** auction house code
+(`C_AuctionHouse`), not the Classic one. So Forever's AH API is Mainline's:
+`C_AuctionHouse.ReplicateItems()` asks for every listing at once (allowed once per
+15 minutes), `REPLICATE_ITEM_LIST_UPDATE` says it arrived, then
+`GetNumReplicateItems` / `GetReplicateItemInfo(i)` / `GetReplicateItemLink(i)` (0-based)
+read it. Some listings come without item data and need `RequestLoadItemDataByID` first.
+Auctionator is "All Rights Reserved"; none of its code is used, only the API it shows.
+`/gwp ah` does that scan (not yet run on the beta).
+
 ## Still open
 
 - [x] Encounter Journal loot tables: not available on Forever (`WRONG_GAME_TYPE`)

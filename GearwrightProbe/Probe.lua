@@ -116,6 +116,9 @@ local API_PATHS = {
   "C_TradeSkillUI.GetAllRecipeIDs", "C_TradeSkillUI.GetRecipeInfo", "C_TradeSkillUI.GetBaseProfessionInfo",
   "GetNumTradeSkills", "GetTradeSkillInfo", "GetNumTrainerServices", "GetTrainerServiceInfo",
   "GetProfessions", "GetProfessionInfo",
+  -- auction house full scan
+  "C_AuctionHouse.ReplicateItems", "C_AuctionHouse.GetNumReplicateItems", "C_AuctionHouse.GetReplicateItemInfo",
+  "C_AuctionHouse.GetReplicateItemLink", "C_AuctionHouse.SendBrowseQuery",
   -- inspect
   "NotifyInspect", "CanInspect",
   -- weapon skills (does a talent add axes?)
@@ -655,9 +658,19 @@ local function toJSON(v, buf)
   end
 end
 
-function P.export()
+-- /gwp export: everything but the auction scan (it's big); /gwp export ah: only that.
+function P.export(arg)
+  local d, out = db(), {}
+  if arg == "ah" then
+    if not d.scans.auction then return say("no auction scan yet: /gwp ah at the auction house") end
+    out = { scans = { auction = d.scans.auction } }
+  else
+    for k, v in pairs(d) do out[k] = v end
+    out.scans = {}
+    for k, v in pairs(d.scans) do if k ~= "auction" then out.scans[k] = v end end
+  end
   local buf = {}
-  toJSON(db(), buf)
+  toJSON(out, buf)
   local text = table.concat(buf)
   if not P.exportFrame then
     local f = CreateFrame("Frame", "GearwrightProbeExport", UIParent, "BasicFrameTemplateWithInset")
@@ -692,6 +705,134 @@ function P.export()
   say("export: %d characters", #text)
 end
 
+-- Auction house ------------------------------------------------------------------
+-- /gwp ah, with the auction house open: one full scan of every listing
+-- (C_AuctionHouse.ReplicateItems; the server allows one every 15 minutes).
+-- Gear is recorded in full (link, level, slot, stats, tooltip text), so we get
+-- the stats of hundreds of items nobody has to equip. Everything else only
+-- keeps its lowest unit buyout, for crafting costs later. Sellers' names are
+-- never recorded.
+local AH_BATCH, AH_RETRIES, AH_COOLDOWN = 400, 6, 15 * 60
+
+local function isGear(itemID)
+  if not (C_Item and C_Item.GetItemInfoInstant) then return false end
+  local _, _, _, equipLoc, _, classID, subclassID = C_Item.GetItemInfoInstant(itemID)
+  if (classID == 2 or classID == 4) and type(equipLoc) == "string" and equipLoc ~= ""
+      and equipLoc ~= "INVTYPE_NON_EQUIP_IGNORE" and equipLoc ~= "INVTYPE_BAG" then
+    return true, equipLoc, classID, subclassID
+  end
+  return false
+end
+
+-- Full record of one gear listing, or nil when the client hasn't the data yet.
+local function readGear(index, itemID)
+  local link = sanitize(C_AuctionHouse.GetReplicateItemLink(index))
+  if type(link) ~= "string" then return nil end
+  local info = pack(C_Item.GetItemInfo(link))
+  if info[1] == nil then return nil end
+  local _, equipLoc, classID, subclassID = isGear(itemID)
+  local tip = capture("C_TooltipInfo.GetHyperlink", link)
+  local stats = itemStats(link)
+  return {
+    id = itemID, name = sanitize(info[1]), link = link, quality = sanitize(info[3]),
+    ilvl = sanitize(info[4]), reqLevel = sanitize(info[5]), equip = equipLoc,
+    class = classID, sub = subclassID, stats = stats.values and stats.values[1],
+    tooltip = tooltipLines(tip.values and tip.values[1]),
+  }
+end
+
+local ah = { open = false }
+
+local function ahFinish(scan, waiting)
+  scan.pending = nil
+  local gear, prices = 0, 0
+  for _ in pairs(scan.gear) do gear = gear + 1 end
+  for _ in pairs(scan.prices) do prices = prices + 1 end
+  scan.missing = waiting
+  ah.scanning = false
+  say("auction house: %d listings, %d gear items recorded, %d other items priced%s",
+    scan.listings, gear, prices, waiting > 0 and (", %d gear items had no data"):format(waiting) or "")
+  say("/reload, then send the SavedVariables file, or /gwp export ah")
+end
+
+-- Gear listings whose item data wasn't loaded: ask the server, try again.
+local function ahRetry(scan, todo, try)
+  if not ah.open then return ahFinish(scan, #todo) end
+  local left = {}
+  for _, t in ipairs(todo) do
+    local rec = not scan.gear[t.key] and readGear(t.index, t.id)
+    if rec then
+      rec.minBuyout, rec.listings = t.buyout, t.listings
+      scan.gear[t.key] = rec
+    elseif not scan.gear[t.key] then
+      left[#left + 1] = t
+      if C_Item.RequestLoadItemDataByID then pcall(C_Item.RequestLoadItemDataByID, t.id) end
+    end
+  end
+  if #left > 0 and try < AH_RETRIES then
+    say("auction house: waiting for %d items...", #left)
+    return C_Timer.After(1.5, function() ahRetry(scan, left, try + 1) end)
+  end
+  ahFinish(scan, #left)
+end
+
+local function ahProcess()
+  local n = C_AuctionHouse.GetNumReplicateItems() or 0
+  local scan = { at = now(), listings = n, gear = {}, prices = {} }
+  db().scans.auction = scan
+  local todo, byKey = {}, {}
+  say("auction house: %d listings, reading...", n)
+  local function batch(start)
+    if not ah.open then return ahFinish(scan, #todo) end
+    for i = start, math.min(start + AH_BATCH, n) - 1 do
+      local info = pack(C_AuctionHouse.GetReplicateItemInfo(i))
+      local count, buyout, itemID = info[3], info[10], info[17]
+      if type(itemID) == "number" then
+        local unit = (type(buyout) == "number" and buyout > 0 and type(count) == "number" and count > 0)
+          and math.floor(buyout / count) or nil
+        local key = tostring(itemID)
+        if isGear(itemID) then
+          -- Random-suffix items share an ID: tell them apart by name.
+          key = key .. ":" .. tostring(sanitize(info[1]))
+          local t = byKey[key]
+          if not t then
+            t = { key = key, index = i, id = itemID, listings = 0 }
+            byKey[key] = t
+            todo[#todo + 1] = t
+          end
+          t.listings = t.listings + 1
+          if unit and (not t.buyout or unit < t.buyout) then t.buyout = unit end
+        elseif unit and (not scan.prices[key] or unit < scan.prices[key]) then
+          scan.prices[key] = unit
+        end
+      end
+    end
+    if start + AH_BATCH < n then
+      return C_Timer.After(0.05, function() batch(start + AH_BATCH) end)
+    end
+    ahRetry(scan, todo, 1)
+  end
+  batch(0)
+end
+
+function P.ah()
+  if not (C_AuctionHouse and C_AuctionHouse.ReplicateItems) then
+    return say("no C_AuctionHouse.ReplicateItems on this client")
+  end
+  if not ah.open then return say("open the auction house first") end
+  if ah.scanning then return say("auction house: already scanning") end
+  local last = db().ahLastScan
+  if last and time() - last < AH_COOLDOWN then
+    return say("auction house: the server allows one full scan every 15 minutes; try again in %d min",
+      math.ceil((AH_COOLDOWN - (time() - last)) / 60))
+  end
+  db().ahLastScan = time()
+  ah.scanning = true
+  ah.waiting = true
+  say("auction house: full scan requested; keep the window open until it says done")
+  C_AuctionHouse.ReplicateItems()
+end
+
 -- Wiring ----------------------------------------------------------------------------
 local events = CreateFrame("Frame")
 events:RegisterEvent("ADDON_LOADED")
@@ -700,6 +841,9 @@ events:RegisterEvent("TRADE_SKILL_SHOW")
 events:RegisterEvent("TRAINER_SHOW")
 events:RegisterEvent("INSPECT_READY")
 events:RegisterEvent("LOOT_OPENED")
+for _, e in ipairs({ "AUCTION_HOUSE_SHOW", "AUCTION_HOUSE_CLOSED", "REPLICATE_ITEM_LIST_UPDATE" }) do
+  pcall(events.RegisterEvent, events, e)
+end
 events:SetScript("OnEvent", function(_, event, arg1)
   if event == "ADDON_LOADED" and arg1 == ADDON then
     persistenceCheck()
@@ -712,6 +856,13 @@ events:SetScript("OnEvent", function(_, event, arg1)
     C_Timer.After(0.5, scanTrainer)
   elseif event == "LOOT_OPENED" then
     recordLoot()
+  elseif event == "AUCTION_HOUSE_SHOW" then
+    ah.open = true
+  elseif event == "AUCTION_HOUSE_CLOSED" then
+    ah.open = false
+  elseif event == "REPLICATE_ITEM_LIST_UPDATE" and ah.waiting then
+    ah.waiting = false
+    ahProcess()
   elseif event == "INSPECT_READY" and P.inspecting then
     onInspectReady()
   end
@@ -873,7 +1024,7 @@ end
 
 local COMMANDS = {
   env = P.env, api = P.api, talents = P.talents, gear = P.gear, stats = P.stats, export = P.export,
-  items = P.items, ej = P.ej,
+  items = P.items, ej = P.ej, ah = P.ah,
   sheet = function() P.sheet() end,
   all = function()
     P.env(); P.api(); P.talents(); P.gear(); P.stats(); P.sheet()
@@ -896,7 +1047,7 @@ SlashCmdList.GEARWRIGHTPROBE = function(msg)
     local ok, err = pcall(fn, rest)
     if not ok then say("|cffff5050error:|r %s", tostring(err)) end
   else
-    say("usage: /gwp all | env | api | talents | gear | stats | sheet | items [ids] | ej | inspect | persist | export | clear")
+    say("usage: /gwp all | env | api | talents | gear | stats | sheet | items [ids] | ej | ah | inspect | persist | export [ah] | clear")
     say("passive: open your character sheet, a profession window or class trainer and it is recorded automatically;")
     say("loot you open is logged with what dropped it")
   end
