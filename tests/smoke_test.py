@@ -37,7 +37,7 @@ SlashCmdList = {}
 C_Timer = { After = function(_, fn) fn() end }
 WOW_PROJECT_ID = 99
 function GetLocale() return "enUS" end
-function GetBuildInfo() return "1.15.0", "99999", "Oct 1 2026", 120105 end
+function GetBuildInfo() return "1.60.1", "70205", "Oct 2 2026", 16001 end
 function UnitClass() return "Rogue", "ROGUE" end
 function UnitRace() return "Human","Human" end
 function UnitLevel() return 30 end

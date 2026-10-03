@@ -27,7 +27,7 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 
 | Question | Answer | Capture |
 |---|---|---|
-| Interface number | | |
+| Interface number | 16001 (client 1.60.1, build 70205) | `/dump select(4, GetBuildInfo())` |
 | Talent API (classic / traits / none) | | |
 | Talent ranks readable or secret? | | |
 | Item stat tokens seen | | |
