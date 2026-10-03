@@ -115,6 +115,7 @@ local API_PATHS = {
   -- professions / trainers
   "C_TradeSkillUI.GetAllRecipeIDs", "C_TradeSkillUI.GetRecipeInfo", "C_TradeSkillUI.GetBaseProfessionInfo",
   "GetNumTradeSkills", "GetTradeSkillInfo", "GetNumTrainerServices", "GetTrainerServiceInfo",
+  "GetProfessions", "GetProfessionInfo",
   -- inspect
   "NotifyInspect", "CanInspect",
   -- weapon skills (does a talent add axes?)

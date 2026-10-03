@@ -31,7 +31,9 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [x] First-pass stat weights per spec (clearly labelled as early; AP equivalents, scaled by level)
 - [x] Skip items the class can't use; spec weapon rules (daggers for Assassination)
 - [x] Quest reward pick and loot/roll upgrade messages
-- [x] Crafted upgrades from every profession you've opened, both primaries (`/gearwright craft`)
+- [x] Crafted upgrades from every scanned profession, yours or not: craft it, learn it, or have it
+      crafted (`Data/Crafted.lua` from `tools/crafted_from_probe.py`; Crafting tab)
+- [ ] Engineering recipes (needs a probe scan from an engineer)
 - [x] Advice before level 10 (no talent points yet): scored as the leveling spec, Combat
 - [ ] Bag scan for upgrades you're carrying
 - [ ] One recommended build per spec (raid DPS)

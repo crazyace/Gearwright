@@ -78,6 +78,33 @@ TABS.upgrades = {
   end,
 }
 
+local CRAFT_COLOR = { craft = "good", learn = "warn", yours = "warn", order = "muted" }
+
+TABS.crafting = {
+  label = "Crafting", icon = "Interface\\Icons\\Trade_BlackSmithing",
+  build = function()
+    local list, reason, pending = ns.Advisor.CraftReport()
+    if not list then return {}, why(reason) end
+    local rows = {}
+    for _, r in ipairs(list) do
+      local sub = slotName(r.slot) .. "  -  " .. Theme.Hex(CRAFT_COLOR[r.status]) .. ns.Advisor.CraftStatusText(r) .. "|r"
+      if r.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(r.reqLevel) end
+      rows[#rows + 1] = {
+        icon = ns.API.GetItemIcon("item:" .. r.itemID) or EMPTY_ICON,
+        title = r.link or r.name, sub = sub, link = r.link,
+        value = plus(r.delta), valueColor = "good",
+      }
+    end
+    local message
+    if pending and pending > 0 then
+      message = ("Reading %d more items from the server..."):format(pending)
+    elseif #rows == 0 then
+      message = "No crafted upgrades for you up to " .. ns.Advisor.CRAFT_LOOKAHEAD .. " levels ahead."
+    end
+    return rows, message
+  end,
+}
+
 TABS.enchants = {
   label = "Enchants", icon = "Interface\\Icons\\Trade_Engraving",
   build = function()
@@ -119,7 +146,7 @@ TABS.talents = {
   end,
 }
 
-UI.TAB_ORDER = { "gear", "upgrades", "enchants", "talents" }
+UI.TAB_ORDER = { "gear", "upgrades", "crafting", "enchants", "talents" }
 UI.TABS = TABS
 
 function UI.BuildRows(tab)
@@ -346,7 +373,7 @@ for _, event in ipairs(ns.API.TALENT_EVENTS) do ns:On(event, refreshIfShown) end
 -- Dungeon items arrive from the server a few at a time; redraw once they settle.
 local refreshQueued
 ns:On("GET_ITEM_INFO_RECEIVED", function()
-  if refreshQueued or UI.tab ~= "upgrades" or not (UI.frame and UI.frame:IsShown()) then return end
+  if refreshQueued or (UI.tab ~= "upgrades" and UI.tab ~= "crafting") or not (UI.frame and UI.frame:IsShown()) then return end
   refreshQueued = true
   C_Timer.After(0.5, function() refreshQueued = false; refreshIfShown() end)
 end)

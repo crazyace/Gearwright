@@ -10,8 +10,9 @@ stat weights, and tells you:
   (chat messages; `/gearwright notices` turns them off)
 - **Talents** - where does your build differ from the recommended one?
 - **Enchants** - the best stat enchant for each slot, and what it adds over the one you have
-- **Crafting** - which items your professions can make are upgrades, across both primary
-  professions (open each once so Gearwright remembers its recipes; `/gearwright craft`)
+- **Crafting** - crafted upgrades from every profession, yours or not: whether you can craft
+  it, need to learn the recipe, or should have someone craft it (`/gearwright` -> Crafting,
+  `/gearwright craft`)
 - **Dungeons** - the boss drops and dungeon quest rewards that would be upgrades for you, and
   where they drop (window tab + tooltip line)
 
@@ -82,7 +83,7 @@ python tests/smoke_test.py
 | `/gearwright spec <assassination\|combat\|subtlety\|auto>` | Force or auto-detect spec |
 | `/gearwright tooltip` | Toggle the tooltip upgrade line |
 | `/gearwright notices` | Toggle quest reward / loot upgrade messages |
-| `/gearwright craft` | Upgrades your professions can craft, up to 5 levels ahead (open each profession once first) |
+| `/gearwright craft` | Crafted upgrades up to 5 levels ahead, and who can make them |
 | `/gwp all` | Probe: dump env, APIs, talents, gear, stats |
 | `/gwp sheet` | Probe: record the character sheet's stat lines and tooltips (also automatic when you open it) |
 | `/gwp export` | Probe: copyable JSON of everything recorded |

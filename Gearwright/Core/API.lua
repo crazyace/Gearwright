@@ -104,6 +104,21 @@ function API.RequestItem(itemID)
 end
 
 -- Recipes -----------------------------------------------------------------------
+-- The player's professions as { [name] = skillLevel }, from GetProfessions
+-- (Mainline). Empty when the client has no such API.
+function API.PlayerProfessions()
+  local out = {}
+  if not (GetProfessions and GetProfessionInfo) then return out end
+  local ok, a, b, c, d, e, f = pcall(GetProfessions)
+  if not ok then return out end
+  for _, index in pairs({ a, b, c, d, e, f }) do
+    local okI, name, _, skill = pcall(GetProfessionInfo, index)
+    name = okI and API.clean(name)
+    if name then out[name] = API.clean(skill) or 0 end
+  end
+  return out
+end
+
 -- Every recipe of the open profession window, learned or not:
 --   { { recipeID=, name=, learned=, itemID= }, ... }, professionName   or nil, reason
 function API.ReadRecipes()

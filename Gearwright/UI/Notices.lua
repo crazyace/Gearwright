@@ -120,42 +120,39 @@ ns:On("LOOT_OPENED", function() Notices.Loot() end)
 ns:On("START_LOOT_ROLL", function(rollID) Notices.Roll(rollID) end)
 
 -- Crafting ---------------------------------------------------------------------
--- /gearwright craft: every profession whose window has been opened on this
--- character (up to two primary professions on Forever, plus secondary ones).
+-- /gearwright craft: crafted upgrades from every profession, with whether you
+-- can make it yourself, need to learn the recipe, or should have it crafted.
 
 local CRAFT_REASONS = {
-  ["no-profession-open"] = "open each of your professions once so Gearwright can read its recipes",
-  ["no-tradeskill-api"] = "this client has no profession API Gearwright knows",
+  ["no-craft-data"] = "no recipes known yet; open a profession window with the probe or Gearwright loaded",
 }
 local CRAFT_SHOWN = 8
 
 function Notices.Craft(retried)
-  local rows, professions, pending = ns.Advisor.CraftReport()
+  local rows, mine, pending = ns.Advisor.CraftReport()
   if not rows then
-    ns.util.print("craft: %s", CRAFT_REASONS[professions] or tostring(professions))
+    ns.util.print("craft: %s", CRAFT_REASONS[mine] or tostring(mine))
     return
   end
-  local which = table.concat(professions, " and ")
   if pending > 0 and not retried and C_Timer then
-    ns.util.print("reading %d %s items...", pending, which)
+    ns.util.print("reading %d crafted items...", pending)
     C_Timer.After(2, function() Notices.Craft(true) end)
     return
   end
   if #rows == 0 then
-    ns.util.print("no %s upgrades for you up to level %d", which,
+    ns.util.print("no crafted upgrades for you up to level %d",
       (ns.API.clean(UnitLevel("player")) or 0) + ns.Advisor.CRAFT_LOOKAHEAD)
   else
-    ns.util.print("%s upgrades:", which)
+    ns.util.print("crafted upgrades:")
     for i = 1, math.min(#rows, CRAFT_SHOWN) do
       local r = rows[i]
       local s = describe({ link = r.link or r.name or ("item " .. r.itemID), delta = r.delta, slot = r.slot, reqLevel = r.reqLevel })
-      local tag = #professions > 1 and (" |cff999999[" .. r.profession .. "]|r") or ""
-      print("  " .. s .. tag .. (r.learned and "" or " |cff999999(not learned)|r"))
+      print("  " .. s .. " |cff999999- " .. ns.Advisor.CraftStatusText(r) .. "|r")
     end
-    if #rows > CRAFT_SHOWN then print(("  ...and %d more"):format(#rows - CRAFT_SHOWN)) end
+    if #rows > CRAFT_SHOWN then print(("  ...and %d more (see /gearwright -> Crafting)"):format(#rows - CRAFT_SHOWN)) end
   end
-  if #professions == 1 then
-    ns.util.print("only %s seen so far; if you have a second profession, open it once to include it", professions[1])
+  if #mine == 0 then
+    ns.util.print("open your professions once so Gearwright knows which recipes you have")
   end
   if pending > 0 then ns.util.print("%d items still not cached; run it again in a moment", pending) end
   return rows

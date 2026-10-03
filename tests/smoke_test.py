@@ -428,29 +428,38 @@ cap_delta = L.eval("function(ns) return ns.Advisor.CompareToEquipped('item:1002:
 print("craft:", crafted)
 assert [r[0] for r in crafted] == [5, 1] and abs(crafted[1][1] - cap_delta) < 1e-9, crafted
 out = "\n".join(L.globals().printed.values())
-assert "reading 1 Leatherworking items" in out and "Leatherworking upgrades:" in out and "(not learned)" in out, out
-assert "only Leatherworking seen so far" in out, out
-# Two primary professions: opening Blacksmithing adds its recipes to the
-# remembered Leatherworking ones; both still count once the window is closed.
+assert "reading 1 crafted items" in out and "crafted upgrades:" in out, out
+assert "learn the recipe (Leatherworking)" in out and "you can craft it (Leatherworking)" in out, out
+# Professions you don't have still count: the 25-DPS sword over the 20-DPS
+# dagger is an upgrade to have crafted. Once GetProfessions says you're a
+# blacksmith it's yours to check; opening Blacksmithing says the recipe isn't learned.
 L.execute("""
 ITEMS["item:2002"] = ITEMS["item:2002:0:0"]
-CRAFT_OUTPUT[6] = 2002; RECIPES = { 6 }
-C_TradeSkillUI.GetBaseProfessionInfo = function() return { professionName = "Blacksmithing" } end
+CRAFT_OUTPUT[6] = 2002
 """)
+L.eval("""function(ns) SAVED_CRAFTED = ns.Data.CRAFTED
+  ns.Data.CRAFTED = { professions = { "Blacksmithing" }, recipes = { { 1, 6, 2002, "Sword" } } } end""")(ns)
+def sword():
+    return L.eval("""function(ns) local rows = ns.Advisor.CraftReport()
+      for _, r in ipairs(rows) do if r.itemID == 2002 then return r.status, ns.Advisor.CraftStatusText(r) end end end""")(ns)
+L.execute("RECIPES = {}")  # Leatherworking window closed
+assert sword() == ("order", "have it crafted (Blacksmithing)"), sword()
+L.execute("""function GetProfessions() return 1, 2 end
+function GetProfessionInfo(i) return ({ "Leatherworking", "Blacksmithing" })[i], "icon", 50 end""")
+assert sword()[0] == "yours", sword()
+L.execute("""RECIPES = { 6 }
+C_TradeSkillUI.GetBaseProfessionInfo = function() return { professionName = "Blacksmithing" } end""")
 L.globals().fire("TRADE_SKILL_SHOW")
 L.execute("RECIPES = {}; printed = {}")
-both = L.eval("""function(ns) local rows, names = ns.Advisor.CraftReport() local o = {}
-  for _, r in ipairs(rows) do o[#o + 1] = r.profession .. ":" .. r.recipeID end
-  return table.concat(names, ","), table.concat(o, ",") end""")(ns)
-print("two professions:", both)
-assert both[0] == "Blacksmithing,Leatherworking" and "Blacksmithing:6" in both[1] and "Leatherworking:1" in both[1], both
+assert sword()[0] == "learn", sword()
 L.globals().SlashCmdList.GEARWRIGHT("craft")
 out = "\n".join(L.globals().printed.values())
-assert "Blacksmithing and Leatherworking upgrades:" in out and "[Blacksmithing]" in out, out
-L.execute("printed = {}")
-L.eval("function(ns) ns.db.recipes = nil end")(ns)
+assert "learn the recipe (Blacksmithing)" in out and "learn the recipe (Leatherworking)" in out, out
+L.execute("GetProfessions, GetProfessionInfo = nil, nil; printed = {}")
+L.eval("function(ns) ns.db.recipes = nil; ns.Data.CRAFTED = nil end")(ns)
 L.globals().SlashCmdList.GEARWRIGHT("craft")
-assert "open each of your professions once" in L.globals().printed[1], L.globals().printed[1]
+assert "no recipes known yet" in L.globals().printed[1], L.globals().printed[1]
+L.eval("function(ns) ns.Data.CRAFTED = SAVED_CRAFTED end")(ns)
 L.execute("C_TradeSkillUI = nil")
 
 # Dungeons ------------------------------------------------------------------------
@@ -676,6 +685,10 @@ assert 'itemID = 5540, name = "Pearl-handled Dagger", dungeon = "The Deadmines",
 assert subprocess.run([sys.executable, str(R / "tools" / "loot_from_probe.py"), *map(str, sorted((R / "data" / "probe").glob("*.json"))),
                        "-o", str(OUT / "check.lua")], capture_output=True).returncode == 0
 assert (OUT / "check.lua").read_text() == (R / "Gearwright" / "Data" / "DungeonLoot.lua").read_text(), "rerun tools/loot_from_probe.py"
+# Data/Crafted.lua is current with the saved probe scans.
+assert subprocess.run([sys.executable, str(R / "tools" / "crafted_from_probe.py"), *map(str, sorted((R / "data" / "probe").glob("*.json"))),
+                       "-o", str(OUT / "crafted.lua")], check=True, capture_output=True).returncode == 0
+assert (OUT / "crafted.lua").read_text() == (R / "Gearwright" / "Data" / "Crafted.lua").read_text(), "rerun tools/crafted_from_probe.py"
 # also write a SavedVariables-style Lua file
 L.execute(r"""
 local function ser(v, ind)

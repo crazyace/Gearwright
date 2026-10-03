@@ -256,51 +256,97 @@ end
 Advisor.CRAFT_LOOKAHEAD = 5 -- also show items up to this many levels above you
 local CRAFT_UPGRADE = 0.5
 
--- Upgrades among the recipes of every profession this character has opened
--- (Engine/Professions.lua; Forever allows two primary professions), best first:
---   rows = { { recipeID, name, learned, itemID, link, delta, slot, reqLevel, profession } }
--- Returns rows, professions (sorted names), pending  (pending = items not cached yet)
+-- Crafted upgrades from every profession, yours or not, best first. Recipes
+-- come from Data/Crafted.lua (every profession the probe has scanned) and from
+-- the profession windows you've opened (Engine/Professions.lua).
+--   rows = { { recipeID, name, itemID, link, delta, slot, reqLevel, profession, status } }
+--   status: "craft"  your profession, recipe learned
+--           "learn"  your profession, recipe not learned yet
+--           "yours"  your profession, but its window hasn't been opened to check
+--           "order"  not your profession: have someone craft it
+-- Returns rows, mine (sorted names of your professions), pending
 --   or nil, reason
 function Advisor.CraftReport()
   local ctx, reason = Advisor.Context()
   if not ctx then return nil, reason end
-  local known = ns.Professions.Known()
-  local names = {}
-  for name in pairs(known) do names[#names + 1] = name end
-  if #names == 0 then
-    local _, why = ns.API.ReadRecipes()
-    return nil, why or "no-profession-open"
+
+  local known = ns.Professions.Known()          -- [prof] = { recipes } you've opened
+  local have = ns.API.PlayerProfessions()        -- [prof] = skill
+  for name in pairs(known) do have[name] = have[name] or true end
+  local mine = {}
+  for name in pairs(have) do mine[#mine + 1] = name end
+  table.sort(mine)
+
+  -- One entry per (profession, item): your own scan wins, it knows "learned".
+  local recipes, seen = {}, {}
+  local function add(prof, r)
+    local key = prof .. ":" .. tostring(r.itemID)
+    if r.itemID and not seen[key] then
+      seen[key] = true
+      recipes[#recipes + 1] = { prof = prof, recipeID = r.recipeID, name = r.name, itemID = r.itemID, learned = r.learned }
+    end
   end
-  table.sort(names)
+  for prof, list in pairs(known) do
+    for _, r in ipairs(list) do add(prof, r) end
+  end
+  local data = ns.Data.CRAFTED
+  for _, r in ipairs(data and data.recipes or {}) do
+    add(data.professions[r[1]], { recipeID = r[2], itemID = r[3], name = r[4] })
+  end
+  if #recipes == 0 then return nil, "no-craft-data" end
 
   local level = ns.API.clean(UnitLevel("player")) or 1
-  local rows, pending = {}, 0
-  for _, profession in ipairs(names) do
-    for _, r in ipairs(known[profession]) do
-      local item = r.itemID and ("item:" .. r.itemID)
-      local reqLevel = item and ns.API.GetItemDetails(item)
-      if item and not reqLevel then
-        -- Not cached yet, or not an item we can read; equippability works uncached.
-        if ns.API.GetItemBasics(item) and Advisor.CandidateSlots(item, ctx) then
-          pending = pending + 1
-          ns.API.RequestItem(r.itemID)
+  local rows, pending, best = {}, 0, {}
+  for _, r in ipairs(recipes) do
+    local item = "item:" .. r.itemID
+    local reqLevel = ns.API.GetItemDetails(item)
+    if not reqLevel then
+      -- Not cached yet, or not an item we can read; equippability works uncached.
+      if ns.API.GetItemBasics(item) and Advisor.CandidateSlots(item, ctx) then
+        pending = pending + 1
+        ns.API.RequestItem(r.itemID)
+      end
+    elseif reqLevel <= level + Advisor.CRAFT_LOOKAHEAD then
+      local delta, slot = Advisor.CompareToEquipped(item, ctx)
+      if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
+        pending = pending + 1
+      elseif type(delta) == "number" and delta > CRAFT_UPGRADE then
+        local status = "order"
+        if have[r.prof] then
+          status = (r.learned == true and "craft") or (r.learned == false and "learn") or "yours"
         end
-      elseif item and reqLevel <= level + Advisor.CRAFT_LOOKAHEAD then
-        local delta, slot = Advisor.CompareToEquipped(item, ctx)
-        if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
-          pending = pending + 1
-        elseif type(delta) == "number" and delta > CRAFT_UPGRADE then
-          rows[#rows + 1] = {
-            recipeID = r.recipeID, name = r.name, learned = r.learned, itemID = r.itemID,
-            link = ns.API.GetItemLink(item), delta = delta, slot = slot,
-            reqLevel = reqLevel > level and reqLevel or nil, profession = profession,
-          }
+        local row = {
+          recipeID = r.recipeID, name = r.name, itemID = r.itemID, link = ns.API.GetItemLink(item),
+          delta = delta, slot = slot, reqLevel = reqLevel > level and reqLevel or nil,
+          profession = r.prof, status = status,
+        }
+        -- An item several professions make: keep the one you can do most about.
+        local prev = best[r.itemID]
+        if not prev then
+          best[r.itemID] = row
+          rows[#rows + 1] = row
+        elseif Advisor.CRAFT_STATUS_ORDER[status] < Advisor.CRAFT_STATUS_ORDER[prev.status] then
+          for k, v in pairs(row) do prev[k] = v end
         end
       end
     end
   end
-  table.sort(rows, function(a, b) return a.delta > b.delta end)
-  return rows, names, pending
+  table.sort(rows, function(x, y)
+    if x.delta ~= y.delta then return x.delta > y.delta end
+    return x.itemID < y.itemID
+  end)
+  return rows, mine, pending
+end
+
+Advisor.CRAFT_STATUS_ORDER = { craft = 1, learn = 2, yours = 3, order = 4 }
+
+-- "you can craft this" / "learn it: Leatherworking" / "have it crafted: Blacksmithing"
+function Advisor.CraftStatusText(row)
+  local s = row.status
+  if s == "craft" then return "you can craft it (" .. row.profession .. ")" end
+  if s == "learn" then return "learn the recipe (" .. row.profession .. ")" end
+  if s == "yours" then return row.profession .. ": open it to check the recipe" end
+  return "have it crafted (" .. row.profession .. ")"
 end
 
 -- Dungeons ---------------------------------------------------------------------

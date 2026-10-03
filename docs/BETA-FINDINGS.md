@@ -224,6 +224,10 @@ Forever-specific amounts worth knowing:
 
 - Forever allows **two primary professions**. The API only lists the open profession's
   recipes, so Gearwright saves them per character whenever a profession window opens.
+- Crafted gear from other professions comes from the probe scans (`Data/Crafted.lua`):
+  Blacksmithing, Enchanting, Leatherworking and Tailoring so far; no Engineering scan yet.
+  Which professions you have comes from `GetProfessions`/`GetProfessionInfo`, if the
+  client has them (the probe now records whether it does).
 - `C_TradeSkillUI.GetAllRecipeIDs` lists every recipe of the profession, learned or not.
 - `GetRecipeSchematic(id, false).outputItemID` gives the crafted item, so crafted gear
   can be scored like any other item (`/gearwright craft`).
