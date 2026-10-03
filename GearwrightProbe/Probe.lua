@@ -318,7 +318,10 @@ local function regionTexts(frame)
   local out = {}
   if type(frame.GetRegions) ~= "function" then return out end
   for _, r in ipairs({ frame:GetRegions() }) do
-    if type(r.GetObjectType) == "function" and r:GetObjectType() == "FontString" then
+    -- Hidden font strings hold placeholder text (e.g. the level line's
+    -- "Free Trial level cap reached."), so only shown ones count.
+    local shown = type(r.IsShown) ~= "function" or r:IsShown()
+    if shown and type(r.GetObjectType) == "function" and r:GetObjectType() == "FontString" then
       local t = fontText(r)
       if type(t) == "string" and t ~= "" then out[#out + 1] = t end
     end

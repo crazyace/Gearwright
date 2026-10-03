@@ -109,8 +109,8 @@ leftover on Forever; the real stat lines are unnamed frames elsewhere in the win
 
 **Weapon skill exists** (Classic style), so weapon-skill bonuses may matter for gear.
 
-**This account is a Free Trial capped at level 19** ("Free Trial level cap reached" on
-the level line). Captures at other levels need a non-trial character.
+The beta's level cap is currently 30. (An earlier note here claimed a Free Trial cap at
+19; that came from a hidden placeholder string on the level line, which the probe now ignores.)
 
 ## Enchants
 
@@ -141,5 +141,5 @@ committed as a separate capture.
 - [ ] Enchanting recipes and trainer services (open the windows; recorded automatically)
 - [ ] Other Rogues' gear and enchants (`/gwp inspect`)
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety
-- [ ] Agility-per-crit at more levels (`/gwp all` every few levels; blocked at 19 on a Free Trial account)
+- [ ] Agility-per-crit at more levels (`/gwp all` every few levels; beta cap is 30)
 - [ ] Does any gear carry weapon-skill bonuses ("+N Daggers")?

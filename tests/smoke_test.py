@@ -247,8 +247,12 @@ GameTooltip.Hide = function(self) self.item = nil; hide(self) end
 -- strings are blank (nil) still show a plain tooltip on hover. Neither is a stat.
 local emptySlot = frame(nil, nil, { text(nil) }, { OnEnter = function() GameTooltip:AddLine("Head") end })
 local zoom = frame(nil, nil, { text(nil) }, { OnEnter = function() GameTooltip:AddLine("Zoom In") end })
+-- The level line carries a hidden placeholder string that must not be read.
+local hiddenText = text("Free Trial level cap reached.")
+hiddenText.IsShown = function() return false end
+local levelInfo = frame(nil, { GetName = function() return "PaperDollLevelInfo" end }, { text("Level 19"), hiddenText })
 local statsPane = frame({ agility })
-PaperDollFrame = frame({ CharacterStatsPane, statsPane, slot, emptySlot, zoom }, {
+PaperDollFrame = frame({ levelInfo, CharacterStatsPane, statsPane, slot, emptySlot, zoom }, {
   HookScript = function(self, _, fn) self.onShow = fn end })
 CharacterFrame = frame({ PaperDollFrame })
 -- Like the beta client: right after ToggleCharacter the window doesn't report
@@ -271,8 +275,8 @@ L.globals().fire("ADDON_LOADED","GearwrightProbe"); L.globals().fire("PLAYER_LOG
 L.globals().SlashCmdList.GEARWRIGHTPROBE("all")  # window closed: /gwp all opens it, reads it, closes it
 assert L.eval("function() return TOGGLES, SHEET_OPEN end")() == (2, False)
 dbg = L.eval("""function() local d = GearwrightProbeDB.snapshots[1].sections.sheetDebug
-  return d.how, d.hovered, d.stored, d.map[1] end""")()
-assert tuple(dbg) == ("opened by probe", 1, 1, "3 StatsPaneAgility: Agility: | 66"), tuple(dbg)
+  return d.how, d.hovered, d.stored, d.map[1], d.map[2] end""")()
+assert tuple(dbg) == ("opened by probe", 1, 1, "2 PaperDollLevelInfo: Level 19", "3 StatsPaneAgility: Agility: | 66"), tuple(dbg)
 # With the window closed and no way to open it, an empty read keeps the earlier capture.
 L.execute("local t = ToggleCharacter; ToggleCharacter = nil; SlashCmdList.GEARWRIGHTPROBE('sheet'); ToggleCharacter = t")
 sheet = L.eval("""function() local s = GearwrightProbeDB.snapshots[1].sections.sheet
