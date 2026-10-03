@@ -80,10 +80,18 @@ The enchant ID parses out of the item link as expected.
 `issecretvalue` and `canaccessvalue` exist. Nothing captured so far was secret:
 talents, item stats, tooltips and all 14 character-stat calls returned plain values.
 
+## SavedVariables
+
+**They persist across sessions.** In a later session the probe's login line read
+"SavedVariables OK: found data written 2026-10-03 16:49:39", and that session's export
+still held the 16:36:04 snapshot from the first session next to a new 16:50:41 one.
+Gearwright's settings (`GearwrightDB`) can rely on this; `/gwp export` is a convenience,
+not a workaround. The second snapshot (gear only) matched the first, so it wasn't
+committed as a separate capture.
+
 ## Still open
 
 - [ ] Hit/crit/haste/expertise units: equip gear with those stats, `/gwp gear`
-- [ ] SavedVariables persistence: log in a second session and read the probe's login line
 - [ ] Enchanting recipes and trainer services (open the windows; recorded automatically)
 - [ ] Other Rogues' gear and enchants (`/gwp inspect`)
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety

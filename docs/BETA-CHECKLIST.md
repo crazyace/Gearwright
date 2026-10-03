@@ -33,5 +33,5 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 | Item stat tokens seen | see BETA-FINDINGS.md | 2026-10-03-assassination |
 | Hit/crit units (rating or %) | | |
 | Which stat calls are secret? | none so far | 2026-10-03-assassination |
-| SavedVariables persist? | | |
+| SavedVariables persist? | yes | 2026-10-03 second session |
 | Tab order: Assassination / Combat / Subtlety? | n/a: groups 11580 / 11573 / 11572 | 2026-10-03-assassination |
