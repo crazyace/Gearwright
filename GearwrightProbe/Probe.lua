@@ -343,12 +343,17 @@ local function hoverTooltip(frame)
   return #lines > 0 and lines or nil
 end
 
-local function collectSheet(frame, out, seen, depth)
+local function collectSheet(frame, out, seen, depth, diag)
   if depth > 10 or #out >= 150 or type(frame) ~= "table" or type(frame.GetChildren) ~= "function" then return end
+  diag.scanned = diag.scanned + 1
   local visible = type(frame.IsVisible) ~= "function" or frame:IsVisible()
-  if visible then
-    local static = type(frame.tooltip) == "string" or type(frame.tooltip2) == "string"
-    local hover = hoverTooltip(frame)
+  if visible then diag.visible = diag.visible + 1 end
+  local static = type(frame.tooltip) == "string" or type(frame.tooltip2) == "string"
+  if static then diag.stored = diag.stored + 1 end
+  -- Stored text is readable even with the window closed; hovering needs it on screen.
+  local hover = visible and hoverTooltip(frame) or nil
+  if hover then diag.hovered = diag.hovered + 1 end
+  do
     local key = hover and hover[1] or (static and tostring(frame.tooltip))
     if key and not seen[key] then
       seen[key] = true
@@ -362,25 +367,33 @@ local function collectSheet(frame, out, seen, depth)
       }
     end
   end
-  for _, child in ipairs({ frame:GetChildren() }) do collectSheet(child, out, seen, depth + 1) end
+  for _, child in ipairs({ frame:GetChildren() }) do collectSheet(child, out, seen, depth + 1, diag) end
 end
 
-local function recordSheet(quiet)
+local function recordSheet(quiet, how)
   local root = _G.CharacterStatsPane or _G.PaperDollFrame or _G.CharacterFrame
   if not root then return say("no character sheet frame found") end
-  local lines = {}
-  collectSheet(root, lines, {}, 0)
+  local lines, diag = {}, { scanned = 0, visible = 0, stored = 0, hovered = 0 }
+  collectSheet(root, lines, {}, 0, diag)
+  local paperDoll = _G.PaperDollFrame
+  diag.how = how or "already open"
+  diag.root = (type(root.GetName) == "function" and root:GetName()) or "?"
+  diag.windowVisible = paperDoll and paperDoll:IsVisible() or false
+  diag.toggleCharacter = type(_G.ToggleCharacter) == "function"
   local s = snapshot()
+  s.sections.sheetDebug = diag  -- why a capture came out the way it did
   local old = s.sections.sheet
-  if #lines == 0 and type(old) == "table" and #old > 0 then
-    -- Never let an empty read (window closed) replace a real capture.
-    if not quiet then say("character sheet: nothing visible, kept the %d lines recorded earlier", #old) end
+  if type(old) == "table" and #old > #lines then
+    -- Never let a worse read (window closed, fewer lines) replace a better one.
+    if not quiet then say("character sheet: this read found %d lines, kept the %d recorded earlier", #lines, #old) end
     return
   end
   s.level = sanitize(UnitLevel("player"))
   s.sections.sheet = lines
-  if #lines == 0 then
-    say("character sheet: 0 stat lines; open it with C, expand every category, then /gwp sheet")
+  if #lines <= 1 then
+    say("character sheet: %d stat lines (window %s, %d frames, %d visible, %d hovered)",
+      #lines, diag.windowVisible and "open" or "closed", diag.scanned, diag.visible, diag.hovered)
+    say("  open it with C, expand every category, then /gwp sheet")
   elseif not quiet then
     say("character sheet: %d stat lines recorded", #lines)
   end
@@ -388,22 +401,19 @@ end
 
 -- Records the sheet, opening the character window first if it is closed and
 -- closing it again afterwards, so /gwp all doesn't depend on it being open.
+-- The window may only become visible a frame later, so always wait before reading.
 function P.sheet(quiet)
   if InCombatLockdown and InCombatLockdown() then return say("leave combat first") end
   local frame = _G.PaperDollFrame
   if frame and not frame:IsVisible() and type(_G.ToggleCharacter) == "function" then
     P.sheetOpening = true
-    local opened = pcall(_G.ToggleCharacter, "PaperDollFrame") and frame:IsVisible()
-    if opened then
-      -- Stat lines fill in after the window shows.
-      C_Timer.After(0.5, function()
-        P.sheetOpening = false
-        recordSheet(quiet)
-        if frame:IsVisible() then pcall(_G.ToggleCharacter, "PaperDollFrame") end
-      end)
-      return
-    end
-    P.sheetOpening = false
+    local toggled = pcall(_G.ToggleCharacter, "PaperDollFrame")
+    C_Timer.After(0.5, function()
+      P.sheetOpening = false
+      recordSheet(quiet, toggled and "opened by probe" or "ToggleCharacter failed")
+      if toggled and frame:IsVisible() then pcall(_G.ToggleCharacter, "PaperDollFrame") end
+    end)
+    return
   end
   recordSheet(quiet)
 end
@@ -414,7 +424,7 @@ local function hookSheet()
   P.sheetHooked = true
   -- Opening the window yourself records it too (unless P.sheet opened it).
   frame:HookScript("OnShow", function()
-    if not P.sheetOpening then C_Timer.After(0.5, function() recordSheet(true) end) end
+    if not P.sheetOpening then C_Timer.After(0.5, function() recordSheet(true, "opened by you") end) end
   end)
 end
 

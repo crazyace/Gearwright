@@ -236,10 +236,18 @@ local armor = frame(nil, { Label = text("Armor:"), Value = text("487"),
 CharacterStatsPane = frame({ frame({ agility, armor }) })
 PaperDollFrame = frame({ CharacterStatsPane }, {
   HookScript = function(self, _, fn) self.onShow = fn end })
+-- Like the beta client: right after ToggleCharacter the window doesn't report
+-- visible yet; it does a moment later.
+SHOW_LAG = 0
+PaperDollFrame.IsVisible = function()
+  if SHOW_LAG > 0 then SHOW_LAG = SHOW_LAG - 1; return false end
+  return SHEET_OPEN
+end
 TOGGLES = 0
 function ToggleCharacter()
   TOGGLES = TOGGLES + 1
   SHEET_OPEN = not SHEET_OPEN
+  if SHEET_OPEN then SHOW_LAG = 1 end
   if SHEET_OPEN and PaperDollFrame.onShow then PaperDollFrame.onShow() end
 end
 """)
@@ -247,6 +255,9 @@ load_addon("GearwrightProbe","GearwrightProbe.toc")
 L.globals().fire("ADDON_LOADED","GearwrightProbe"); L.globals().fire("PLAYER_LOGIN")
 L.globals().SlashCmdList.GEARWRIGHTPROBE("all")  # window closed: /gwp all opens it, reads it, closes it
 assert L.eval("function() return TOGGLES, SHEET_OPEN end")() == (2, False)
+dbg = L.eval("""function() local d = GearwrightProbeDB.snapshots[1].sections.sheetDebug
+  return d.how, d.hovered, d.stored end""")()
+assert tuple(dbg) == ("opened by probe", 1, 1), tuple(dbg)
 # With the window closed and no way to open it, an empty read keeps the earlier capture.
 L.execute("local t = ToggleCharacter; ToggleCharacter = nil; SlashCmdList.GEARWRIGHTPROBE('sheet'); ToggleCharacter = t")
 sheet = L.eval("""function() local s = GearwrightProbeDB.snapshots[1].sections.sheet
