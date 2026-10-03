@@ -136,6 +136,13 @@ def load(path):
 
 # --- Summary -----------------------------------------------------------------
 
+def strip_codes(text):
+    """Remove WoW color/texture escape codes (|cffxxxxxx, |r, |T...|t)."""
+    text = re.sub(r"\|c(?:n[^:|]*:|[0-9a-fA-F]{8})", "", text)
+    text = re.sub(r"\|T.*?\|t", "", text)
+    return text.replace("|r", "")
+
+
 def summarize(db):
     lines = []
     snaps = db.get("snapshots") or []
@@ -202,6 +209,34 @@ def summarize(db):
         secret = sorted(k for k, v in stats.items() if isinstance(v, dict) and v.get("status") == "secret")
         if stats:
             lines.append(f"   stat calls: {len(stats)}   secret: {', '.join(secret) or 'none'}")
+            missing = sorted(k for k, v in stats.items() if isinstance(v, dict) and v.get("status") == "missing")
+            if missing:
+                lines.append(f"   stat calls missing: {', '.join(missing)}")
+            for key in sorted(stats):
+                v = stats[key]
+                if not isinstance(v, dict):
+                    continue
+                if key.startswith("rating:"):
+                    rating = ((v.get("rating") or {}).get("values") or [None])[0]
+                    bonus = ((v.get("bonus") or {}).get("values") or [None])[0]
+                    if rating or bonus:
+                        lines.append(f"      {key[7:]} (id {v.get('id')}): rating {rating}, bonus {bonus}")
+                elif v.get("status") == "ok":
+                    lines.append(f"      {key}: {v.get('values')}")
+            agi = ((stats.get("UnitStat:player:2") or {}).get("values") or [None])[0]
+            crit = ((stats.get("GetCritChanceFromAgility:player") or {}).get("values") or [None])[0]
+            if isinstance(agi, (int, float)) and isinstance(crit, (int, float)) and crit > 0:
+                lines.append(f"   agility per 1% crit: {agi / crit:.2f}  (level {snap.get('level')})")
+
+        sheet = sec.get("sheet") or []
+        if sheet:
+            lines.append(f"   character sheet: {len(sheet)} stat lines")
+            for row in sheet:
+                head = row.get("tooltip") or row.get("label") or "?"
+                lines.append(f"      {strip_codes(str(head))}")
+                if row.get("tooltip2"):
+                    for part in strip_codes(str(row["tooltip2"])).split("\n"):
+                        lines.append(f"         {part}")
 
     for key, scan in (db.get("scans") or {}).items():
         count = len(scan.get("recipes") or scan.get("services") or scan.get("gear") or [])

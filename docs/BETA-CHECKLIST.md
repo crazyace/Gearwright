@@ -6,9 +6,10 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 
 1. Log in. Note the probe's login line: *SavedVariables OK* or *nothing from a previous session*.
    - Second session onward, "nothing" means the beta is dropping SavedVariables. Use export.
-2. `/gwp all`
-3. `/gwp export` -> Ctrl+A, Ctrl+C -> paste into `data/probe/YYYY-MM-DD-<spec>.json`
-4. `python tools/probe_to_json.py data/probe/<file>.json` and skim the summary.
+2. Open your character sheet (C) once, so the probe records every stat line and tooltip.
+3. `/gwp all`
+4. `/gwp export` -> Ctrl+A, Ctrl+C -> paste into `data/probe/YYYY-MM-DD-<spec>.json`
+5. `python tools/probe_to_json.py data/probe/<file>.json` and skim the summary.
 
 ## Once each
 
