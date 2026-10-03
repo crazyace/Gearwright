@@ -14,6 +14,15 @@ Stats.KEYS = { "agi", "str", "sta", "ap", "hit", "crit", "haste", "expertise", "
 Stats.LABELS = {
   agi = "Agility", str = "Strength", sta = "Stamina", ap = "Attack Power",
   hit = "Hit", crit = "Crit", haste = "Haste", expertise = "Expertise", dps = "Weapon DPS",
+  int = "Intellect", spi = "Spirit", armor = "Armor", defense = "Defense",
+  dodge = "Dodge", block = "Block", weaponDamage = "Weapon Damage",
+}
+
+-- Names used on the "Enchanted: Stamina +2 and Armor +16" tooltip line.
+Stats.ENCHANT_NAMES = {
+  Agility = "agi", Strength = "str", Stamina = "sta", Intellect = "int", Spirit = "spi",
+  Armor = "armor", Defense = "defense", ["Attack Power"] = "ap",
+  ["Weapon Damage"] = "weaponDamage", Damage = "weaponDamage",
 }
 
 -- GetItemStats tokens -> our keys. Extend from probe output (tools/probe_to_json.py
@@ -78,6 +87,25 @@ function Stats.AddTooltipEffects(stats, lines)
     end
   end
   return stats
+end
+
+-- The enchant on an item, from its tooltip. GetItemStats leaves enchants out.
+-- Returns stats, text  (stats is {} for an enchant we can't read, e.g. a proc);
+-- nil when the item has no "Enchanted:" line.
+function Stats.FromEnchantLine(lines)
+  for _, line in ipairs(lines or {}) do
+    local text = line:match("^Enchanted: (.+)$")
+    if text then
+      local stats = {}
+      for part in (text .. " and "):gmatch("(.-) and ") do
+        local name, n = part:match("^(.-) %+(%d+)$")
+        if not name then n, name = part:match("^%+(%d+) (.-)$") end
+        local key = name and Stats.ENCHANT_NAMES[name]
+        if key then stats[key] = (stats[key] or 0) + tonumber(n) end
+      end
+      return stats, text
+    end
+  end
 end
 
 -- Normalized stats for an item link, or nil if unreadable.

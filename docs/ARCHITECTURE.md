@@ -5,9 +5,9 @@
      |
  Core/API.lua ........ the only file that reads game data; strips secret values
      |
- Data/ ............... what's "right": stat keys, weights, builds, enchants (per class)
+ Data/ ............... what's "right": stat keys, enchant effects, weights and builds (per class)
      |
- Engine/ ............. pure logic: Spec.Detect -> Scoring -> Advisor (gear/talents/enchants)
+ Engine/ ............. pure logic: Spec.Detect -> Scoring -> Advisor (gear/talents/enchants/crafting)
      |
  UI/ ................. Tooltip line, main window. Renders Advisor output, no logic.
 ```
@@ -18,7 +18,8 @@
    restricted. When the probe tells us something works differently, we fix one file.
 2. **Engine has no WoW calls.** Everything takes plain tables, so it runs in
    `tests/smoke_test.py` and could be reused by a future web tool.
-3. **Data is data.** Weights, builds and enchants are Lua tables in `Data/<CLASS>/`.
+3. **Data is data.** Weights and builds are Lua tables in `Data/<CLASS>/`; enchant effects
+   (`Data/Enchants.lua`) are generated from a probe scan and shared by every class.
    Adding a class means adding a folder, not touching the engine.
 4. **Every data file carries a status.** `_status = "provisional" | "todo" | "verified"`.
    The UI warns while anything is provisional.
@@ -30,7 +31,7 @@ Each file gets the shared addon namespace `ns` via `local _, ns = ...`.
 
 ## Adding a class
 
-1. Create `Data/<CLASS_TOKEN>/` with `Specs.lua`, `Weights.lua`, `Talents.lua`, `Enchants.lua`
+1. Create `Data/<CLASS_TOKEN>/` with `Specs.lua`, `Weights.lua`, `Talents.lua` (enchants are shared: `Data/Enchants.lua`)
    (copy the Rogue files; `CLASS_TOKEN` is the second return of `UnitClass`, e.g. `WARRIOR`).
 2. Add the files to `Gearwright.toc`.
 3. Fill `tabToSpec` and `traitTabGroups` from probe output (`tools/probe_to_json.py` lists every

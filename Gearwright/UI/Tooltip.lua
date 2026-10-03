@@ -29,4 +29,12 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tool
   local later = reqLevel and (" |cffff9900at level %d|r"):format(reqLevel) or ""
   tooltip:AddLine(("|cff4fc3f7Gearwright|r %s%s%.1f|r vs %s (%s)%s"):format(
     color, sign, delta, ns.Advisor.SLOT_NAMES[slot] or "equipped", spec or "?", later))
+
+  -- Where an upgrade comes from, when a dungeon data addon knows.
+  local itemID = delta > 0.05 and ns.API.GetItemBasics(link)
+  local sources = itemID and ns.Sources.For(itemID)
+  if sources then
+    local more = #sources > 1 and (" |cff999999+%d more|r"):format(#sources - 1) or ""
+    tooltip:AddLine(("|cffaaaaaa%s|r%s"):format(ns.Sources.Describe(sources[1]), more))
+  end
 end)

@@ -66,7 +66,7 @@ function GetInventoryItemLink(unit, slot) return INV[slot] end
 local function item(l) return ITEMS[l] or {} end
 C_Item = { GetItemStats = function(l) return ITEMS[l] and ITEMS[l].stats end,
            GetItemInfoInstant = function(l) local i = item(l) return 1, "Armor", "Cloth", i.equip, 0, i.class, i.sub end,
-           GetItemInfo = function(l) local i = ITEMS[l] if not i then return nil end
+           GetItemInfo = function(l) local i = ITEMS[l] if not i or i.uncached then return nil end
              return "name", l, 2, 20, i.req or 1, "Armor", "Leather", 1, i.equip, 0, i.sell or 0 end }
 -- Main hand 34 damage every 1.7 s: 20 DPS, so 1% of damage = 2.8 AP.
 function UnitDamage() return 34, 34, 17, 17, 0, 0, 1 end
@@ -108,13 +108,26 @@ print("enchant id:", L.eval("function(ns) return ns.API.GetEnchantID('item:2001:
 L.globals().SlashCmdList.GEARWRIGHT("spec subtlety")
 print("override:", L.eval("function(ns) return ns.Spec.Detect() end")(ns))
 L.globals().SlashCmdList.GEARWRIGHT("")  # open window -> OnShow -> buildText
-txt = L.eval("function(ns) return ns.UI.frame.text.text end")(ns)
+L.execute("""
+function SCREEN(ns)
+  local out = { ns.UI.frame.spec.text or "" }
+  for _, tab in ipairs(ns.UI.TAB_ORDER) do
+    local rows, msg = ns.UI.BuildRows(tab)
+    out[#out + 1] = "[" .. tab .. "]" .. (msg and (" " .. msg) or "")
+    for _, r in ipairs(rows) do
+      out[#out + 1] = table.concat({ r.sub or "", r.title or "", r.value or "" }, "  ")
+    end
+  end
+  return table.concat(out, "\\n")
+end
+""")
+txt = L.globals().SCREEN(ns)
 print("---- main window ----"); print(txt)
 for want in ("Spec:|r Subtlety", "(override)", "Stat weights are provisional", "Head", "item:1001:0:0",
-             "No recommended build for this spec yet.", "No enchant recommendations for this spec yet."):
+             "No recommended build for this spec yet.", "Best: Superior Striking", "No dungeon loot known yet"):
     assert want in txt, want
 L.globals().SlashCmdList.GEARWRIGHT("spec auto")  # refreshes the open window
-txt = L.eval("function(ns) return ns.UI.frame.text.text end")(ns)
+txt = L.globals().SCREEN(ns)
 assert "Spec:|r Combat" in txt and "(talents)" in txt, txt
 L.globals().SlashCmdList.GEARWRIGHT("")  # toggle closed
 assert not L.eval("function(ns) return ns.UI.frame:IsShown() end")(ns)
@@ -295,7 +308,7 @@ assert rows == "Murder 0/2", rows
 # Window shows the detected spec and refreshes on a talent event.
 L.globals().SlashCmdList.GEARWRIGHT("")
 L.globals().fire("TRAIT_CONFIG_UPDATED")
-txt = L.eval("function(ns) return ns.UI.frame.text.text end")(ns)
+txt = L.globals().SCREEN(ns)
 assert "Spec:|r Assassination" in txt and "(talents)" in txt, txt
 L.globals().SlashCmdList.GEARWRIGHT("")
 
@@ -312,6 +325,121 @@ assert L.eval("""function(ns)
   return ns.Stats.AddTooltipEffects({}, {"Equip: +4 Attack Power against Humanoids."}).ap end""")(ns) is None
 # Enchant IDs parse out of the new-style colored links.
 assert L.eval("function(ns, l) return ns.API.GetEnchantID(l) end")(ns, gear["7"]["link"].replace("\\u007c", "|")) == 8481
+
+# Enchants ---------------------------------------------------------------------
+# GetItemStats leaves the enchant out; it's read from the "Enchanted:" line.
+ench = L.eval("""function(ns, tip) local s, t = ns.Stats.FromEnchantLine(tip) return s.sta, s.armor, t end""")(
+    ns, L.table_from(gear["7"]["tooltip"]))
+assert tuple(ench) == (2, 16, "Stamina +2 and Armor +16"), ench
+assert L.eval("""function(ns) return ns.Stats.FromEnchantLine({"Enchanted: +3 Agility"}).agi end""")(ns) == 3
+assert L.eval("""function(ns) return ns.Stats.FromEnchantLine({"Sword", "+2 Agility"}) end""")(ns) is None
+assert L.eval("""function(ns) local s, t = ns.Stats.FromEnchantLine({"Enchanted: Crusader"}) return next(s), t end""")(ns) == (None, "Crusader")
+
+# Flat weapon damage is DPS divided by the weapon's speed (1.7 s in the mock).
+wd = L.eval("""function(ns) local w = ns.Advisor.Context().weights
+  return ns.Weights.For(w, "weaponDamage", 16), ns.Weights.For(w, "weaponDamage", 17) end""")(ns)
+assert abs(wd[0] - 14 / 1.7) < 1e-9 and abs(wd[1] - 7 / 1.7) < 1e-9, wd
+
+# The data file is what the tool makes from the saved scan: nobody edited it by hand.
+import subprocess, sys
+gen = OUT / "Enchants.lua"
+subprocess.run([sys.executable, str(R / "tools" / "enchants_from_probe.py"),
+                str(R / "data" / "probe" / "2026-10-03-professions.json"), "-o", str(gen)],
+               check=True, capture_output=True)
+assert gen.read_text() == (R / "Gearwright" / "Data" / "Enchants.lua").read_text(), "rerun tools/enchants_from_probe.py"
+from importlib.util import spec_from_file_location, module_from_spec
+_m = spec_from_file_location("ench", R / "tools" / "enchants_from_probe.py"); ench_tool = module_from_spec(_m); _m.loader.exec_module(ench_tool)
+assert ench_tool.parse("Permanently enchant a cloak so that it increases the wearer's Agility by 3.") == {"agi": 3}
+assert ench_tool.parse("Permanently enchant a piece of chest armor to increase all stats by 4, and Nature Resistance by 15.")["agi"] == 4
+assert ench_tool.parse("Permanently enchant a Melee Weapon to do 6 additional points of damage to Beasts.") == {}
+assert ench_tool.parse("Permanently enchant a melee weapon so that often when attacking in melee it heals for 75 to 125 and increases Strength by 100 for 15 sec.") == {}
+
+# Report: the bracer's +3 Agility could be +9; the chest's armor kit could be
+# Greater Stats; the head takes no enchant; empty slots are skipped.
+L.execute("""
+ITEMS["item:5001:0:0"] = { equip="INVTYPE_WRIST", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=2}, tip={"Bracers", "Enchanted: Agility +3"} }
+ITEMS["item:5002:0:0"] = { equip="INVTYPE_CHEST", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=2}, tip={"Vest", "Enchanted: Stamina +2 and Armor +16"} }
+INV[9], INV[5] = "item:5001:0:0", "item:5002:0:0"
+""")
+rows = L.eval("""function(ns) local rows, ctx = ns.Advisor.EnchantReport() local out = {}
+  for i, r in ipairs(rows) do out[i] = {r.slot, r.best.name, r.best.score, r.current or false, r.gain, r.ok} end
+  return out, ctx.weights.agi, ctx.weights.sta, ctx.weights.str end""")(ns)
+rows, agi, sta, strw = [list(r.values()) for r in rows[0].values()], rows[1], rows[2], rows[3]
+print("enchant report:", rows)
+assert [r[0] for r in rows] == [5, 9, 16], rows
+chest, wrist, mh = rows
+assert chest[1] == "Greater Stats" and abs(chest[4] - (4 * agi + 4 * strw + 4 * sta - 2 * sta)) < 1e-9, chest
+assert wrist[1] == "Agility" and abs(wrist[4] - 6 * agi) < 1e-9 and wrist[5] is False, wrist
+assert mh[1] == "Superior Striking" and mh[3] is False and abs(mh[4] - 5 * 14 / 1.7) < 1e-9, mh
+# Already the best: OK.
+L.execute('ITEMS["item:5001:0:0"].tip = {"Bracers", "Enchanted: Agility +9"}')
+ok = L.eval("function(ns) local rows = ns.Advisor.EnchantReport() return rows[2].ok end")(ns)
+assert ok is True
+L.execute("INV[9], INV[5] = nil, nil")
+
+# Crafting ---------------------------------------------------------------------
+# Recipe 1 makes the better cap; 2 is above level 35; 3 is plate; 4 makes
+# nothing; 5's item isn't cached until asked for.
+L.execute("""
+for _, id in ipairs({1002, 1003, 3001}) do ITEMS["item:" .. id] = ITEMS["item:" .. id .. ":0:0"] end
+ITEMS["item:1005"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=40}, tip={"Crafted Cap"}, uncached=true }
+C_Item.RequestLoadItemDataByID = function(id) if ITEMS["item:" .. id] then ITEMS["item:" .. id].uncached = nil end end
+local OUTPUT = { 1002, 1003, 3001, false, 1005 }
+RECIPES = { 1, 2, 3, 4, 5 }
+C_TradeSkillUI = { GetAllRecipeIDs = function() return RECIPES end,
+  GetRecipeInfo = function(id) return { name = "recipe " .. id, learned = id == 1 } end,
+  GetRecipeSchematic = function(id) return { outputItemID = OUTPUT[id] or nil } end,
+  GetBaseProfessionInfo = function() return { professionName = "Leatherworking" } end }
+printed = {}
+""")
+crafted = L.eval("""function(ns) ns.Notices.Craft() local rows = ns.Advisor.CraftReport() local out = {}
+  for i, r in ipairs(rows) do out[i] = {r.recipeID, r.delta, r.learned} end return out end""")(ns)
+crafted = [list(r.values()) for r in crafted.values()]
+cap_delta = L.eval("function(ns) return ns.Advisor.CompareToEquipped('item:1002:0:0') end")(ns)[0]
+print("craft:", crafted)
+assert [r[0] for r in crafted] == [5, 1] and abs(crafted[1][1] - cap_delta) < 1e-9, crafted
+out = "\n".join(L.globals().printed.values())
+assert "reading 1 Leatherworking items" in out and "Leatherworking upgrades:" in out and "(not learned)" in out, out
+L.execute("RECIPES = {}; printed = {}")
+L.globals().SlashCmdList.GEARWRIGHT("craft")
+assert "open a profession window first" in L.globals().printed[1], L.globals().printed[1]
+L.execute("C_TradeSkillUI = nil")
+
+# Dungeons ------------------------------------------------------------------------
+# Forever Dungeon Journal's table, in its own shape: boss loot {id, name, slot,
+# quality}, quest rewards {id, name, quality}. Gearwright only reads it.
+L.execute("""
+function UnitFactionGroup() return "Alliance" end
+ForeverDungeonJournal_NS = { DB = {
+  ["Hall of Thanes"] = { level = "13-20",
+    bosses = { { name = "Faldrim Anvilmar", loot = { {1002, "Better Cap", "Head, Leather", 3}, {3001, "Plate Helm", "Head, Plate", 3} } },
+               { name = "Trash Drops", trash = true, loot = { {1003, "Future Cap", "Head, Leather", 3} } } },
+    quests = { { name = "The Restless Dead", faction = "Alliance", rewardItems = { {1005, "Crafted Cap", 3} } },
+               { name = "Horde Only", faction = "Horde", rewardItems = { {2003, "Dagger", 3} } } } },
+  ["The Deadmines"] = { level = "17-26", bosses = { { name = "Sneed", loot = { {1002, "Better Cap", "Head, Leather", 3} } } } },
+} }
+""")
+L.eval("function(ns) ns.Sources.Reset() end")(ns)
+dung = L.eval("""function(ns) local rows = ns.Advisor.DungeonReport() local out = {}
+  for i, r in ipairs(rows) do out[i] = {r.itemID, #r.sources, ns.Sources.Describe(r.sources[1])} end return out end""")(ns)
+dung = [list(r.values()) for r in dung.values()]
+print("dungeon upgrades:", dung)
+# 1005 (quest) and 1002 (two bosses) are upgrades; plate is unusable, 1003 is
+# level 40 (beyond 5 levels ahead), the Horde quest is for the other faction.
+assert [r[0] for r in dung] == [1005, 1002], dung
+assert dung[0][2] == "quest The Restless Dead, Hall of Thanes (13-20)", dung
+assert dung[1][1] == 2 and dung[1][2] == "Faldrim Anvilmar, Hall of Thanes (13-20)", dung
+upg = L.eval("function(ns) local rows = ns.UI.BuildRows('upgrades') return #rows, rows[1].value, rows[2].sub end")(ns)
+assert upg[0] == 2 and upg[1].startswith("+") and "(+1 more)" in upg[2], upg
+
+# Gearwright's own table (from probe loot logs) works without that addon.
+L.execute("ForeverDungeonJournal_NS = nil")
+L.execute('ns_own = { { itemID = 1002, name = "Better Cap", dungeon = "The Deadmines", from = "Rhahk\'Zor", count = 3 } }')
+own = L.eval("""function(ns) ns.Data.DUNGEON_LOOT = ns_own; ns.Sources.Reset()
+  local rows = ns.Advisor.DungeonReport() local s = ns.Sources.For(1002)[1]
+  ns.Data.DUNGEON_LOOT = {}; ns.Sources.Reset()
+  return #rows, ns.Sources.Describe(s), ns.Sources.All() end""")(ns)
+assert own[0] == 1 and own[1] == "Rhahk'Zor, The Deadmines" and own[2] is None, own
 
 # Probe
 # Character sheet + stats, shaped like the Forever beta: no GetCritChanceFromAgility,
@@ -471,11 +599,35 @@ rec = L.eval("""function() local r = GearwrightProbeDB.scans["tradeskill:Enchant
 assert tuple(rec) == (True, False, 4239, "Permanently enchant"), tuple(rec)
 keys = sorted(L.eval("function() local o={} for k in pairs(GearwrightProbeDB.scans) do o[#o+1]=k end return o end")().values())
 assert keys == ["ej", "items", "tradeskill:3", "tradeskill:Enchanting", "tradeskill:Leatherworking"], keys
+# Loot log: each corpse counts once; the NPC ID comes out of its GUID.
+L.execute("""
+LOOT = { "|cff1eff00|Hitem:5540::::|h[Pearl-handled Dagger]|h|r" }
+function GetLootSourceInfo() return "Creature-0-4618-0-12-1732-000012345", 1 end
+function GetInstanceInfo() return "The Deadmines", "party" end
+function UnitGUID() return "Creature-0-4618-0-12-1732-000012345" end
+function UnitName() return "Defias Squallshaper" end
+""")
+L.globals().fire("LOOT_OPENED"); L.globals().fire("LOOT_OPENED")
+L.execute('function GetLootSourceInfo() return "Creature-0-4618-0-12-1732-000099999", 1 end')
+L.globals().fire("LOOT_OPENED")
+drop = L.eval("""function() local e = GearwrightProbeDB.scans.loot.items["5540"]
+  local f = e.from["Creature:1732"] return e.name, f.count, f.where, f.name end""")()
+assert tuple(drop) == ("Pearl-handled Dagger", 2, "The Deadmines", "Defias Squallshaper"), tuple(drop)
+L.execute("LOOT = {}; GetLootSourceInfo, GetInstanceInfo, UnitGUID = nil, nil, nil; function UnitName() return 'Tester' end")
 L.globals().SlashCmdList.GEARWRIGHTPROBE("export")
 print("---- probe export title ----"); print(L.globals().LASTTEXT)
 for p in L.globals().printed.values(): print("  >", p)
 
 open(OUT/"export.json","w").write(L.globals().EXPORTTEXT)
+# The probe's loot log turns into Gearwright's own dungeon loot table.
+gen = OUT / "DungeonLoot.lua"
+subprocess.run([sys.executable, str(R / "tools" / "loot_from_probe.py"), str(OUT / "export.json"), "-o", str(gen)],
+               check=True, capture_output=True)
+loot_lua = gen.read_text()
+assert 'itemID = 5540, name = "Pearl-handled Dagger", dungeon = "The Deadmines", from = "Defias Squallshaper", npcID = 1732, count = 2' in loot_lua, loot_lua
+assert subprocess.run([sys.executable, str(R / "tools" / "loot_from_probe.py"), *map(str, sorted((R / "data" / "probe").glob("*.json"))),
+                       "-o", str(OUT / "check.lua")], capture_output=True).returncode == 0
+assert (OUT / "check.lua").read_text() == (R / "Gearwright" / "Data" / "DungeonLoot.lua").read_text(), "rerun tools/loot_from_probe.py"
 # also write a SavedVariables-style Lua file
 L.execute(r"""
 local function ser(v, ind)

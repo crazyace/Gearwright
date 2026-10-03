@@ -16,11 +16,13 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 - [x] Fresh level-10 Rogue with talents in **Assassination** -> `/gwp all`
 - [ ] Respec into **Combat** -> `/gwp talents`
 - [ ] Respec into **Subtlety** -> `/gwp talents`
-- [ ] `/gwp items` -> reads six reference items by ID (hit, crit, haste/expertise gear) without
+- [x] `/gwp items` -> reads six reference items by ID (hit, crit, haste/expertise gear) without
       owning them. Settles the stat units. `/gwp items 1234 5678` reads any other IDs.
 - [ ] Equip an item with an "Equip: +x% hit/crit" line -> `/gwp gear` (confirms what equipping changes)
-- [ ] Open your **class trainer** (recorded automatically)
-- [ ] Open **Enchanting** on any character (recorded automatically)
+- [x] Open your **class trainer** (recorded automatically)
+- [x] Open **Enchanting** on any character (recorded automatically)
+- [ ] Run a dungeon with the probe loaded: every loot window is logged with what dropped it
+- [ ] Open a profession and run `/gearwright craft`; check `/gearwright` -> Enchants
 - [ ] Target another Rogue -> `/gwp inspect`
 - [ ] Hover items with **Gearwright** loaded: does the tooltip line appear?
 - [ ] Open `/gearwright`: does spec detection match what you specced?

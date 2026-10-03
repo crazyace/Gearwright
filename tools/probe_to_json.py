@@ -287,6 +287,22 @@ def summarize(db):
                     if isinstance(v, dict):
                         lines.append(f"      {v.get('name')} [{v.get('slot')}] {v.get('armorType') or ''}")
             continue
+        if key == "loot":
+            items = scan.get("items") or {}
+            lines.append(f"loot log since {scan.get('since')}: {len(items)} items")
+            for item_id, rec in sorted(items.items(), key=lambda kv: str(kv[1].get("name"))):
+                for src, e in sorted((rec.get("from") or {}).items()):
+                    lines.append(f"   {item_id} {rec.get('name')}: {e.get('count')}x from "
+                                 f"{e.get('name') or src} in {e.get('where')}")
+            continue
+        if key.startswith("trainer:"):
+            services = scan.get("services") or []
+            lines.append(f"{key}: {len(services)} services")
+            for row in services:
+                v = row.get("values") or []
+                if v:
+                    lines.append("   " + " | ".join(str(x) for x in v if x not in ("", None)))
+            continue
         if key == "items":
             lines.append(f"items by ID: {len(scan)}")
             for item_id, item in sorted(scan.items(), key=lambda kv: str(kv[0])):

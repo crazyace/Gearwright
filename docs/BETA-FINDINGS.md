@@ -160,7 +160,13 @@ not as ground truth.
   `GetLootSlotLink`, `GetLootRollItemLink`.
 - Encounter Journal: `EJ_SelectInstance`, `EJ_GetNumLoot` and
   `C_EncounterJournal.GetLootInfoByIndex` exist (the old `EJ_GetLootInfoByIndex` doesn't).
-  Whether it lists Forever's dungeons and their loot: `/gwp ej`.
+  **But it's empty, and can't be filled.** On 2026-10-03 `/gwp ej` found 0 tiers and
+  0 instances. With the diagnostics (17:49): `LoadAddOn("Blizzard_EncounterJournal")`
+  returns `WRONG_GAME_TYPE`, `EJ_GetCurrentTier` is 0, and `EJ_GetInstanceInfo` answers
+  nothing for any of 20 Classic journal IDs (Deadmines 63, Wailing Caverns 240, Molten
+  Core 741, Onyxia 760...). Forever ships the functions without the journal's data.
+  Dungeon loot has to come from real drops instead: the probe now logs every loot
+  window with the NPC (from its GUID) and the instance or zone it dropped in.
 
 ## Enchanting (skill 225/225)
 
@@ -177,8 +183,57 @@ The Enchanting window listed 270 recipes (`C_TradeSkillUI`), many new for Foreve
 | Weapon | Agility (23800), Crusader (20034), Lesser/Greater/Superior Striking |
 | 2H Weapon | Lesser Agility (1248510), Agility (27837) |
 
-That capture had names only. The probe now also records whether each recipe is learned,
-what item it makes and its description, which gives the enchant amounts.
+A second capture (2026-10-03 17:46) recorded each recipe's description, learned flag
+and output item. 179 of the 261 recipes are `Enchant <slot> - <name>`; the descriptions
+give exact amounts (e.g. "Permanently enchant bracers to give +9 Agility."), and
+`tools/enchants_from_probe.py` turns 114 of them into `Gearwright/Data/Enchants.lua`.
+The other 65 are procs (Crusader, Fiery Weapon), spell power, resistances, slayer
+damage, gathering skills or movement speed, which have no stat weight yet.
+
+Forever-specific amounts worth knowing:
+
+- Two different "Bracer - Agility" recipes: 1248497 gives +5, 1217203 gives +9
+  (the same as Superior Agility, 1248599).
+- Cloak - Lesser Agility (13882) gives +3, the same as Minor Agility (13419).
+- Chest - Minor Stats (13626) and Lesser Stats (13700) both give +2 to all stats.
+- Living Stats (1213616): +4 all stats and +15 Nature resistance.
+- Shield - Critical Strike (1220623): +1% crit.
+
+## Professions (2026-10-03, saved in `data/probe/2026-10-03-professions.json`)
+
+| Profession | Skill | Recipes | Learned | Make an item |
+|---|---|---|---|---|
+| Tailoring | 225/225 | 471 | 97 | 471 |
+| Leatherworking | 85/150 | 592 | 31 | 592 |
+| Enchanting | 225/225 | 261 | 74 | 82 |
+| First Aid | 83/150 | 32 | 7 | 32 |
+| Cooking | 15/75 | 132 | 4 | 132 |
+| Skinning | 133/150 | 3 | 1 | 3 |
+| Blacksmithing | 208/225 | 507 | 91 | 507 |
+
+- `C_TradeSkillUI.GetAllRecipeIDs` lists every recipe of the profession, learned or not.
+- `GetRecipeSchematic(id, false).outputItemID` gives the crafted item, so crafted gear
+  can be scored like any other item (`/gearwright craft`).
+- Every profession has new Forever "camp" recipes (Camp Tent, Loom, Tanning Rack,
+  Basic Campfire...). They make items, not gear.
+- Recipes that make an item have an empty description, or "Craft a <name>.".
+
+## Trainers (2026-10-03)
+
+The trainer window lists every service with its level, rank and category (`GetTrainerServiceInfo`
+returns name, availability, icon, level, rank, category). A level 19 Rogue saw 85 class
+services from level 20 to 60. Worth knowing for Rogue advice:
+
+- **Poisons are trained** from level 20 (Crippling, Instant II at 28, Deadly at 30, Wound
+  at 32, Mind-numbing at 24), not learned from the level 20 quest as in Classic.
+- **Mutilate has trained ranks**: rank 1 comes from the talent, ranks 2-4 from the trainer
+  at 40, 50 and 60.
+- Kidney Shot rank 1 at 30, Blind at 34, Slice and Dice rank 2 at 42; no Hemorrhage or
+  Ghostly Strike ranks (talent-only).
+- The Leatherworking trainer (21 services) teaches the new Forever "Prowler's / Skulker's /
+  Skirmisher's Leather Belt" family alongside the Classic patterns.
+
+Saved with the profession scans in `data/probe/2026-10-03-professions.json`.
 
 ## Enchants
 
@@ -205,9 +260,12 @@ committed as a separate capture.
 
 ## Still open
 
-- [ ] Encounter Journal loot tables: `/gwp ej`
-- [ ] Enchanting again, for recipe effects and learned flags (open the window)
-- [ ] Trainer services (open the trainer window; recorded automatically)
+- [x] Encounter Journal loot tables: not available on Forever (`WRONG_GAME_TYPE`)
+- [ ] Dungeon drops from the probe's loot log (run a dungeon, then `/gwp export`)
+- [x] Enchanting again, for recipe effects and learned flags (2026-10-03 17:46)
+- [ ] What the enchant tooltip line says for a stat enchant ("Enchanted: Agility +3"?
+      only armor kits seen so far)
+- [x] Trainer services (Rogue and Leatherworking trainers, 2026-10-03)
 - [ ] Other Rogues' gear and enchants (`/gwp inspect`)
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety
 - [ ] Agility-per-crit at more levels (`/gwp all` every few levels; beta cap is 30)

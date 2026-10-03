@@ -30,7 +30,9 @@ function Weights.Interpolate(points, level)
   return a[2] + (b[2] - a[2]) * (level - a[1]) / (b[1] - a[1])
 end
 
--- char: { level = n, mainHandDps = n }  (either may be nil)
+local DEFAULT_SPEED = 2.0 -- when the snapshot has no weapon speed
+
+-- char: { level = n, mainHandDps = n, mainHandSpeed = n, offHandSpeed = n }  (any may be nil)
 function Weights.Build(classData, spec, char)
   local base = classData.weights[spec]
   local pct = Weights.APPerPercent(char)
@@ -42,15 +44,25 @@ function Weights.Build(classData, spec, char)
   local agiPerCrit = Weights.Interpolate(classData.agiPerCrit, char and char.level)
   w.agi = 1 + ((agiPerCrit and agiPerCrit > 1) and w.crit / agiPerCrit or 0)
   w.apPerPercent = pct
+  w.mainHandSpeed = (char and char.mainHandSpeed) or DEFAULT_SPEED
+  w.offHandSpeed = (char and char.offHandSpeed) or w.mainHandSpeed
   return w
 end
 
+local function dpsWeight(weights, slot)
+  if slot == 17 then return weights.offHandDps end
+  if slot == 18 then return weights.rangedDps end
+  return weights.mainHandDps
+end
+
 -- Weight for one stat in one slot: weapon DPS depends on the hand.
+-- weaponDamage (flat damage per swing, from enchants) is DPS divided by speed.
 function Weights.For(weights, key, slot)
-  if key == "dps" then
-    if slot == 17 then return weights.offHandDps end
-    if slot == 18 then return weights.rangedDps end
-    return weights.mainHandDps
+  if key == "dps" then return dpsWeight(weights, slot) end
+  if key == "weaponDamage" then
+    local speed = (slot == 17 and weights.offHandSpeed) or weights.mainHandSpeed or DEFAULT_SPEED
+    local w = dpsWeight(weights, slot)
+    return w and w / speed
   end
   return weights[key]
 end
