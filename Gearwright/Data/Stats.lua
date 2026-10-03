@@ -1,9 +1,9 @@
 -- Gearwright: canonical stat keys and how raw item data maps onto them.
 --
 -- Weight tables (Data/<CLASS>/Weights.lua) are keyed by these short keys.
--- UNITS ARE UNCONFIRMED: Forever may report hit/crit as % (Classic style,
--- via "Equip:" lines) or as ratings (Mainline style). The first beta capture
--- had no hit/crit gear, so this is still open; weights assume "% points".
+-- Hit, crit, haste and expertise are kept in % points. Forever items carry
+-- ratings, but their tooltips show a fixed % ("Improves your chance to hit by
+-- 2.0%"); see RATING_PER_PERCENT.
 local _, ns = ...
 
 local Stats = {}
@@ -32,20 +32,32 @@ Stats.TOKEN_TO_KEY = {
   ITEM_MOD_DAMAGE_PER_SECOND_SHORT = "dps",
 }
 
--- English-only "Equip:" patterns for Classic-style effects. Localize later.
+-- Rating per 1%, the same at every item level. From 40 Forever leather items on
+-- Wowhead (2026-10-03), comparing each item's stored rating with its tooltip:
+-- hit 10 -> "1.0%", 20 -> "2.0%", 3 -> "0.3%"; crit 14 -> "1.0%", 21 -> "1.5%";
+-- haste and expertise 10 -> "1.0%". Not yet seen in the beta client itself.
+Stats.RATING_PER_PERCENT = { hit = 10, crit = 14, haste = 10, expertise = 10 }
+
+-- English-only "Equip:" patterns. Forever writes "by 2.0%", Classic "by 2%".
+-- Localize later.
 Stats.TOOLTIP_PATTERNS = {
-  { pattern = "chance to hit by (%d+)%%", key = "hit" },
-  { pattern = "critical strike by (%d+)%%", key = "crit" },
+  { pattern = "chance to hit by ([%d%.]+)%%", key = "hit" },
+  { pattern = "critical strike by ([%d%.]+)%%", key = "crit" },
   { pattern = "%+(%d+) Attack Power%.?$", key = "ap" }, -- not "... against Humanoids."
-  { pattern = "[Ee]xpertise by (%d+)", key = "expertise" },
-  { pattern = "[Hh]aste by (%d+)%%", key = "haste" },
+  { pattern = "[Ee]xpertise by ([%d%.]+)", key = "expertise" },
+  { pattern = "Dodged or Parried by ([%d%.]+)%%", key = "expertise" },
+  { pattern = "[Hh]aste by ([%d%.]+)%%", key = "haste" },
+  { pattern = "attack speed.- by ([%d%.]+)%%", key = "haste" },
 }
 
 function Stats.FromRaw(raw)
   local out = {}
   for token, value in pairs(raw or {}) do
     local key = Stats.TOKEN_TO_KEY[token]
-    if key and type(value) == "number" then out[key] = (out[key] or 0) + value end
+    if key and type(value) == "number" then
+      local per = token:find("RATING") and Stats.RATING_PER_PERCENT[key]
+      out[key] = (out[key] or 0) + (per and value / per or value)
+    end
   end
   return out
 end

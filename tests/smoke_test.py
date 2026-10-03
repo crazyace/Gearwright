@@ -52,7 +52,7 @@ function GetNumTalents(t) return #TABS[t][2] end
 function GetTalentInfo(t,i) local x=TABS[t][2][i] return x[1], "icon", 1, i, x[2], x[3] end
 -- Items
 -- class/sub: Enum.ItemClass and subclass (4/2 leather, 4/4 plate, 2/15 dagger, 2/7 sword)
-local ITEMS = {
+ITEMS = {
  ["item:1001:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=10, ITEM_MOD_STAMINA_SHORT=8}, tip={"Cap", "Equip: Improves your chance to hit by 1%."} },
  ["item:1002:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=14, ITEM_MOD_ATTACK_POWER_SHORT=20}, tip={"Better Cap"}, sell=120 },
  ["item:1003:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=30}, tip={"Future Cap"}, req=40, sell=500 },
@@ -149,9 +149,13 @@ assert d[1] == 17 and abs(d[0] - 22 * 7) < 1e-9, d
 L.execute("INV[17] = 'item:2003:0:0'")
 d = compare("item:2002:0:0")
 assert d[1] == 16 and abs(d[0] - 5 * 14) < 1e-9, d
-# ...but Assassination wants daggers in both hands.
+# ...but Assassination needs a main-hand dagger (Backstab), so for it the sword
+# can only replace the 22-DPS off-hand dagger, at half value.
 L.eval("function(ns) ns.db.specOverride = 'assassination' end")(ns)
-assert compare("item:2002:0:0")[:2] == [None, "wrong-weapon-type"]
+d = compare("item:2002:0:0")
+assert d[1] == 17 and abs(d[0] - 3 * 7) < 1e-9, d
+L.execute("ITEMS['item:2004:0:0'] = { equip='INVTYPE_WEAPONMAINHAND', class=2, sub=7, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")
+assert compare("item:2004:0:0")[:2] == [None, "wrong-weapon-type"]
 L.eval("function(ns) ns.db.specOverride = false end")(ns)
 L.execute("INV[17] = nil")
 # Items above your level still score, and say when you can wear them.
@@ -197,6 +201,22 @@ n = len(L.globals().printed)
 L.globals().fire("LOOT_OPENED")
 assert len(L.globals().printed) == n
 L.globals().SlashCmdList.GEARWRIGHT("notices")
+
+# Forever ratings: stored as rating, shown as a fixed % (Wowhead, Mask of the
+# Unforgiven: 20 hit rating = "2.0%", 14 crit rating = "1.0%"). Counted once, in %.
+hit, crit = L.eval("""function(ns)
+  local s = ns.Stats.AddTooltipEffects(
+    ns.Stats.FromRaw({ITEM_MOD_HIT_RATING_SHORT = 20, ITEM_MOD_CRIT_RATING_SHORT = 14}),
+    {"Equip: Improves your chance to hit by 2.0%.", "Equip: Improves your chance to get a critical strike by 1.0%."})
+  return s.hit, s.crit end""")(ns)
+assert (hit, crit) == (2, 1), (hit, crit)
+# Tooltip-only, with Forever's decimal wording.
+s = L.eval("""function(ns)
+  return ns.Stats.AddTooltipEffects({}, {"Equip: Improves your chance to hit by 0.3%.",
+    "Equip: Increases your attack speed and casting speed by 1.0%.",
+    "Equip: Reduces chance to be Dodged or Parried by 1.0%.",
+    "Equip: Improves your chance to get a critical strike with missile weapons by 1%."}) end""")(ns)
+assert (s["hit"], s["haste"], s["expertise"], s["crit"]) == (0.3, 1, 1, None), dict(s)
 
 # Traits talents, replayed from a real Forever beta capture --------------------
 # Level 19 Rogue with 10 points in Assassination (Malice 5, Ruthlessness 3,

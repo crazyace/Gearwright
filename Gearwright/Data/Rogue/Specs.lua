@@ -29,7 +29,9 @@ R.specs = {
   assassination = {
     label = "Assassination",
     summary = "Poison-focused; built around Mutilate and Venom.",
-    weapons = { mainHand = "dagger", offHand = "dagger" }, -- Mutilate wants daggers
+    -- Backstab needs a main-hand dagger. Forever's Mutilate has no dagger
+    -- requirement (Wowhead spell 1310707, 2026-10-03), so the off hand is free.
+    weapons = { mainHand = "dagger", offHand = "any" },
   },
   combat = {
     label = "Combat",
@@ -39,6 +41,6 @@ R.specs = {
   subtlety = {
     label = "Subtlety",
     summary = "Stealth openers; Hemorrhage feeds your Rupture.",
-    weapons = { mainHand = "dagger", offHand = "any" },
+    weapons = { mainHand = "dagger", offHand = "any" }, -- Backstab and Ambush
   },
 }
