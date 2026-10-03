@@ -175,6 +175,17 @@ def summarize(db):
         if "traits" in talents:
             trees = talents["traits"].get("trees") or []
             lines.append(f"   traits trees: {len(trees)}")
+            for tree in trees:
+                rows = []
+                for entry in tree.get("nodes") or []:
+                    node = entry.get("node") if isinstance(entry.get("node"), dict) else {}
+                    name = ((entry.get("spellName") or {}).get("values") or ["?"])[0]
+                    rows.append((node.get("posX", 0), node.get("posY", 0), name,
+                                 node.get("activeRank", 0) or 0, node.get("maxRanks", "?"), entry.get("spellID")))
+                spent = sum(r[3] for r in rows)
+                lines.append(f"   traits tree {tree.get('treeID')}: {len(rows)} nodes, {spent} points spent")
+                for x, y, name, rank, max_rank, spell in sorted(rows):
+                    lines.append(f"      {name} ({rank}/{max_rank})  spell {spell}  x={x} y={y}")
 
         gear = sec.get("gear") or {}
         tokens = set()

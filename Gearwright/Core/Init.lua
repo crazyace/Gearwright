@@ -9,13 +9,15 @@ ns.version = (getMeta and getMeta(ADDON, "Version")) or "dev"
 
 -- Event bus -----------------------------------------------------------------
 -- Modules subscribe with ns:On("EVENT", fn). One frame, many listeners.
+-- Unknown event names are skipped: newer clients error on them, and we don't
+-- yet know every event the Forever client fires.
 local frame = CreateFrame("Frame")
 local handlers = {}
 
 function ns:On(event, fn)
   if not handlers[event] then
     handlers[event] = {}
-    frame:RegisterEvent(event)
+    if not pcall(frame.RegisterEvent, frame, event) then return end
   end
   table.insert(handlers[event], fn)
 end

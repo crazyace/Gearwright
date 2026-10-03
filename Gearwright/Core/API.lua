@@ -70,41 +70,117 @@ function API.GetItemTooltipLines(link)
 end
 
 -- Talents -----------------------------------------------------------------------
--- Forever keeps Classic-shaped trees (3 tabs, 31-point style), but which API
--- exposes them on the Forever client is UNCONFIRMED. GearwrightProbe answers this.
+-- Forever (beta 1.60.1) exposes talents through the Traits API: one tree holding
+-- all three specs, readable, no secret values. Which spec a node belongs to is
+-- given by a per-class group ID (Data/<Class>/Specs.lua: traitTabGroups).
+-- The Classic API path is kept for clients that still have it.
 --
 -- Returns:
---   { source = "classic", tabs = { { name=, points=, talents = { {name=, tier=, column=, rank=, max=} } } } }
+--   { source = "traits" | "classic",
+--     tabs = { { name=, points=, talents = { {name=, rank=, max=, spellID=, nodeID=} } } } }
 --   or nil, reason
-function API.ReadTalents()
-  if GetNumTalentTabs and GetTalentInfo then
-    local result = { source = "classic", tabs = {} }
-    for tab = 1, GetNumTalentTabs() do
-      -- Return order of GetTalentTabInfo varies by client; take the first string.
-      local a, b = GetTalentTabInfo(tab)
-      local tabName = API.clean(type(a) == "string" and a or b)
-      local entry = { name = tabName, points = 0, talents = {} }
-      for i = 1, (GetNumTalents(tab) or 0) do
-        local name, _, tier, column, rank, maxRank = GetTalentInfo(tab, i)
-        name, rank = API.clean(name), API.clean(rank)
-        if name then
-          rank = rank or 0
-          entry.points = entry.points + rank
-          entry.talents[#entry.talents + 1] = {
-            name = name, tier = tier, column = column, rank = rank, max = maxRank,
-          }
-        end
+
+local function spellName(spellID)
+  if C_Spell and C_Spell.GetSpellName then return C_Spell.GetSpellName(spellID) end
+  return GetSpellInfo and (GetSpellInfo(spellID))
+end
+
+local function nodeName(configID, info)
+  local entryID = (info.activeEntry and info.activeEntry.entryID) or (info.entryIDs and info.entryIDs[1])
+  local entry = entryID and C_Traits.GetEntryInfo(configID, entryID)
+  local def = entry and entry.definitionID and C_Traits.GetDefinitionInfo(entry.definitionID)
+  if not def then return nil end
+  return API.clean(def.overrideName) or (def.spellID and API.clean(spellName(def.spellID))), def.spellID
+end
+
+-- tabGroups: { [groupID] = tabIndex }. Nodes in none of the groups are ignored.
+local function readTraits(tabGroups)
+  if not tabGroups then return nil, "no-trait-tab-map" end
+  local configID = API.clean(C_ClassTalents.GetActiveConfigID())
+  if not configID then return nil, "no-talent-config" end
+  local config = C_Traits.GetConfigInfo(configID)
+  local treeIDs = config and API.clean(config.treeIDs)
+  if type(treeIDs) ~= "table" then return nil, "no-talent-config" end
+
+  local result = { source = "traits", tabs = {} }
+  for _, tab in pairs(tabGroups) do
+    for i = #result.tabs + 1, tab do result.tabs[i] = { points = 0, talents = {} } end
+  end
+  for _, treeID in ipairs(treeIDs) do
+    for _, nodeID in ipairs(C_Traits.GetTreeNodes(treeID) or {}) do
+      local info = C_Traits.GetNodeInfo(configID, nodeID)
+      local tab
+      for _, g in ipairs(info and info.groupIDs or {}) do tab = tab or tabGroups[g] end
+      local name, spellID
+      if tab then name, spellID = nodeName(configID, info) end
+      if name then
+        local rank = API.clean(info.activeRank) or API.clean(info.ranksPurchased) or 0
+        local entry = result.tabs[tab]
+        entry.points = entry.points + rank
+        entry.talents[#entry.talents + 1] = {
+          name = name, rank = rank, max = info.maxRanks, spellID = spellID, nodeID = nodeID,
+          y = info.posY or 0, x = info.posX or 0,
+        }
       end
-      result.tabs[tab] = entry
     end
-    return result
   end
+  for _, entry in ipairs(result.tabs) do
+    table.sort(entry.talents, function(a, b)
+      if a.y ~= b.y then return a.y < b.y end
+      return a.x < b.x
+    end)
+  end
+  return result
+end
 
+local function readClassic()
+  local result = { source = "classic", tabs = {} }
+  for tab = 1, GetNumTalentTabs() do
+    -- Return order of GetTalentTabInfo varies by client; take the first string.
+    local a, b = GetTalentTabInfo(tab)
+    local tabName = API.clean(type(a) == "string" and a or b)
+    local entry = { name = tabName, points = 0, talents = {} }
+    for i = 1, (GetNumTalents(tab) or 0) do
+      local name, _, tier, column, rank, maxRank = GetTalentInfo(tab, i)
+      name, rank = API.clean(name), API.clean(rank)
+      if name then
+        rank = rank or 0
+        entry.points = entry.points + rank
+        entry.talents[#entry.talents + 1] = {
+          name = name, tier = tier, column = column, rank = rank, max = maxRank,
+        }
+      end
+    end
+    result.tabs[tab] = entry
+  end
+  return result
+end
+
+-- Reading the tree is ~160 API calls, and tooltips ask on every hover, so the
+-- last good read is cached until a talent event says it changed.
+API.TALENT_EVENTS = { "TRAIT_CONFIG_UPDATED", "PLAYER_TALENT_UPDATE", "CHARACTER_POINTS_CHANGED" }
+local talentCache = {}
+for _, event in ipairs(API.TALENT_EVENTS) do
+  ns:On(event, function() talentCache = {} end)
+end
+
+function API.ReadTalents(tabGroups)
+  local key = tabGroups or "none"
+  if talentCache[key] then return talentCache[key] end
+  local result, reason
   if C_ClassTalents and C_Traits then
-    -- TODO(phase 0): implement once the probe shows how Forever maps
-    -- its trees onto the Traits system.
-    return nil, "traits-api-not-implemented"
+    local ok, r, why = pcall(readTraits, tabGroups)
+    if ok then
+      result, reason = r, why
+    else
+      result, reason = nil, "traits-error"
+      ns.util.debug("talent read failed: %s", tostring(r))
+    end
+  elseif GetNumTalentTabs and GetTalentInfo then
+    result = readClassic()
+  else
+    reason = "no-talent-api"
   end
-
-  return nil, "no-talent-api"
+  talentCache[key] = result
+  return result, reason
 end

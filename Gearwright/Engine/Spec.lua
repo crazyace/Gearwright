@@ -17,7 +17,7 @@ function Spec.Detect()
   local override = ns.db and ns.db.specOverride
   if override and classData.specs[override] then return override, "override" end
 
-  local talents, reason = ns.API.ReadTalents()
+  local talents, reason = ns.API.ReadTalents(classData.traitTabGroups)
   if not talents then return nil, reason end
 
   -- Spec = tab with the most points spent.

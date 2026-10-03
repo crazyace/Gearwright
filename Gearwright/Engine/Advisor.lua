@@ -88,7 +88,7 @@ function Advisor.TalentReport()
   local build = ctx.class.builds and ctx.class.builds[ctx.spec]
   if not build or next(build.talents) == nil then return nil, "no-build-data" end
 
-  local talents, why = ns.API.ReadTalents()
+  local talents, why = ns.API.ReadTalents(ctx.class.traitTabGroups)
   if not talents then return nil, why end
 
   local have = {}
