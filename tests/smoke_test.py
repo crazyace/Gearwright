@@ -386,6 +386,26 @@ sheet = L.eval("""function() local s = GearwrightProbeDB.snapshots[1].sections.s
 # item slot, empty slot and model button skipped; no "<nil>" from blank right-hand tooltip text.
 assert tuple(sheet) == (2, "66", 3, "Reduces Physical Damage taken by 19.46%", "Increases Attack Power by 66"), tuple(sheet)
 
+# Items by ID: the server sends item data a moment after it's asked for, and
+# never for an ID that doesn't exist.
+L.execute("""
+ITEMS["item:13404:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_HIT_RATING_SHORT=20},
+  tip={"Mask of the Unforgiven", "Equip: Improves your chance to hit by 2.0%."} }
+local asked, byLink = {}, C_Item.GetItemInfo
+C_Item.RequestLoadItemDataByID = function(id) asked[id] = (asked[id] or 0) end
+C_Item.GetItemInfo = function(x)
+  if type(x) ~= "number" then return byLink(x) end
+  asked[x] = (asked[x] or 0) + 1
+  if x ~= 13404 or asked[x] < 2 then return nil end
+  return "Mask of the Unforgiven", "item:13404:0:0", 3, 57, 52
+end
+""")
+L.globals().SlashCmdList.GEARWRIGHTPROBE("items 13404 424242")
+mask = L.eval("""function() local r = GearwrightProbeDB.scans.items["13404"]
+  return r.stats.values[1].ITEM_MOD_HIT_RATING_SHORT, r.tooltip[2], GearwrightProbeDB.scans.items["424242"] end""")()
+assert tuple(mask) == (20, "Equip: Improves your chance to hit by 2.0%.", None), tuple(mask)
+assert "items: read 1 of 2 (no data for 424242)" in L.globals().printed[len(L.globals().printed) - 1]
+
 # Regression: two professions' recipe scans must not overwrite each other.
 L.execute("""
 PROF = "Enchanting"
@@ -397,7 +417,7 @@ L.globals().fire("TRADE_SKILL_SHOW")
 L.execute("PROF = 'Leatherworking'"); L.globals().fire("TRADE_SKILL_SHOW")
 L.execute("C_TradeSkillUI.GetBaseProfessionInfo = function() return nil end"); L.globals().fire("TRADE_SKILL_SHOW")
 keys = sorted(L.eval("function() local o={} for k in pairs(GearwrightProbeDB.scans) do o[#o+1]=k end return o end")().values())
-assert keys == ["tradeskill:3", "tradeskill:Enchanting", "tradeskill:Leatherworking"], keys
+assert keys == ["items", "tradeskill:3", "tradeskill:Enchanting", "tradeskill:Leatherworking"], keys
 L.globals().SlashCmdList.GEARWRIGHTPROBE("export")
 print("---- probe export title ----"); print(L.globals().LASTTEXT)
 for p in L.globals().printed.values(): print("  >", p)
@@ -419,6 +439,8 @@ for f in ("export.json", "GearwrightProbe.lua"):
     r = subprocess.run([sys.executable, str(R/"tools"/"probe_to_json.py"), str(OUT/f)], capture_output=True, text=True)
     assert r.returncode == 0 and "Malice (5/5)" in r.stdout and "10 points spent" in r.stdout, r.stdout + r.stderr
     for want in ("character sheet: 2 stat lines", "Agility 66 (49+17)", "Increases Attack Power by 66",
-                 "agility per 1% crit: 7.59  (from the sheet", "Reduces Physical Damage taken by 19.46%", "CR_HIT_MELEE (id 6): rating 12, bonus 1.2"):
+                 "agility per 1% crit: 7.59  (from the sheet", "Reduces Physical Damage taken by 19.46%", "CR_HIT_MELEE (id 6): rating 12, bonus 1.2",
+                 "items by ID: 1", "13404 Mask of the Unforgiven (req 52): ITEM_MOD_HIT_RATING_SHORT=20",
+                 "Equip: Improves your chance to hit by 2.0%."):
         assert want in r.stdout, (want, r.stdout)
 print("\nALL SMOKE TESTS PASSED")
