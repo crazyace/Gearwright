@@ -16,8 +16,9 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 - [x] Fresh level-10 Rogue with talents in **Assassination** -> `/gwp all`
 - [ ] Respec into **Combat** -> `/gwp talents`
 - [ ] Respec into **Subtlety** -> `/gwp talents`
-- [ ] Equip an item with an "Equip: +x% hit/crit" line -> `/gwp gear` (stat units)
-- [ ] Equip something with Expertise and Haste if you find it -> `/gwp gear`
+- [ ] `/gwp items` -> reads six reference items by ID (hit, crit, haste/expertise gear) without
+      owning them. Settles the stat units. `/gwp items 1234 5678` reads any other IDs.
+- [ ] Equip an item with an "Equip: +x% hit/crit" line -> `/gwp gear` (confirms what equipping changes)
 - [ ] Open your **class trainer** (recorded automatically)
 - [ ] Open **Enchanting** on any character (recorded automatically)
 - [ ] Target another Rogue -> `/gwp inspect`

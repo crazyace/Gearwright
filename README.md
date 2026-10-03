@@ -6,6 +6,8 @@ Gearwright reads your talents to work out your spec, scores items with spec-spec
 stat weights, and tells you:
 
 - **Gear** - is this item an upgrade, and by how much? (tooltip line + gear summary)
+- **Quest rewards and loot** - which reward to take, and which drops or rolls are upgrades
+  (chat messages; `/gearwright notices` turns them off)
 - **Talents** - where does your build differ from the recommended one?
 - **Enchants** - which slots are missing the recommended enchant?
 

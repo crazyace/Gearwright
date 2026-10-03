@@ -62,10 +62,9 @@ Cutthroat 462708.
   and the tooltip line "Equip: +3 Attack Power." Gearwright counts the stat once.
 - "Equip: +4 Attack Power against Humanoids." is a separate token and is not counted as AP.
 - Enchants are **not** in `GetItemStats`; they show as an "Enchanted: ..." tooltip line.
-- **Hit/crit units: still open.** No hit/crit/haste/expertise gear in any capture yet.
-  The client defines the full Mainline set of 31 `CR_*` ratings (including Versatility,
-  Mastery, Avoidance, Lifesteal, Speed) and all read 0, so the rating system exists,
-  but whether items use it is unknown.
+- **Hit/crit units: ratings shown as a fixed %** (from Wowhead, see below; not yet seen
+  in a beta capture). The client defines the full Mainline set of 31 `CR_*` ratings
+  (including Versatility, Mastery, Avoidance, Lifesteal, Speed), all 0 so far.
 
 ## Character stats (level 19 Gnome Rogue, 16:58 and 17:04 captures)
 
@@ -112,6 +111,29 @@ leftover on Forever; the real stat lines are unnamed frames elsewhere in the win
 The beta's level cap is currently 30. (An earlier note here claimed a Free Trial cap at
 19; that came from a hidden placeholder string on the level line, which the probe now ignores.)
 
+## From Wowhead's Forever database
+
+Wowhead has a Forever database at `wowhead.com/forever/...` (checked 2026-10-03).
+It's datamined, so it can be ahead of or behind the beta client: its Catacomb Cloak
+(279899) has 6 AP and 3 Stamina where the beta showed 3 AP and 2 Stamina. Treat it
+as a lead to confirm in game, not as ground truth.
+
+- **Ratings convert at a fixed rate, at every item level.** 40 leather items,
+  stored rating vs tooltip text:
+
+  | Stat | Rating per 1% | Examples |
+  |---|---|---|
+  | Hit | 10 | 3 -> 0.3%, 10 -> 1.0%, 20 -> 2.0% |
+  | Crit | 14 | 7 -> 0.5%, 14 -> 1.0%, 21 -> 1.5%, 28 -> 2.0% |
+  | Haste | 10 | "Increases your attack speed and casting speed by 1.0%" |
+  | Expertise | 10 | "Reduces chance to be Dodged or Parried by 1.0%" |
+
+  Tooltips use one decimal ("by 2.0%"), unlike Classic ("by 2%").
+  Gearwright converts rating tokens to % and reads either wording (`Data/Stats.lua`).
+- **Weapon rules:** Backstab and Ambush require a main-hand dagger. Mutilate (1310707,
+  level 30) "attacks with both weapons" and has no dagger requirement, so Assassination
+  is free in the off hand.
+
 ## Enchants
 
 The enchant ID parses out of the item link as expected.
@@ -137,7 +159,7 @@ committed as a separate capture.
 
 ## Still open
 
-- [ ] Hit/crit/haste/expertise units: equip gear with those stats, `/gwp gear`
+- [ ] Confirm the rating -> % conversion in game: equip any hit/crit gear, `/gwp gear`
 - [ ] Enchanting recipes and trainer services (open the windows; recorded automatically)
 - [ ] Other Rogues' gear and enchants (`/gwp inspect`)
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety

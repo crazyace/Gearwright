@@ -33,38 +33,67 @@ function Advisor.Context()
     class = classData,
     spec = spec,
     specHow = how,
-    weights = classData.weights[spec],
+    weights = ns.Weights.Build(classData, spec, ns.API.CharacterSnapshot()),
   }
 end
 
 -- Gear ------------------------------------------------------------------------
 
--- Score delta of `link` vs the weakest equipped item it could replace.
--- Returns delta, slotID, newScore, oldScore  (or nil, reason)
+local DAGGER = 15
+
+-- Slots `link` could go in for this class and spec, or nil + reason:
+--   "not-equippable", "not-usable" (armor/weapon type), "wrong-weapon-type" (spec rule).
+function Advisor.CandidateSlots(link, ctx)
+  local _, equipLoc, classID, subclassID = ns.API.GetItemBasics(link)
+  local slots = equipLoc and EQUIP_LOC_TO_SLOTS[equipLoc]
+  if not slots then return nil, "not-equippable" end
+
+  local prof = ctx.class.proficiency
+  if prof and classID and prof[classID] and not prof[classID][subclassID] then
+    return nil, "not-usable"
+  end
+
+  local rules = ctx.class.specs[ctx.spec] and ctx.class.specs[ctx.spec].weapons
+  if not rules or classID ~= 2 then return slots end
+  local out = {}
+  for _, slot in ipairs(slots) do
+    local want = (slot == 16 and rules.mainHand) or (slot == 17 and rules.offHand) or "any"
+    if want == "any" or (want == "dagger" and subclassID == DAGGER) then out[#out + 1] = slot end
+  end
+  if #out == 0 then return nil, "wrong-weapon-type" end
+  return out
+end
+
+-- Score delta of `link` vs what it would replace, in the slot where it helps most.
+-- Returns delta, slotID, newScore, oldScore, requiredLevel  (or nil, reason)
+-- requiredLevel is set only when it's above your level.
 function Advisor.CompareToEquipped(link)
   local ctx, reason = Advisor.Context()
   if not ctx then return nil, reason end
 
-  local _, equipLoc = ns.API.GetItemBasics(link)
-  local slots = equipLoc and EQUIP_LOC_TO_SLOTS[equipLoc]
-  if not slots then return nil, "not-equippable" end
+  local slots, why = Advisor.CandidateSlots(link, ctx)
+  if not slots then return nil, why end
 
-  local newScore = ns.Scoring.ScoreLink(link, ctx.weights)
-  if not newScore then return nil, "stats-unreadable" end
-
-  local worstSlot, worstScore
+  local best
   for _, slot in ipairs(slots) do
+    local newScore = ns.Scoring.ScoreLink(link, ctx.weights, slot)
+    if not newScore then return nil, "stats-unreadable" end
+    local oldScore = 0 -- empty slot
     local equipped = ns.API.GetEquippedLink(slot)
-    local score = 0 -- empty slot
     if equipped then
       -- Unreadable (e.g. not cached yet) is not the same as empty: scoring it
       -- as 0 would make anything look like an upgrade.
-      score = ns.Scoring.ScoreLink(equipped, ctx.weights)
-      if not score then return nil, "equipped-unreadable" end
+      oldScore = ns.Scoring.ScoreLink(equipped, ctx.weights, slot)
+      if not oldScore then return nil, "equipped-unreadable" end
     end
-    if not worstScore or score < worstScore then worstSlot, worstScore = slot, score end
+    local delta = newScore - oldScore
+    if not best or delta > best[1] then best = { delta, slot, newScore, oldScore } end
   end
-  return newScore - worstScore, worstSlot, newScore, worstScore
+
+  local reqLevel = ns.API.GetItemDetails(link)
+  local level = ns.API.clean(UnitLevel("player"))
+  if not (reqLevel and level and reqLevel > level) then reqLevel = nil end
+  return best[1], best[2], best[3], best[4], reqLevel
 end
 
 function Advisor.GearReport()
@@ -73,7 +102,7 @@ function Advisor.GearReport()
   local rows = {}
   for _, slot in ipairs(Advisor.SLOT_ORDER) do
     local link = ns.API.GetEquippedLink(slot)
-    local score = link and ns.Scoring.ScoreLink(link, ctx.weights)
+    local score = link and ns.Scoring.ScoreLink(link, ctx.weights, slot)
     rows[#rows + 1] = { slot = slot, name = Advisor.SLOT_NAMES[slot], link = link, score = score }
   end
   return rows, ctx

@@ -22,6 +22,7 @@ end
 -- Items -----------------------------------------------------------------------
 local getItemStats = (C_Item and C_Item.GetItemStats) or GetItemStats
 local getItemInfoInstant = (C_Item and C_Item.GetItemInfoInstant) or GetItemInfoInstant
+local getItemInfo = (C_Item and C_Item.GetItemInfo) or GetItemInfo
 
 -- Raw stat table keyed by ITEM_MOD_*_SHORT tokens, or nil.
 function API.GetItemStats(link)
@@ -36,12 +37,34 @@ function API.GetItemStats(link)
   return out
 end
 
--- itemID, equipLoc for a link or ID.
+-- itemID, equipLoc, classID, subclassID for a link or ID. Works for uncached items.
 function API.GetItemBasics(item)
   if not item or not getItemInfoInstant then return nil end
-  local ok, itemID, _, _, equipLoc = pcall(getItemInfoInstant, item)
+  local ok, itemID, _, _, equipLoc, _, classID, subclassID = pcall(getItemInfoInstant, item)
   if not ok then return nil end
-  return itemID, equipLoc
+  return itemID, equipLoc, classID, subclassID
+end
+
+-- requiredLevel, sellPrice (copper). Both nil until the item is cached.
+function API.GetItemDetails(item)
+  if not item or not getItemInfo then return nil end
+  local ok, name, _, _, _, reqLevel, _, _, _, _, _, sellPrice = pcall(getItemInfo, item)
+  if not ok or not name then return nil end
+  return API.clean(reqLevel), API.clean(sellPrice)
+end
+
+-- What weights depend on: level and current main-hand DPS (buffs included).
+function API.CharacterSnapshot()
+  local char = { level = API.clean(UnitLevel("player")) }
+  if UnitDamage and UnitAttackSpeed then
+    local okD, low, high = pcall(UnitDamage, "player")
+    local okS, speed = pcall(UnitAttackSpeed, "player")
+    low, high, speed = API.clean(low), API.clean(high), API.clean(speed)
+    if okD and okS and low and high and speed and speed > 0 then
+      char.mainHandDps = (low + high) / 2 / speed
+    end
+  end
+  return char
 end
 
 function API.GetEquippedLink(slot, unit)

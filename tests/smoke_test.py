@@ -51,15 +51,26 @@ function GetTalentTabInfo(t) return 100+t, TABS[t][1], "desc" end
 function GetNumTalents(t) return #TABS[t][2] end
 function GetTalentInfo(t,i) local x=TABS[t][2][i] return x[1], "icon", 1, i, x[2], x[3] end
 -- Items
-local ITEMS = {
- ["item:1001:0:0"] = { equip="INVTYPE_HEAD", stats={ITEM_MOD_AGILITY_SHORT=10, ITEM_MOD_STAMINA_SHORT=8}, tip={"Cap", "Equip: Improves your chance to hit by 1%."} },
- ["item:1002:0:0"] = { equip="INVTYPE_HEAD", stats={ITEM_MOD_AGILITY_SHORT=14, ITEM_MOD_ATTACK_POWER_SHORT=20}, tip={"Better Cap"} },
- ["item:2001:1900:0"] = { equip="INVTYPE_WEAPON", stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=20}, tip={} },
+-- class/sub: Enum.ItemClass and subclass (4/2 leather, 4/4 plate, 2/15 dagger, 2/7 sword)
+ITEMS = {
+ ["item:1001:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=10, ITEM_MOD_STAMINA_SHORT=8}, tip={"Cap", "Equip: Improves your chance to hit by 1%."} },
+ ["item:1002:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=14, ITEM_MOD_ATTACK_POWER_SHORT=20}, tip={"Better Cap"}, sell=120 },
+ ["item:1003:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=30}, tip={"Future Cap"}, req=40, sell=500 },
+ ["item:3001:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=4, stats={ITEM_MOD_AGILITY_SHORT=50}, tip={"Plate Helm"}, sell=900 },
+ ["item:2001:1900:0"] = { equip="INVTYPE_WEAPON", class=2, sub=15, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=20}, tip={} },
+ ["item:2002:0:0"] = { equip="INVTYPE_WEAPON", class=2, sub=7, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=25}, tip={"Sword"} },
+ ["item:2003:0:0"] = { equip="INVTYPE_WEAPON", class=2, sub=15, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=22}, tip={"Dagger"} },
 }
 INV = { [1] = "item:1001:0:0", [16] = "item:2001:1900:0" }
 function GetInventoryItemLink(unit, slot) return INV[slot] end
+local function item(l) return ITEMS[l] or {} end
 C_Item = { GetItemStats = function(l) return ITEMS[l] and ITEMS[l].stats end,
-           GetItemInfoInstant = function(l) return 1, "Armor", "Cloth", ITEMS[l] and ITEMS[l].equip end }
+           GetItemInfoInstant = function(l) local i = item(l) return 1, "Armor", "Cloth", i.equip, 0, i.class, i.sub end,
+           GetItemInfo = function(l) local i = ITEMS[l] if not i then return nil end
+             return "name", l, 2, 20, i.req or 1, "Armor", "Leather", 1, i.equip, 0, i.sell or 0 end }
+-- Main hand 34 damage every 1.7 s: 20 DPS, so 1% of damage = 2.8 AP.
+function UnitDamage() return 34, 34, 17, 17, 0, 0, 1 end
+function UnitAttackSpeed() return 1.7, 1.7 end
 C_TooltipInfo = { GetHyperlink = function(l) local o={lines={}} for _,t in ipairs(ITEMS[l] and ITEMS[l].tip or {}) do o.lines[#o.lines+1]={leftText=t} end return o end }
 function UnitAttackPower() return 100, 0, 0 end
 function GetCritChance() return 5.5 end
@@ -86,7 +97,13 @@ print("spec:", spec, how)
 cmp = L.eval("function(ns) return ns.Advisor.CompareToEquipped('item:1002:0:0') end")(ns)
 print("compare better cap:", cmp)
 assert spec == "combat" and how == "talents"
-assert abs(cmp[0] - 1.6) < 1e-9, cmp
+# Combat at level 30, 20 main-hand DPS. Scores are in attack-power equivalents.
+PCT = 0.14 * 20                                   # AP worth 1% of damage
+AGI_PER_CRIT = 7.59 + (29.0 - 7.59) * (30 - 19) / (60 - 19)
+AGI = 1 + 1.0 * PCT / AGI_PER_CRIT                # 1 AP + its share of crit
+CAP = 10 * AGI + 8 * 0.2 + 1 * 1.2 * PCT          # agi, sta, 1% hit
+BETTER_CAP = 14 * AGI + 20
+assert abs(cmp[0] - (BETTER_CAP - CAP)) < 1e-9, (cmp, BETTER_CAP - CAP)
 print("enchant id:", L.eval("function(ns) return ns.API.GetEnchantID('item:2001:1900:0') end")(ns))
 L.globals().SlashCmdList.GEARWRIGHT("spec subtlety")
 print("override:", L.eval("function(ns) return ns.Spec.Detect() end")(ns))
@@ -108,7 +125,7 @@ r = L.eval("function(ns) return {ns.Advisor.CompareToEquipped('item:1002:0:0')} 
 assert r[1] is None and r[2] == "equipped-unreadable", list(r.values())
 L.execute("INV[1] = nil")
 r = L.eval("function(ns) return ns.Advisor.CompareToEquipped('item:1002:0:0') end")(ns)
-assert r[0] == 24 and r[3] == 0, r  # truly empty slot: full score is the upgrade
+assert abs(r[0] - BETTER_CAP) < 1e-9 and r[3] == 0, r  # truly empty slot: full score is the upgrade
 L.execute("INV[1] = 'item:1001:0:0'")
 
 # Regression: a bonus in both GetItemStats and an "Equip:" line counts once.
@@ -117,6 +134,89 @@ ap, hit = L.eval("""function(ns)
     {"Equip: +20 Attack Power.", "Equip: Improves your chance to hit by 1%."})
   return s.ap, s.hit end""")(ns)
 assert ap == 20 and hit == 1, (ap, hit)
+
+# Gear checks ------------------------------------------------------------------
+def compare(link):
+    r = L.eval("function(ns, l) return {ns.Advisor.CompareToEquipped(l)} end")(ns, link)
+    return [r[i] if i in r else None for i in range(1, 6)]
+# A Rogue can't wear plate, whatever its stats.
+assert compare("item:3001:0:0")[:2] == [None, "not-usable"]
+# A dagger goes where it helps most: the empty off hand (DPS at half value)
+# beats replacing the 20-DPS main-hand dagger.
+d = compare("item:2003:0:0")
+assert d[1] == 17 and abs(d[0] - 22 * 7) < 1e-9, d
+# Main hand: a 25-DPS sword over the 20-DPS dagger is worth 5 x 14 AP for Combat...
+L.execute("INV[17] = 'item:2003:0:0'")
+d = compare("item:2002:0:0")
+assert d[1] == 16 and abs(d[0] - 5 * 14) < 1e-9, d
+# ...but Assassination needs a main-hand dagger (Backstab), so for it the sword
+# can only replace the 22-DPS off-hand dagger, at half value.
+L.eval("function(ns) ns.db.specOverride = 'assassination' end")(ns)
+d = compare("item:2002:0:0")
+assert d[1] == 17 and abs(d[0] - 3 * 7) < 1e-9, d
+L.execute("ITEMS['item:2004:0:0'] = { equip='INVTYPE_WEAPONMAINHAND', class=2, sub=7, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")
+assert compare("item:2004:0:0")[:2] == [None, "wrong-weapon-type"]
+L.eval("function(ns) ns.db.specOverride = false end")(ns)
+L.execute("INV[17] = nil")
+# Items above your level still score, and say when you can wear them.
+d = compare("item:1003:0:0")
+assert d[0] > 0 and d[4] == 40, d
+assert compare("item:1002:0:0")[4] is None
+# Weights follow level: agility is worth more crit per point at 19 than at 60.
+lo, hi = L.eval("""function(ns)
+  local c = ns.Data.ROGUE
+  return ns.Weights.Build(c, "combat", {level = 19, mainHandDps = 20}).agi,
+         ns.Weights.Build(c, "combat", {level = 60, mainHandDps = 20}).agi end""")(ns)
+assert abs(lo - (1 + PCT / 7.59)) < 1e-9 and abs(hi - (1 + PCT / 29.0)) < 1e-9, (lo, hi)
+
+# Quest rewards: the upgrade is picked, the plate helm is ignored.
+L.execute("""
+QUEST = { "item:3001:0:0", "item:1002:0:0", "item:1003:0:0" }
+function GetNumQuestChoices() return #QUEST end
+function GetQuestItemLink(kind, i) return QUEST[i] end
+""")
+def last_print():
+    p = L.globals().printed
+    return p[len(p)]
+L.globals().fire("QUEST_COMPLETE")
+assert "take reward 2: item:1002:0:0" in last_print(), last_print()
+# No upgrade: say which reward sells for the most.
+L.execute('QUEST = { "item:3001:0:0", "item:1001:0:0" }')
+L.globals().fire("QUEST_DETAIL")
+assert "no upgrade among the rewards; item:3001:0:0 sells for the most (0g 9s 0c)" in last_print(), last_print()
+# Loot window and need/greed rolls.
+L.execute("""
+LOOT = { "item:1001:0:0", "item:1002:0:0", "item:1002:0:0" }
+function GetNumLootItems() return #LOOT end
+function GetLootSlotLink(i) return LOOT[i] end
+function GetLootRollItemLink() return "item:1002:0:0" end
+""")
+n = len(L.globals().printed)
+L.globals().fire("LOOT_OPENED")
+assert len(L.globals().printed) == n + 1 and "upgrade: item:1002:0:0" in last_print(), last_print()
+L.globals().fire("START_LOOT_ROLL", 7)
+assert "worth a Need" in last_print(), last_print()
+L.globals().SlashCmdList.GEARWRIGHT("notices")
+n = len(L.globals().printed)
+L.globals().fire("LOOT_OPENED")
+assert len(L.globals().printed) == n
+L.globals().SlashCmdList.GEARWRIGHT("notices")
+
+# Forever ratings: stored as rating, shown as a fixed % (Wowhead, Mask of the
+# Unforgiven: 20 hit rating = "2.0%", 14 crit rating = "1.0%"). Counted once, in %.
+hit, crit = L.eval("""function(ns)
+  local s = ns.Stats.AddTooltipEffects(
+    ns.Stats.FromRaw({ITEM_MOD_HIT_RATING_SHORT = 20, ITEM_MOD_CRIT_RATING_SHORT = 14}),
+    {"Equip: Improves your chance to hit by 2.0%.", "Equip: Improves your chance to get a critical strike by 1.0%."})
+  return s.hit, s.crit end""")(ns)
+assert (hit, crit) == (2, 1), (hit, crit)
+# Tooltip-only, with Forever's decimal wording.
+s = L.eval("""function(ns)
+  return ns.Stats.AddTooltipEffects({}, {"Equip: Improves your chance to hit by 0.3%.",
+    "Equip: Increases your attack speed and casting speed by 1.0%.",
+    "Equip: Reduces chance to be Dodged or Parried by 1.0%.",
+    "Equip: Improves your chance to get a critical strike with missile weapons by 1%."}) end""")(ns)
+assert (s["hit"], s["haste"], s["expertise"], s["crit"]) == (0.3, 1, 1, None), dict(s)
 
 # Traits talents, replayed from a real Forever beta capture --------------------
 # Level 19 Rogue with 10 points in Assassination (Malice 5, Ruthlessness 3,
@@ -286,6 +386,26 @@ sheet = L.eval("""function() local s = GearwrightProbeDB.snapshots[1].sections.s
 # item slot, empty slot and model button skipped; no "<nil>" from blank right-hand tooltip text.
 assert tuple(sheet) == (2, "66", 3, "Reduces Physical Damage taken by 19.46%", "Increases Attack Power by 66"), tuple(sheet)
 
+# Items by ID: the server sends item data a moment after it's asked for, and
+# never for an ID that doesn't exist.
+L.execute("""
+ITEMS["item:13404:0:0"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_HIT_RATING_SHORT=20},
+  tip={"Mask of the Unforgiven", "Equip: Improves your chance to hit by 2.0%."} }
+local asked, byLink = {}, C_Item.GetItemInfo
+C_Item.RequestLoadItemDataByID = function(id) asked[id] = (asked[id] or 0) end
+C_Item.GetItemInfo = function(x)
+  if type(x) ~= "number" then return byLink(x) end
+  asked[x] = (asked[x] or 0) + 1
+  if x ~= 13404 or asked[x] < 2 then return nil end
+  return "Mask of the Unforgiven", "item:13404:0:0", 3, 57, 52
+end
+""")
+L.globals().SlashCmdList.GEARWRIGHTPROBE("items 13404 424242")
+mask = L.eval("""function() local r = GearwrightProbeDB.scans.items["13404"]
+  return r.stats.values[1].ITEM_MOD_HIT_RATING_SHORT, r.tooltip[2], GearwrightProbeDB.scans.items["424242"] end""")()
+assert tuple(mask) == (20, "Equip: Improves your chance to hit by 2.0%.", None), tuple(mask)
+assert "items: read 1 of 2 (no data for 424242)" in L.globals().printed[len(L.globals().printed) - 1]
+
 # Regression: two professions' recipe scans must not overwrite each other.
 L.execute("""
 PROF = "Enchanting"
@@ -297,7 +417,7 @@ L.globals().fire("TRADE_SKILL_SHOW")
 L.execute("PROF = 'Leatherworking'"); L.globals().fire("TRADE_SKILL_SHOW")
 L.execute("C_TradeSkillUI.GetBaseProfessionInfo = function() return nil end"); L.globals().fire("TRADE_SKILL_SHOW")
 keys = sorted(L.eval("function() local o={} for k in pairs(GearwrightProbeDB.scans) do o[#o+1]=k end return o end")().values())
-assert keys == ["tradeskill:3", "tradeskill:Enchanting", "tradeskill:Leatherworking"], keys
+assert keys == ["items", "tradeskill:3", "tradeskill:Enchanting", "tradeskill:Leatherworking"], keys
 L.globals().SlashCmdList.GEARWRIGHTPROBE("export")
 print("---- probe export title ----"); print(L.globals().LASTTEXT)
 for p in L.globals().printed.values(): print("  >", p)
@@ -319,6 +439,8 @@ for f in ("export.json", "GearwrightProbe.lua"):
     r = subprocess.run([sys.executable, str(R/"tools"/"probe_to_json.py"), str(OUT/f)], capture_output=True, text=True)
     assert r.returncode == 0 and "Malice (5/5)" in r.stdout and "10 points spent" in r.stdout, r.stdout + r.stderr
     for want in ("character sheet: 2 stat lines", "Agility 66 (49+17)", "Increases Attack Power by 66",
-                 "agility per 1% crit: 7.59  (from the sheet", "Reduces Physical Damage taken by 19.46%", "CR_HIT_MELEE (id 6): rating 12, bonus 1.2"):
+                 "agility per 1% crit: 7.59  (from the sheet", "Reduces Physical Damage taken by 19.46%", "CR_HIT_MELEE (id 6): rating 12, bonus 1.2",
+                 "items by ID: 1", "13404 Mask of the Unforgiven (req 52): ITEM_MOD_HIT_RATING_SHORT=20",
+                 "Equip: Improves your chance to hit by 2.0%."):
         assert want in r.stdout, (want, r.stdout)
 print("\nALL SMOKE TESTS PASSED")

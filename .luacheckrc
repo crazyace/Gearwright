@@ -14,5 +14,7 @@ read_globals = {
   "GetNumTalentTabs", "GetTalentTabInfo", "GetNumTalents", "GetTalentInfo",
   "GetNumTradeSkills", "GetTradeSkillLine", "GetNumTrainerServices", "NotifyInspect", "GetLocale", "WOW_PROJECT_ID",
   "UnitClass", "UnitFullName", "UnitLevel", "UnitName", "UnitExists",
+  "UnitDamage", "UnitAttackSpeed", "GetItemInfo", "GetCoinTextureString",
+  "GetNumQuestChoices", "GetQuestItemLink", "GetNumLootItems", "GetLootSlotLink", "GetLootRollItemLink",
   "issecretvalue", "InCombatLockdown", "geterrorhandler", "tinsert", "date",
 }

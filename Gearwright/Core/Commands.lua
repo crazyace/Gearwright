@@ -6,6 +6,7 @@ local function help()
   print("  /gearwright            toggle the window")
   print("  /gearwright spec <assassination|combat|subtlety|auto>")
   print("  /gearwright tooltip    toggle the tooltip line")
+  print("  /gearwright notices    toggle quest reward / loot upgrade messages")
   print("  /gearwright debug      toggle debug output")
 end
 
@@ -31,6 +32,9 @@ SlashCmdList.GEARWRIGHT = function(msg)
   elseif cmd == "tooltip" then
     ns.db.showTooltip = not ns.db.showTooltip
     ns.util.print("tooltip line %s", ns.db.showTooltip and "on" or "off")
+  elseif cmd == "notices" then
+    ns.db.notices = not ns.db.notices
+    ns.util.print("upgrade messages %s", ns.db.notices and "on" or "off")
   elseif cmd == "debug" then
     ns.db.debug = not ns.db.debug
     ns.util.print("debug %s", ns.db.debug and "on" or "off")

@@ -271,6 +271,20 @@ def summarize(db):
                 lines.append(f"   agility per 1% crit: {per_crit:.2f}  (from the sheet, level {snap.get('level')})")
 
     for key, scan in (db.get("scans") or {}).items():
+        if key == "items":
+            lines.append(f"items by ID: {len(scan)}")
+            for item_id, item in sorted(scan.items(), key=lambda kv: str(kv[0])):
+                info = (item.get("info") or {}).get("values") or []
+                name = info[0] if info else "?"
+                req = info[4] if len(info) > 4 else "?"
+                stats = ((item.get("stats") or {}).get("values") or [{}])[0]
+                stats = stats if isinstance(stats, dict) else {}
+                lines.append(f"   {item_id} {name} (req {req}): "
+                             + ", ".join(f"{k}={v}" for k, v in sorted(stats.items())))
+                for t in item.get("tooltip") or []:
+                    if isinstance(t, str) and t.startswith("Equip:"):
+                        lines.append(f"      {t}")
+            continue
         count = len(scan.get("recipes") or scan.get("services") or scan.get("gear") or [])
         lines.append(f"scan {key}: {count} entries")
     return "\n".join(lines)

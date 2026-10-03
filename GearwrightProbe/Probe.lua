@@ -99,7 +99,12 @@ local API_PATHS = {
   -- items
   "C_Item.GetItemStats", "GetItemStats", "C_Item.GetItemInfoInstant", "GetItemInfoInstant",
   "C_TooltipInfo.GetHyperlink", "C_TooltipInfo.GetInventoryItem", "TooltipDataProcessor.AddTooltipPostCall",
-  "GetInventoryItemLink", "C_PaperDollInfo.GetInspectItemLevel",
+  "GetInventoryItemLink", "C_PaperDollInfo.GetInspectItemLevel", "C_Item.GetItemInfo", "GetItemInfo",
+  -- quest rewards / loot (Gearwright's upgrade messages)
+  "GetNumQuestChoices", "GetQuestItemLink", "GetNumLootItems", "GetLootSlotLink", "GetLootRollItemLink",
+  "UnitDamage", "C_Item.RequestLoadItemDataByID", "C_TooltipInfo.GetItemByID",
+  -- dungeon/raid loot tables, if this client has the Encounter Journal
+  "EJ_SelectInstance", "EJ_GetNumLoot", "EJ_GetLootInfoByIndex", "C_EncounterJournal.GetLootInfoByIndex",
   -- character stats
   "UnitStat", "UnitAttackPower", "UnitAttackSpeed", "GetCritChance", "GetHitModifier",
   "GetSpellHitModifier", "GetExpertise", "GetHaste", "GetMeleeHaste", "GetCombatRating",
@@ -617,8 +622,68 @@ events:SetScript("OnEvent", function(_, event, arg1)
   end
 end)
 
+-- Items by ID -------------------------------------------------------------------
+-- The client can describe any item, owned or not, once the server has sent it.
+-- Default set: Forever items that Wowhead lists with ratings, to see how the
+-- client itself reports them, plus a few to compare against known data.
+local DEFAULT_ITEMS = {
+  13404,  -- Mask of the Unforgiven: 20 hit + 14 crit rating ("2.0%" / "1.0%")
+  7348,   -- Fletcher's Gloves: 14 crit rating, level 20
+  240080, -- Waywatcher Headdress: haste + expertise rating
+  279899, -- Catacomb Cloak: Wowhead and the beta disagree on its stats
+  252504, -- Brawler's Leather Hood: new for Forever, level 20
+  5540,   -- Pearl-handled Dagger: equipped, as a control
+}
+
+local function readItem(id)
+  local info = capture("C_Item.GetItemInfo", id)
+  if info.status == "missing" then info = capture("GetItemInfo", id) end
+  local v = info.values or {}
+  if v[1] == nil or v[1] == "<nil>" then return nil end -- not sent by the server yet
+  local link = type(v[2]) == "string" and v[2] or ("item:" .. id)
+  local tip = capture("C_TooltipInfo.GetItemByID", id)
+  if tip.status ~= "ok" then tip = capture("C_TooltipInfo.GetHyperlink", link) end
+  return {
+    link = link, info = info, instant = capture("C_Item.GetItemInfoInstant", id),
+    stats = itemStats(link), tooltip = tooltipLines(tip.values and tip.values[1]),
+  }
+end
+
+function P.items(arg)
+  local ids = {}
+  for id in (arg or ""):gmatch("%d+") do ids[#ids + 1] = tonumber(id) end
+  if #ids == 0 then ids = DEFAULT_ITEMS end
+  for _, id in ipairs(ids) do
+    if C_Item and C_Item.RequestLoadItemDataByID then pcall(C_Item.RequestLoadItemDataByID, id) end
+  end
+  local d = db()
+  d.scans.items = d.scans.items or {}
+  local out, read = d.scans.items, 0
+  local function pass(list, try)
+    local missing = {}
+    for _, id in ipairs(list) do
+      local r = readItem(id)
+      if r then out[tostring(id)] = r; read = read + 1 else missing[#missing + 1] = id end
+    end
+    if #missing > 0 and try < 4 and C_Timer then
+      return C_Timer.After(1, function() pass(missing, try + 1) end)
+    end
+    local tokens = {}
+    for _, id in ipairs(ids) do
+      local r = out[tostring(id)]
+      local st = r and r.stats.values and r.stats.values[1]
+      if type(st) == "table" then for token in pairs(st) do tokens[#tokens + 1] = token end end
+    end
+    table.sort(tokens)
+    say("items: read %d of %d%s", read, #ids, #missing > 0 and (" (no data for " .. table.concat(missing, ", ") .. ")") or "")
+    if #tokens > 0 then say("item stat tokens: %s", table.concat(tokens, ", ")) end
+  end
+  pass(ids, 1)
+end
+
 local COMMANDS = {
   env = P.env, api = P.api, talents = P.talents, gear = P.gear, stats = P.stats, export = P.export,
+  items = P.items,
   sheet = function() P.sheet() end,
   all = function()
     P.env(); P.api(); P.talents(); P.gear(); P.stats(); P.sheet()
@@ -635,13 +700,13 @@ local COMMANDS = {
 
 SLASH_GEARWRIGHTPROBE1 = "/gwp"
 SlashCmdList.GEARWRIGHTPROBE = function(msg)
-  local cmd = (msg or ""):lower():match("^(%S*)")
+  local cmd, rest = (msg or ""):lower():match("^(%S*)%s*(.-)$")
   local fn = COMMANDS[cmd]
   if fn then
-    local ok, err = pcall(fn)
+    local ok, err = pcall(fn, rest)
     if not ok then say("|cffff5050error:|r %s", tostring(err)) end
   else
-    say("usage: /gwp all | env | api | talents | gear | stats | sheet | inspect | persist | export | clear")
+    say("usage: /gwp all | env | api | talents | gear | stats | sheet | items [ids] | inspect | persist | export | clear")
     say("passive: open your character sheet, a profession window or class trainer and it is recorded automatically")
   end
 end

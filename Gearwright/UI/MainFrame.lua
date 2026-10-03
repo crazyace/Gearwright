@@ -27,6 +27,7 @@ local function buildText()
   if ctx.class.weights._status == "provisional" then
     add("|cffff9900Stat weights are provisional placeholders.|r")
   end
+  add("|cff999999Scores are in attack-power equivalents.|r")
 
   add(" ")
   add("|cffffd100Gear|r")
