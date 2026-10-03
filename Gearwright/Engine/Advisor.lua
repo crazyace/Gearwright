@@ -55,7 +55,13 @@ function Advisor.CompareToEquipped(link)
   local worstSlot, worstScore
   for _, slot in ipairs(slots) do
     local equipped = ns.API.GetEquippedLink(slot)
-    local score = equipped and ns.Scoring.ScoreLink(equipped, ctx.weights) or 0
+    local score = 0 -- empty slot
+    if equipped then
+      -- Unreadable (e.g. not cached yet) is not the same as empty: scoring it
+      -- as 0 would make anything look like an upgrade.
+      score = ns.Scoring.ScoreLink(equipped, ctx.weights)
+      if not score then return nil, "equipped-unreadable" end
+    end
     if not worstScore or score < worstScore then worstSlot, worstScore = slot, score end
   end
   return newScore - worstScore, worstSlot, newScore, worstScore

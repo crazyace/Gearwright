@@ -46,7 +46,7 @@ data/probe/            Probe captures you commit (raw research data)
 Run the offline smoke test after any change:
 
 ```
-pip install lupa
+pip install "lupa>=2.0"
 python tests/smoke_test.py
 ```
 

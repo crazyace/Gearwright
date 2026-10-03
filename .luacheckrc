@@ -1,4 +1,5 @@
 std = "lua51"
+self = false
 max_line_length = 140
 exclude_files = { "tests/", "tools/" }
 globals = {
@@ -11,7 +12,7 @@ read_globals = {
   "CreateFrame", "UIParent", "UISpecialFrames", "GameTooltip", "ItemRefTooltip", "ChatFontNormal",
   "GetAddOnMetadata", "GetItemStats", "GetItemInfoInstant", "GetInventoryItemLink",
   "GetNumTalentTabs", "GetTalentTabInfo", "GetNumTalents", "GetTalentInfo",
-  "GetNumTradeSkills", "GetNumTrainerServices", "NotifyInspect", "GetLocale", "WOW_PROJECT_ID",
+  "GetNumTradeSkills", "GetTradeSkillLine", "GetNumTrainerServices", "NotifyInspect", "GetLocale", "WOW_PROJECT_ID",
   "UnitClass", "UnitFullName", "UnitLevel", "UnitName", "UnitExists",
   "issecretvalue", "geterrorhandler", "tinsert", "date",
 }
