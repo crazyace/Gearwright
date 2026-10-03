@@ -305,7 +305,12 @@ end
 -- visible stat frame (calls its OnEnter), reads GameTooltip, then leaves.
 -- Frames that store the text up front (.tooltip / .tooltip2) are read directly.
 local function fontText(region)
-  if type(region) == "table" and type(region.GetText) == "function" then return sanitize(region:GetText()) end
+  if type(region) ~= "table" or type(region.GetText) ~= "function" then return nil end
+  local text = region:GetText()
+  -- An empty font string is nil, not "<nil>": otherwise every blank slot and
+  -- button counts as a text frame and gets hovered and recorded.
+  if text == nil then return nil end
+  return sanitize(text)
 end
 
 -- Text of a frame's own font strings, e.g. "Agility:" and "66".
@@ -363,10 +368,12 @@ local function collectSheet(frame, out, seen, depth, diag)
   if hover then diag.hovered = diag.hovered + 1 end
   do
     local key = hover and hover[1] or (static and tostring(frame.tooltip))
-    if key and not seen[key] then
+    local label = fontText(frame.Label) or fontText(frame.Name) or texts[1]
+    -- No label means a button or empty item slot, not a stat line.
+    if key and label and label ~= "" and not seen[key] then
       seen[key] = true
       out[#out + 1] = {
-        label = fontText(frame.Label) or fontText(frame.Name) or texts[1],
+        label = label,
         value = fontText(frame.Value) or texts[2],
         tooltip = static and sanitize(frame.tooltip) or nil,
         tooltip2 = static and sanitize(frame.tooltip2) or nil,

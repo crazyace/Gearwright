@@ -243,8 +243,12 @@ local slot = frame(nil, nil, nil, { OnEnter = function()
 GameTooltip.GetItem = function(self) return self.item end
 local hide = GameTooltip.Hide
 GameTooltip.Hide = function(self) self.item = nil; hide(self) end
+-- Seen in the 17:14 capture: an empty slot and a model button whose font
+-- strings are blank (nil) still show a plain tooltip on hover. Neither is a stat.
+local emptySlot = frame(nil, nil, { text(nil) }, { OnEnter = function() GameTooltip:AddLine("Head") end })
+local zoom = frame(nil, nil, { text(nil) }, { OnEnter = function() GameTooltip:AddLine("Zoom In") end })
 local statsPane = frame({ agility })
-PaperDollFrame = frame({ CharacterStatsPane, statsPane, slot }, {
+PaperDollFrame = frame({ CharacterStatsPane, statsPane, slot, emptySlot, zoom }, {
   HookScript = function(self, _, fn) self.onShow = fn end })
 CharacterFrame = frame({ PaperDollFrame })
 -- Like the beta client: right after ToggleCharacter the window doesn't report
@@ -273,9 +277,10 @@ assert tuple(dbg) == ("opened by probe", 1, 1, "3 StatsPaneAgility: Agility: | 6
 L.execute("local t = ToggleCharacter; ToggleCharacter = nil; SlashCmdList.GEARWRIGHTPROBE('sheet'); ToggleCharacter = t")
 sheet = L.eval("""function() local s = GearwrightProbeDB.snapshots[1].sections.sheet
   local by = {} for _, r in ipairs(s) do by[r.label] = r end
-  return #s, by["Agility:"].value, #by["Agility:"].hover, by["Armor:"].tooltip2 end""")()
-# Agility hovered in the visible pane, Armor's stored text from the hidden one, item slot skipped.
-assert tuple(sheet) == (2, "66", 3, "Reduces Physical Damage taken by 19.46%"), tuple(sheet)
+  return #s, by["Agility:"].value, #by["Agility:"].hover, by["Armor:"].tooltip2, by["Agility:"].hover[3] end""")()
+# Agility hovered in the visible pane, Armor's stored text from the hidden one;
+# item slot, empty slot and model button skipped; no "<nil>" from blank right-hand tooltip text.
+assert tuple(sheet) == (2, "66", 3, "Reduces Physical Damage taken by 19.46%", "Increases Attack Power by 66"), tuple(sheet)
 
 # Regression: two professions' recipe scans must not overwrite each other.
 L.execute("""
