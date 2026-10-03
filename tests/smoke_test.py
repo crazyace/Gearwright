@@ -218,6 +218,24 @@ s = L.eval("""function(ns)
     "Equip: Improves your chance to get a critical strike with missile weapons by 1%."}) end""")(ns)
 assert (s["hit"], s["haste"], s["expertise"], s["crit"]) == (0.3, 1, 1, None), dict(s)
 
+# Real beta items (/gwp items): each rating converts to exactly the % its own
+# tooltip shows, and the rating and tooltip line are counted once together.
+import json, re
+beta_items = json.loads((R / "data" / "probe" / "2026-10-03-items.json").read_text())["items"]
+EXPECT = {"hit": r"chance to hit by ([\d.]+)%", "crit": r"critical strike by ([\d.]+)%",
+          "haste": r"attack speed.* by ([\d.]+)%", "expertise": r"Dodged or Parried by ([\d.]+)%"}
+read = L.eval("""function(ns, raw, tip)
+  local s = ns.Stats.AddTooltipEffects(ns.Stats.FromRaw(raw), tip)
+  return s.hit, s.crit, s.haste, s.expertise, s.ap end""")
+for item_id, item in beta_items.items():
+    got = dict(zip(("hit", "crit", "haste", "expertise", "ap"),
+                   read(ns, L.table_from(item["stats"]), L.table_from(item["equip"]))))
+    for key, pattern in EXPECT.items():
+        m = [re.search(pattern, line) for line in item["equip"]]
+        want = sum(float(x.group(1)) for x in m if x) or None
+        assert (got[key] is None and want is None) or abs(got[key] - want) < 1e-9, (item["name"], key, got[key], want)
+assert read(ns, L.table_from(beta_items["279899"]["stats"]), L.table_from(beta_items["279899"]["equip"]))[4] == 3
+
 # Traits talents, replayed from a real Forever beta capture --------------------
 # Level 19 Rogue with 10 points in Assassination (Malice 5, Ruthlessness 3,
 # Remorseless Attacks 2). Classic talent API is absent on Forever.
@@ -241,7 +259,7 @@ C_Traits = {
   GetEntryInfo = function(_, id) return { definitionID = id } end,
   GetDefinitionInfo = function(id) return { spellID = TRAIT_SPELLS[id] } end,
 }
-C_Spell = { GetSpellName = function(id) return SPELL_NAMES[id] end }
+C_Spell = { GetSpellName = function(id) return SPELL_NAMES[id] end, GetSpellDescription = function() return "Permanently enchant" end }
 """)
 L.globals().fire("TRAIT_CONFIG_UPDATED")  # drop the cached classic read
 spec, how = L.eval("function(ns) return ns.Spec.Detect() end")(ns)
@@ -406,18 +424,42 @@ mask = L.eval("""function() local r = GearwrightProbeDB.scans.items["13404"]
 assert tuple(mask) == (20, "Equip: Improves your chance to hit by 2.0%.", None), tuple(mask)
 assert "items: read 1 of 2 (no data for 424242)" in L.globals().printed[len(L.globals().printed) - 1]
 
+# Encounter Journal: instances, bosses, then loot once the client has it.
+L.execute("""
+local INST = { [false] = { {101, "The Deadmines"} }, [true] = { {201, "Molten Core"} } }
+local SEL
+function EJ_GetNumTiers() return 1 end
+function EJ_GetLootFilter() return 0, 0 end
+function EJ_GetInstanceByIndex(i, raid) local x = INST[raid][i] if x then return x[1], x[2] end end
+function EJ_SelectInstance(id) SEL = id end
+function EJ_GetEncounterInfoByIndex(i, id) if i <= 2 then return "Boss " .. i, "desc", id * 10 + i end end
+function EJ_GetNumLoot() return SEL == 101 and 1 or 0 end
+C_EncounterJournal = { GetLootInfoByIndex = function(i)
+  return { itemID = 5193, name = "Cape of the Brotherhood", slot = "Back", armorType = "Cloth" } end }
+""")
+L.globals().SlashCmdList.GEARWRIGHTPROBE("ej")
+ej = L.eval("""function() local e = GearwrightProbeDB.scans.ej
+  return #e.instances, e.instances[1].name, #e.instances[1].bosses, e.instances[1].lootCount,
+    e.instances[1].loot[1].values[1].name, e.instances[2].raid, e.instances[2].lootCount end""")()
+assert tuple(ej) == (2, "The Deadmines", 2, 1, "Cape of the Brotherhood", True, 0), tuple(ej)
+assert "loot listed for 1 of 2 instances" in L.globals().printed[len(L.globals().printed)]
+
 # Regression: two professions' recipe scans must not overwrite each other.
 L.execute("""
 PROF = "Enchanting"
 C_TradeSkillUI = { GetAllRecipeIDs = function() return {1, 2} end,
-  GetRecipeInfo = function(id) return {name = "r"..id} end,
+  GetRecipeInfo = function(id) return {name = "r"..id, learned = id == 1} end,
+  GetRecipeSchematic = function(id) return {outputItemID = id == 2 and 4239 or nil} end,
   GetBaseProfessionInfo = function() return {professionName = PROF} end }
 """)
 L.globals().fire("TRADE_SKILL_SHOW")
 L.execute("PROF = 'Leatherworking'"); L.globals().fire("TRADE_SKILL_SHOW")
 L.execute("C_TradeSkillUI.GetBaseProfessionInfo = function() return nil end"); L.globals().fire("TRADE_SKILL_SHOW")
+rec = L.eval("""function() local r = GearwrightProbeDB.scans["tradeskill:Enchanting"].recipes
+  return r[1].learned, r[2].learned, r[2].outputItemID, r[1].desc end""")()
+assert tuple(rec) == (True, False, 4239, "Permanently enchant"), tuple(rec)
 keys = sorted(L.eval("function() local o={} for k in pairs(GearwrightProbeDB.scans) do o[#o+1]=k end return o end")().values())
-assert keys == ["items", "tradeskill:3", "tradeskill:Enchanting", "tradeskill:Leatherworking"], keys
+assert keys == ["ej", "items", "tradeskill:3", "tradeskill:Enchanting", "tradeskill:Leatherworking"], keys
 L.globals().SlashCmdList.GEARWRIGHTPROBE("export")
 print("---- probe export title ----"); print(L.globals().LASTTEXT)
 for p in L.globals().printed.values(): print("  >", p)
@@ -441,6 +483,7 @@ for f in ("export.json", "GearwrightProbe.lua"):
     for want in ("character sheet: 2 stat lines", "Agility 66 (49+17)", "Increases Attack Power by 66",
                  "agility per 1% crit: 7.59  (from the sheet", "Reduces Physical Damage taken by 19.46%", "CR_HIT_MELEE (id 6): rating 12, bonus 1.2",
                  "items by ID: 1", "13404 Mask of the Unforgiven (req 52): ITEM_MOD_HIT_RATING_SHORT=20",
-                 "Equip: Improves your chance to hit by 2.0%."):
+                 "Equip: Improves your chance to hit by 2.0%.",
+                 "encounter journal: 2 instances", "The Deadmines (dungeon, 2 bosses, loot 1)", "Cape of the Brotherhood [Back] Cloth"):
         assert want in r.stdout, (want, r.stdout)
 print("\nALL SMOKE TESTS PASSED")

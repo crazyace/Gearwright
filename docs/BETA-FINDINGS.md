@@ -62,12 +62,28 @@ Cutthroat 462708.
   and the tooltip line "Equip: +3 Attack Power." Gearwright counts the stat once.
 - "Equip: +4 Attack Power against Humanoids." is a separate token and is not counted as AP.
 - Enchants are **not** in `GetItemStats`; they show as an "Enchanted: ..." tooltip line.
-- **Hit/crit units: ratings, shown as a fixed %.** `/gwp items` on the beta (2026-10-03)
-  returned `ITEM_MOD_CRIT_RATING_SHORT`, `ITEM_MOD_HASTE_RATING_SHORT`,
-  `ITEM_MOD_EXPERTISE_RATING_SHORT`, plus `ITEM_MOD_PARRY_RATING_SHORT` and
-  `ITEM_MOD_DEFENSE_SKILL_RATING_SHORT`, for items the character doesn't own.
-  The hit token and the exact values (rating per 1%, from Wowhead below) still need the export. The client defines the full Mainline set of 31 `CR_*` ratings
-  (including Versatility, Mastery, Avoidance, Lifesteal, Speed), all 0 so far.
+- **Hit, crit, haste and expertise are ratings, shown on the tooltip as a fixed %.**
+  Confirmed in the client with `/gwp items` (2026-10-03, items not owned;
+  `data/probe/2026-10-03-items.json`):
+
+  | Token | Rating per 1% | Seen |
+  |---|---|---|
+  | `ITEM_MOD_HIT_RATING_SHORT` | 10 | 3 -> 0.3%, 7 -> 0.7%, 10 -> 1.0%, 20 -> 2.0% |
+  | `ITEM_MOD_CRIT_RATING_SHORT` | 14 | 14 -> 1.0% |
+  | `ITEM_MOD_HASTE_RATING_SHORT` | 10 | 10 -> "attack speed and casting speed by 1.0%" |
+  | `ITEM_MOD_EXPERTISE_RATING_SHORT` | 10 | 10 -> "Dodged or Parried by 1.0%" |
+  | `ITEM_MOD_PARRY_RATING_SHORT` | 15 | -15 -> "Decreases your chance to Parry by 1.0%" |
+  | `ITEM_MOD_DEFENSE_SKILL_RATING_SHORT` | 1 | 21 -> "Increased Defense +21" |
+
+  The same rates Wowhead's data gives (below). The smoke test runs every one of these
+  items through `Data/Stats.lua` and checks the result against its own tooltip.
+  The 31 `CR_*` rating constants (Versatility, Mastery, Avoidance, ...) all read 0 so far.
+- **Any item can be read by ID**, owned or not: `C_Item.GetItemInfo` (the global
+  `GetItemInfo` is gone), `C_Item.GetItemStats`, `C_TooltipInfo.GetItemByID`. Data arrives
+  a second or so after `C_Item.RequestLoadItemDataByID`. Mask of the Unforgiven (13404)
+  never loaded; it may not be on the beta.
+- New Forever gear seen: Assassin's Waistguard (272395, "Classes: Rogue", level 60,
+  21 Agi / 11 Sta / 20 hit rating), Scoutmaster's Eyepatch (276105), Brawler's Leather Hood (252504).
 
 ## Character stats (level 19 Gnome Rogue, 16:58 and 17:04 captures)
 
@@ -118,8 +134,9 @@ The beta's level cap is currently 30. (An earlier note here claimed a Free Trial
 
 Wowhead has a Forever database at `wowhead.com/forever/...` (checked 2026-10-03).
 It's datamined, so it can be ahead of or behind the beta client: its Catacomb Cloak
-(279899) has 6 AP and 3 Stamina where the beta showed 3 AP and 2 Stamina. Treat it
-as a lead to confirm in game, not as ground truth.
+(279899) has 6 AP, 3 Stamina and 17 armor; the beta client reports 3 AP, 2 Stamina
+and 15 armor, both equipped and read by ID. Treat it as a lead to confirm in game,
+not as ground truth.
 
 - **Ratings convert at a fixed rate, at every item level.** 40 leather items,
   stored rating vs tooltip text:
@@ -136,6 +153,32 @@ as a lead to confirm in game, not as ground truth.
 - **Weapon rules:** Backstab and Ambush require a main-hand dagger. Mutilate (1310707,
   level 30) "attacks with both weapons" and has no dagger requirement, so Assassination
   is free in the off hand.
+
+## Other APIs present (2026-10-03)
+
+- Quest rewards and loot: `GetNumQuestChoices`, `GetQuestItemLink`, `GetNumLootItems`,
+  `GetLootSlotLink`, `GetLootRollItemLink`.
+- Encounter Journal: `EJ_SelectInstance`, `EJ_GetNumLoot` and
+  `C_EncounterJournal.GetLootInfoByIndex` exist (the old `EJ_GetLootInfoByIndex` doesn't).
+  Whether it lists Forever's dungeons and their loot: `/gwp ej`.
+
+## Enchanting (skill 225/225)
+
+The Enchanting window listed 270 recipes (`C_TradeSkillUI`), many new for Forever
+(recipe IDs over 1,200,000). Agility enchants, the ones a Rogue cares about:
+
+| Slot | Recipes |
+|---|---|
+| Bracer | Minor Agility (7779), Lesser Agility (1248460), Agility (1248497 and 1217203), Greater Agility (1248500), Superior Agility (1248599) |
+| Boots | Minor Agility (7867), Lesser Agility (13637), Agility (13935), Greater Agility (20023) |
+| Gloves | Agility (13815), Greater Agility (20012), Superior Agility (25080), Minor Haste (13948) |
+| Cloak | Minor Agility (13419), Lesser Agility (13882), Agility (1219587) |
+| Necklace (new slot) | Agility (1249059) |
+| Weapon | Agility (23800), Crusader (20034), Lesser/Greater/Superior Striking |
+| 2H Weapon | Lesser Agility (1248510), Agility (27837) |
+
+That capture had names only. The probe now also records whether each recipe is learned,
+what item it makes and its description, which gives the enchant amounts.
 
 ## Enchants
 
@@ -162,8 +205,9 @@ committed as a separate capture.
 
 ## Still open
 
-- [ ] Confirm the rating -> % conversion in game: equip any hit/crit gear, `/gwp gear`
-- [ ] Enchanting recipes and trainer services (open the windows; recorded automatically)
+- [ ] Encounter Journal loot tables: `/gwp ej`
+- [ ] Enchanting again, for recipe effects and learned flags (open the window)
+- [ ] Trainer services (open the trainer window; recorded automatically)
 - [ ] Other Rogues' gear and enchants (`/gwp inspect`)
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety
 - [ ] Agility-per-crit at more levels (`/gwp all` every few levels; beta cap is 30)

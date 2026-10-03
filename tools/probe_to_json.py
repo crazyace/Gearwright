@@ -271,6 +271,18 @@ def summarize(db):
                 lines.append(f"   agility per 1% crit: {per_crit:.2f}  (from the sheet, level {snap.get('level')})")
 
     for key, scan in (db.get("scans") or {}).items():
+        if key == "ej":
+            insts = scan.get("instances") or []
+            lines.append(f"encounter journal: {len(insts)} instances")
+            for inst in insts:
+                kind = "raid" if inst.get("raid") else "dungeon"
+                lines.append(f"   {inst.get('name')} ({kind}, {len(inst.get('bosses') or [])} bosses, "
+                             f"loot {inst.get('lootCount')})")
+                for row in inst.get("loot") or []:
+                    v = (row.get("values") or [None])[0]
+                    if isinstance(v, dict):
+                        lines.append(f"      {v.get('name')} [{v.get('slot')}] {v.get('armorType') or ''}")
+            continue
         if key == "items":
             lines.append(f"items by ID: {len(scan)}")
             for item_id, item in sorted(scan.items(), key=lambda kv: str(kv[0])):
