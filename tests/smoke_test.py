@@ -215,11 +215,12 @@ GameTooltip = {
   NumLines = function() return #tipLines end,
 }
 local function text(t) return { GetText = function() return t end, GetObjectType = function() return "FontString" end } end
+SHEET_OPEN = false  -- the character window starts closed, as after a login
 local function frame(children, fields, regions, scripts)
   local f = fields or {}
   f.GetChildren = function() return unpack(children or {}) end
   f.GetRegions = function() return unpack(regions or {}) end
-  f.IsVisible = function() return true end
+  f.IsVisible = function() return SHEET_OPEN end
   f.GetScript = function(_, name) return (scripts or {})[name] end
   return f
 end
@@ -235,11 +236,19 @@ local armor = frame(nil, { Label = text("Armor:"), Value = text("487"),
 CharacterStatsPane = frame({ frame({ agility, armor }) })
 PaperDollFrame = frame({ CharacterStatsPane }, {
   HookScript = function(self, _, fn) self.onShow = fn end })
+TOGGLES = 0
+function ToggleCharacter()
+  TOGGLES = TOGGLES + 1
+  SHEET_OPEN = not SHEET_OPEN
+  if SHEET_OPEN and PaperDollFrame.onShow then PaperDollFrame.onShow() end
+end
 """)
 load_addon("GearwrightProbe","GearwrightProbe.toc")
 L.globals().fire("ADDON_LOADED","GearwrightProbe"); L.globals().fire("PLAYER_LOGIN")
-L.globals().SlashCmdList.GEARWRIGHTPROBE("all")
-L.execute("PaperDollFrame.onShow()")  # opening the character window records the sheet
+L.globals().SlashCmdList.GEARWRIGHTPROBE("all")  # window closed: /gwp all opens it, reads it, closes it
+assert L.eval("function() return TOGGLES, SHEET_OPEN end")() == (2, False)
+# With the window closed and no way to open it, an empty read keeps the earlier capture.
+L.execute("local t = ToggleCharacter; ToggleCharacter = nil; SlashCmdList.GEARWRIGHTPROBE('sheet'); ToggleCharacter = t")
 sheet = L.eval("""function() local s = GearwrightProbeDB.snapshots[1].sections.sheet
   return #s, s[1].label, s[1].value, #s[1].hover, s[2].label, s[2].tooltip2 end""")()
 assert tuple(sheet) == (2, "Agility:", "66", 3, "Armor:", "Reduces Physical Damage taken by 19.46%"), tuple(sheet)
