@@ -160,10 +160,13 @@ not as ground truth.
   `GetLootSlotLink`, `GetLootRollItemLink`.
 - Encounter Journal: `EJ_SelectInstance`, `EJ_GetNumLoot` and
   `C_EncounterJournal.GetLootInfoByIndex` exist (the old `EJ_GetLootInfoByIndex` doesn't).
-  But it lists nothing: on 2026-10-03 (17:44) `/gwp ej` found 0 tiers and 0 instances
-  (`EJ_GetNumTiers` = 0, loot filter 4/0). That run predates the probe update that
-  loads the journal UI, selects a tier and tries 20 Classic instance IDs one by one,
-  so it isn't conclusive yet.
+  **But it's empty, and can't be filled.** On 2026-10-03 `/gwp ej` found 0 tiers and
+  0 instances. With the diagnostics (17:49): `LoadAddOn("Blizzard_EncounterJournal")`
+  returns `WRONG_GAME_TYPE`, `EJ_GetCurrentTier` is 0, and `EJ_GetInstanceInfo` answers
+  nothing for any of 20 Classic journal IDs (Deadmines 63, Wailing Caverns 240, Molten
+  Core 741, Onyxia 760...). Forever ships the functions without the journal's data.
+  Dungeon loot has to come from real drops instead: the probe now logs every loot
+  window with the NPC (from its GUID) and the instance or zone it dropped in.
 
 ## Enchanting (skill 225/225)
 
@@ -206,6 +209,7 @@ Forever-specific amounts worth knowing:
 | First Aid | 83/150 | 32 | 7 | 32 |
 | Cooking | 15/75 | 132 | 4 | 132 |
 | Skinning | 133/150 | 3 | 1 | 3 |
+| Blacksmithing | 208/225 | 507 | 91 | 507 |
 
 - `C_TradeSkillUI.GetAllRecipeIDs` lists every recipe of the profession, learned or not.
 - `GetRecipeSchematic(id, false).outputItemID` gives the crafted item, so crafted gear
@@ -213,6 +217,23 @@ Forever-specific amounts worth knowing:
 - Every profession has new Forever "camp" recipes (Camp Tent, Loom, Tanning Rack,
   Basic Campfire...). They make items, not gear.
 - Recipes that make an item have an empty description, or "Craft a <name>.".
+
+## Trainers (2026-10-03)
+
+The trainer window lists every service with its level, rank and category (`GetTrainerServiceInfo`
+returns name, availability, icon, level, rank, category). A level 19 Rogue saw 85 class
+services from level 20 to 60. Worth knowing for Rogue advice:
+
+- **Poisons are trained** from level 20 (Crippling, Instant II at 28, Deadly at 30, Wound
+  at 32, Mind-numbing at 24), not learned from the level 20 quest as in Classic.
+- **Mutilate has trained ranks**: rank 1 comes from the talent, ranks 2-4 from the trainer
+  at 40, 50 and 60.
+- Kidney Shot rank 1 at 30, Blind at 34, Slice and Dice rank 2 at 42; no Hemorrhage or
+  Ghostly Strike ranks (talent-only).
+- The Leatherworking trainer (21 services) teaches the new Forever "Prowler's / Skulker's /
+  Skirmisher's Leather Belt" family alongside the Classic patterns.
+
+Saved with the profession scans in `data/probe/2026-10-03-professions.json`.
 
 ## Enchants
 
@@ -239,11 +260,12 @@ committed as a separate capture.
 
 ## Still open
 
-- [ ] Encounter Journal loot tables: `/gwp ej` again with the updated probe
+- [x] Encounter Journal loot tables: not available on Forever (`WRONG_GAME_TYPE`)
+- [ ] Dungeon drops from the probe's loot log (run a dungeon, then `/gwp export`)
 - [x] Enchanting again, for recipe effects and learned flags (2026-10-03 17:46)
 - [ ] What the enchant tooltip line says for a stat enchant ("Enchanted: Agility +3"?
       only armor kits seen so far)
-- [ ] Trainer services (open the trainer window; recorded automatically)
+- [x] Trainer services (Rogue and Leatherworking trainers, 2026-10-03)
 - [ ] Other Rogues' gear and enchants (`/gwp inspect`)
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety
 - [ ] Agility-per-crit at more levels (`/gwp all` every few levels; beta cap is 30)

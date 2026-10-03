@@ -1,10 +1,106 @@
 {
  "captured": "2026-10-03",
- "character": "Sassy-Ry (Rogue: Leatherworking, Skinning, First Aid, Cooking); Enchanting and Tailoring at 225 look like another character",
- "note": "GearwrightProbe tradeskill scans (17:46-17:47) and /gwp ej (17:44), before the EJ diagnostics update. Item scans are in 2026-10-03-items.json.",
+ "character": "Sassy-Ry (Rogue: Leatherworking, Skinning, First Aid, Cooking); Enchanting, Tailoring and Blacksmithing look like other characters",
+ "note": "GearwrightProbe tradeskill scans (17:46-17:49), trainer windows (17:51-17:52) and /gwp ej (17:49, with diagnostics). Item scans are in 2026-10-03-items.json.",
  "scans": {
   "ej": {
-   "at": "2026-10-03 17:44:48",
+   "at": "2026-10-03 17:49:05",
+   "diag": {
+    "currentTier": {
+     "status": "ok",
+     "values": [
+      0
+     ]
+    },
+    "known": [
+     {
+      "id": 63,
+      "status": "ok"
+     },
+     {
+      "id": 240,
+      "status": "ok"
+     },
+     {
+      "id": 226,
+      "status": "ok"
+     },
+     {
+      "id": 64,
+      "status": "ok"
+     },
+     {
+      "id": 238,
+      "status": "ok"
+     },
+     {
+      "id": 227,
+      "status": "ok"
+     },
+     {
+      "id": 231,
+      "status": "ok"
+     },
+     {
+      "id": 233,
+      "status": "ok"
+     },
+     {
+      "id": 311,
+      "status": "ok"
+     },
+     {
+      "id": 316,
+      "status": "ok"
+     },
+     {
+      "id": 234,
+      "status": "ok"
+     },
+     {
+      "id": 241,
+      "status": "ok"
+     },
+     {
+      "id": 230,
+      "status": "ok"
+     },
+     {
+      "id": 229,
+      "status": "ok"
+     },
+     {
+      "id": 236,
+      "status": "ok"
+     },
+     {
+      "id": 741,
+      "status": "ok"
+     },
+     {
+      "id": 742,
+      "status": "ok"
+     },
+     {
+      "id": 743,
+      "status": "ok"
+     },
+     {
+      "id": 744,
+      "status": "ok"
+     },
+     {
+      "id": 760,
+      "status": "ok"
+     }
+    ],
+    "loadUI": {
+     "loaded": false,
+     "ok": true,
+     "reason": "WRONG_GAME_TYPE"
+    },
+    "tiers": 0
+   },
    "filter": {
     "status": "ok",
     "values": [
@@ -12,13 +108,3072 @@
      0
     ]
    },
-   "instances": [],
-   "tiers": {
+   "instances": []
+  },
+  "tradeskill:Blacksmithing": {
+   "api": "C_TradeSkillUI",
+   "at": "2026-10-03 17:49:37",
+   "profession": {
     "status": "ok",
     "values": [
-     0
+     {
+      "expansionName": "Unknown",
+      "isPrimaryProfession": true,
+      "maxSkillLevel": 225,
+      "profession": 1,
+      "professionID": 164,
+      "professionName": "Blacksmithing",
+      "skillLevel": 208,
+      "skillModifier": 0,
+      "sourceCounter": 11
+     }
     ]
-   }
+   },
+   "recipes": [
+    {
+     "learned": false,
+     "name": "Master Forge",
+     "outputItemID": 279955,
+     "recipeID": 1263073
+    },
+    {
+     "learned": false,
+     "name": "Anvil",
+     "outputItemID": 279988,
+     "recipeID": 1263041
+    },
+    {
+     "desc": "Craft a Sharpening Wheel.",
+     "learned": true,
+     "name": "Sharpening Wheel",
+     "outputItemID": 279944,
+     "recipeID": 1230171
+    },
+    {
+     "learned": false,
+     "name": "Dense Grinding Stone",
+     "outputItemID": 12644,
+     "recipeID": 16639
+    },
+    {
+     "learned": false,
+     "name": "Inlaid Mithril Cylinder",
+     "outputItemID": 9060,
+     "recipeID": 11454
+    },
+    {
+     "learned": true,
+     "name": "Solid Grinding Stone",
+     "outputItemID": 7966,
+     "recipeID": 9920
+    },
+    {
+     "learned": true,
+     "name": "Iron Buckle",
+     "outputItemID": 7071,
+     "recipeID": 8768
+    },
+    {
+     "learned": true,
+     "name": "Heavy Grinding Stone",
+     "outputItemID": 3486,
+     "recipeID": 3337
+    },
+    {
+     "learned": true,
+     "name": "Rough Grinding Stone",
+     "outputItemID": 3470,
+     "recipeID": 3320
+    },
+    {
+     "learned": true,
+     "name": "Coarse Grinding Stone",
+     "outputItemID": 3478,
+     "recipeID": 3326
+    },
+    {
+     "learned": false,
+     "name": "Elemental Sharpening Stone",
+     "outputItemID": 18262,
+     "recipeID": 22757
+    },
+    {
+     "learned": false,
+     "name": "Dense Sharpening Stone",
+     "outputItemID": 12404,
+     "recipeID": 16641
+    },
+    {
+     "learned": false,
+     "name": "Dense Weightstone",
+     "outputItemID": 12643,
+     "recipeID": 16640
+    },
+    {
+     "learned": true,
+     "name": "Solid Sharpening Stone",
+     "outputItemID": 7964,
+     "recipeID": 9918
+    },
+    {
+     "learned": true,
+     "name": "Solid Weightstone",
+     "outputItemID": 7965,
+     "recipeID": 9921
+    },
+    {
+     "learned": true,
+     "name": "Heavy Sharpening Stone",
+     "outputItemID": 2871,
+     "recipeID": 2674
+    },
+    {
+     "learned": true,
+     "name": "Heavy Weightstone",
+     "outputItemID": 3241,
+     "recipeID": 3117
+    },
+    {
+     "learned": true,
+     "name": "Coarse Sharpening Stone",
+     "outputItemID": 2863,
+     "recipeID": 2665
+    },
+    {
+     "learned": true,
+     "name": "Coarse Weightstone",
+     "outputItemID": 3240,
+     "recipeID": 3116
+    },
+    {
+     "learned": true,
+     "name": "Rough Sharpening Stone",
+     "outputItemID": 2862,
+     "recipeID": 2660
+    },
+    {
+     "learned": true,
+     "name": "Rough Weightstone",
+     "outputItemID": 3239,
+     "recipeID": 3115
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Helm",
+     "outputItemID": 19148,
+     "recipeID": 23636
+    },
+    {
+     "learned": false,
+     "name": "Darkrune Helm",
+     "outputItemID": 20551,
+     "recipeID": 24913
+    },
+    {
+     "learned": false,
+     "name": "Enriched Thorium Helm",
+     "outputItemID": 250597,
+     "recipeID": 1252346
+    },
+    {
+     "learned": false,
+     "name": "Enchanted Thorium Helm",
+     "outputItemID": 12620,
+     "recipeID": 16742
+    },
+    {
+     "learned": false,
+     "name": "Lionheart Helm",
+     "outputItemID": 12640,
+     "recipeID": 16729
+    },
+    {
+     "learned": false,
+     "name": "Stalwart Helm",
+     "outputItemID": 250599,
+     "recipeID": 1252348
+    },
+    {
+     "learned": false,
+     "name": "Whitesoul Helm",
+     "outputItemID": 12633,
+     "recipeID": 16724
+    },
+    {
+     "learned": false,
+     "name": "Runic Plate Helm",
+     "outputItemID": 12612,
+     "recipeID": 16726
+    },
+    {
+     "learned": false,
+     "name": "Blessed Plate Helm",
+     "outputItemID": 250593,
+     "recipeID": 1252342
+    },
+    {
+     "learned": false,
+     "name": "Imperial Plate Helm",
+     "outputItemID": 12427,
+     "recipeID": 16658
+    },
+    {
+     "learned": false,
+     "name": "Thorium Helm",
+     "outputItemID": 12410,
+     "recipeID": 16653
+    },
+    {
+     "learned": false,
+     "name": "Ornate Mithril Helm",
+     "outputItemID": 7937,
+     "recipeID": 9980
+    },
+    {
+     "learned": false,
+     "name": "Shining Mithril Helm",
+     "outputItemID": 250543,
+     "recipeID": 1252292
+    },
+    {
+     "learned": false,
+     "name": "Heavy Mithril Helm",
+     "outputItemID": 7934,
+     "recipeID": 9970
+    },
+    {
+     "learned": true,
+     "name": "Steel Plate Helm",
+     "outputItemID": 7922,
+     "recipeID": 9935
+    },
+    {
+     "learned": false,
+     "name": "Darksoul Shoulders",
+     "outputItemID": 19695,
+     "recipeID": 24141
+    },
+    {
+     "learned": false,
+     "name": "Justice Epaulets",
+     "outputItemID": 273914,
+     "recipeID": 1292951
+    },
+    {
+     "learned": false,
+     "name": "Justice Pauldrons",
+     "outputItemID": 273918,
+     "recipeID": 1292955
+    },
+    {
+     "learned": false,
+     "name": "Justice Spaulders",
+     "outputItemID": 273910,
+     "recipeID": 1292947
+    },
+    {
+     "learned": false,
+     "name": "Pauldrons of Glory",
+     "outputItemID": 273950,
+     "recipeID": 1292987
+    },
+    {
+     "learned": false,
+     "name": "Shoulders of Glory",
+     "outputItemID": 273946,
+     "recipeID": 1292983
+    },
+    {
+     "learned": false,
+     "name": "Runic Plate Shoulders",
+     "outputItemID": 12610,
+     "recipeID": 16664
+    },
+    {
+     "learned": false,
+     "name": "Dawnbringer Shoulders",
+     "outputItemID": 12625,
+     "recipeID": 16660
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Shoulders",
+     "outputItemID": 11605,
+     "recipeID": 15295
+    },
+    {
+     "learned": false,
+     "name": "Imperial Plate Shoulders",
+     "outputItemID": 12428,
+     "recipeID": 16646
+    },
+    {
+     "learned": false,
+     "name": "Blessed Plate Pauldrons",
+     "outputItemID": 250586,
+     "recipeID": 1252335
+    },
+    {
+     "learned": false,
+     "name": "Justicar's Pauldrons",
+     "outputItemID": 250580,
+     "recipeID": 1252329
+    },
+    {
+     "learned": false,
+     "name": "Officer's Pauldrons",
+     "outputItemID": 250576,
+     "recipeID": 1252325
+    },
+    {
+     "learned": false,
+     "name": "Prefect's Pauldrons",
+     "outputItemID": 250579,
+     "recipeID": 1252328
+    },
+    {
+     "learned": false,
+     "name": "Sentinel's Pauldrons",
+     "outputItemID": 250577,
+     "recipeID": 1252326
+    },
+    {
+     "learned": false,
+     "name": "Warder's Pauldrons",
+     "outputItemID": 250578,
+     "recipeID": 1252327
+    },
+    {
+     "learned": false,
+     "name": "Ornate Mithril Shoulders",
+     "outputItemID": 7928,
+     "recipeID": 9952
+    },
+    {
+     "learned": false,
+     "name": "Shining Mithril Pauldrons",
+     "outputItemID": 250541,
+     "recipeID": 1252290
+    },
+    {
+     "learned": true,
+     "name": "Heavy Mithril Shoulder",
+     "outputItemID": 7918,
+     "recipeID": 9926
+    },
+    {
+     "learned": false,
+     "name": "Icebane Breastplate",
+     "outputItemID": 22669,
+     "recipeID": 28242
+    },
+    {
+     "learned": false,
+     "name": "Thick Obsidian Breastplate",
+     "outputItemID": 22196,
+     "recipeID": 27587
+    },
+    {
+     "learned": false,
+     "name": "Ironvine Breastplate",
+     "outputItemID": 22762,
+     "recipeID": 28461
+    },
+    {
+     "learned": false,
+     "name": "Darksoul Breastplate",
+     "outputItemID": 19693,
+     "recipeID": 24139
+    },
+    {
+     "learned": false,
+     "name": "Darkrune Breastplate",
+     "outputItemID": 20550,
+     "recipeID": 24914
+    },
+    {
+     "learned": false,
+     "name": "Enchanted Thorium Breastplate",
+     "outputItemID": 12618,
+     "recipeID": 16745
+    },
+    {
+     "learned": false,
+     "name": "Enriched Thorium Breastplate",
+     "outputItemID": 250595,
+     "recipeID": 1252344
+    },
+    {
+     "learned": false,
+     "name": "Breastplate of Salvation",
+     "outputItemID": 250601,
+     "recipeID": 1252350
+    },
+    {
+     "learned": false,
+     "name": "Runic Breastplate",
+     "outputItemID": 12613,
+     "recipeID": 16731
+    },
+    {
+     "learned": false,
+     "name": "Blessed Plate Chest",
+     "outputItemID": 250594,
+     "recipeID": 1252343
+    },
+    {
+     "learned": false,
+     "name": "Imperial Plate Chest",
+     "outputItemID": 12422,
+     "recipeID": 16663
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Plate",
+     "outputItemID": 11604,
+     "recipeID": 15296
+    },
+    {
+     "learned": false,
+     "name": "Demon Forged Breastplate",
+     "outputItemID": 12628,
+     "recipeID": 16667
+    },
+    {
+     "learned": false,
+     "name": "Thorium Armor",
+     "outputItemID": 12405,
+     "recipeID": 16642
+    },
+    {
+     "learned": false,
+     "name": "Truesilver Breastplate",
+     "outputItemID": 7939,
+     "recipeID": 9974
+    },
+    {
+     "learned": false,
+     "name": "Ornate Mithril Breastplate",
+     "outputItemID": 7935,
+     "recipeID": 9972
+    },
+    {
+     "learned": false,
+     "name": "Heavy Mithril Breastplate",
+     "outputItemID": 7930,
+     "recipeID": 9959
+    },
+    {
+     "learned": false,
+     "name": "Shining Mithril Breastplate",
+     "outputItemID": 250540,
+     "recipeID": 1252289
+    },
+    {
+     "learned": false,
+     "name": "Icebane Bracers",
+     "outputItemID": 22671,
+     "recipeID": 28244
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Bracers",
+     "outputItemID": 17014,
+     "recipeID": 20874
+    },
+    {
+     "learned": false,
+     "name": "Blessed Plate Bracers",
+     "outputItemID": 250590,
+     "recipeID": 1252339
+    },
+    {
+     "learned": false,
+     "name": "Imperial Plate Bracers",
+     "outputItemID": 12425,
+     "recipeID": 16649
+    },
+    {
+     "learned": false,
+     "name": "Justicar's Wristguards",
+     "outputItemID": 250585,
+     "recipeID": 1252334
+    },
+    {
+     "learned": false,
+     "name": "Officer's Wristguards",
+     "outputItemID": 250581,
+     "recipeID": 1252330
+    },
+    {
+     "learned": false,
+     "name": "Prefect's Wristguards",
+     "outputItemID": 250584,
+     "recipeID": 1252333
+    },
+    {
+     "learned": false,
+     "name": "Sentinel's Wristguards",
+     "outputItemID": 250582,
+     "recipeID": 1252331
+    },
+    {
+     "learned": false,
+     "name": "Warder's Wristguards",
+     "outputItemID": 250583,
+     "recipeID": 1252332
+    },
+    {
+     "learned": false,
+     "name": "Thorium Bracers",
+     "outputItemID": 12408,
+     "recipeID": 16644
+    },
+    {
+     "learned": false,
+     "name": "Icebane Gauntlets",
+     "outputItemID": 22670,
+     "recipeID": 28243
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Gauntlets",
+     "outputItemID": 19164,
+     "recipeID": 23637
+    },
+    {
+     "learned": false,
+     "name": "Ironvine Gloves",
+     "outputItemID": 22763,
+     "recipeID": 28462
+    },
+    {
+     "learned": false,
+     "name": "Darkrune Gauntlets",
+     "outputItemID": 20549,
+     "recipeID": 24912
+    },
+    {
+     "learned": false,
+     "name": "Stronghold Gauntlets",
+     "outputItemID": 12639,
+     "recipeID": 16741
+    },
+    {
+     "learned": false,
+     "name": "Gloves of the Dawn",
+     "outputItemID": 19057,
+     "recipeID": 23633
+    },
+    {
+     "learned": false,
+     "name": "Gauntlets of Glory",
+     "outputItemID": 273945,
+     "recipeID": 1292982
+    },
+    {
+     "learned": false,
+     "name": "Handguards of Glory",
+     "outputItemID": 273949,
+     "recipeID": 1292986
+    },
+    {
+     "learned": false,
+     "name": "Justice Gauntlets",
+     "outputItemID": 273909,
+     "recipeID": 1292946
+    },
+    {
+     "learned": false,
+     "name": "Justice Gloves",
+     "outputItemID": 273913,
+     "recipeID": 1292950
+    },
+    {
+     "learned": false,
+     "name": "Justice Handguards",
+     "outputItemID": 273917,
+     "recipeID": 1292954
+    },
+    {
+     "learned": false,
+     "name": "Heavy Thorium Gauntlets",
+     "outputItemID": 279264,
+     "recipeID": 1306538
+    },
+    {
+     "learned": false,
+     "name": "Fiery Plate Gauntlets",
+     "outputItemID": 12631,
+     "recipeID": 16655
+    },
+    {
+     "learned": false,
+     "name": "Clutchlord's Grips",
+     "outputItemID": 275625,
+     "recipeID": 1297141
+    },
+    {
+     "learned": false,
+     "name": "Goregasher Grips",
+     "outputItemID": 275622,
+     "recipeID": 1297138
+    },
+    {
+     "learned": false,
+     "name": "Imperial Plate Gauntlets",
+     "outputItemID": 250589,
+     "recipeID": 1252338
+    },
+    {
+     "learned": false,
+     "name": "Blessed Plate Gauntlet",
+     "outputItemID": 250588,
+     "recipeID": 1252337
+    },
+    {
+     "learned": false,
+     "name": "Shining Mithril Gauntlet",
+     "outputItemID": 250545,
+     "recipeID": 1252294
+    },
+    {
+     "learned": false,
+     "name": "Justicar's Gloves",
+     "outputItemID": 250555,
+     "recipeID": 1252304
+    },
+    {
+     "learned": false,
+     "name": "Officer's Gloves",
+     "outputItemID": 250551,
+     "recipeID": 1252300
+    },
+    {
+     "learned": false,
+     "name": "Prefect's Gloves",
+     "outputItemID": 250554,
+     "recipeID": 1252303
+    },
+    {
+     "learned": false,
+     "name": "Sentinel's Gloves",
+     "outputItemID": 250552,
+     "recipeID": 1252301
+    },
+    {
+     "learned": false,
+     "name": "Warder's Gloves",
+     "outputItemID": 250553,
+     "recipeID": 1252302
+    },
+    {
+     "learned": false,
+     "name": "Truesilver Gauntlets",
+     "outputItemID": 7938,
+     "recipeID": 9954
+    },
+    {
+     "learned": false,
+     "name": "Ornate Mithril Gloves",
+     "outputItemID": 7927,
+     "recipeID": 9950
+    },
+    {
+     "learned": true,
+     "name": "Heavy Mithril Gauntlet",
+     "outputItemID": 7919,
+     "recipeID": 9928
+    },
+    {
+     "learned": false,
+     "name": "Ironvine Belt",
+     "outputItemID": 22764,
+     "recipeID": 28463
+    },
+    {
+     "learned": false,
+     "name": "Heavy Obsidian Belt",
+     "outputItemID": 22197,
+     "recipeID": 27585
+    },
+    {
+     "learned": false,
+     "name": "Blessed Plate Belt",
+     "outputItemID": 250592,
+     "recipeID": 1252341
+    },
+    {
+     "learned": false,
+     "name": "Girdle of the Dawn",
+     "outputItemID": 19051,
+     "recipeID": 23632
+    },
+    {
+     "learned": false,
+     "name": "Clutchlord's Support",
+     "outputItemID": 275626,
+     "recipeID": 1297142
+    },
+    {
+     "learned": false,
+     "name": "Goregasher Support",
+     "outputItemID": 275623,
+     "recipeID": 1297139
+    },
+    {
+     "learned": false,
+     "name": "Justicar's Waistguard",
+     "outputItemID": 250575,
+     "recipeID": 1252324
+    },
+    {
+     "learned": false,
+     "name": "Officer's Waistguard",
+     "outputItemID": 250571,
+     "recipeID": 1252320
+    },
+    {
+     "learned": false,
+     "name": "Prefect's Waistguard",
+     "outputItemID": 250574,
+     "recipeID": 1252323
+    },
+    {
+     "learned": false,
+     "name": "Sentinel's Waistguard",
+     "outputItemID": 250572,
+     "recipeID": 1252321
+    },
+    {
+     "learned": false,
+     "name": "Warder's Waistguard",
+     "outputItemID": 250573,
+     "recipeID": 1252322
+    },
+    {
+     "learned": false,
+     "name": "Imperial Plate Belt",
+     "outputItemID": 12424,
+     "recipeID": 16647
+    },
+    {
+     "learned": false,
+     "name": "Thorium Belt",
+     "outputItemID": 12406,
+     "recipeID": 16643
+    },
+    {
+     "learned": false,
+     "name": "Darksoul Leggings",
+     "outputItemID": 19694,
+     "recipeID": 24140
+    },
+    {
+     "learned": false,
+     "name": "Enchanted Thorium Leggings",
+     "outputItemID": 12619,
+     "recipeID": 16744
+    },
+    {
+     "learned": false,
+     "name": "Champion's Legplates",
+     "outputItemID": 250598,
+     "recipeID": 1252347
+    },
+    {
+     "learned": false,
+     "name": "Martyr's Legplates",
+     "outputItemID": 250600,
+     "recipeID": 1252349
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Leggings",
+     "outputItemID": 17013,
+     "recipeID": 20876
+    },
+    {
+     "learned": false,
+     "name": "Titanic Leggings",
+     "outputItemID": 22385,
+     "recipeID": 27829
+    },
+    {
+     "learned": false,
+     "name": "Justice Leggings",
+     "outputItemID": 273908,
+     "recipeID": 1292945
+    },
+    {
+     "learned": false,
+     "name": "Justice Legguards",
+     "outputItemID": 273916,
+     "recipeID": 1292953
+    },
+    {
+     "learned": false,
+     "name": "Justice Legplates",
+     "outputItemID": 273912,
+     "recipeID": 1292949
+    },
+    {
+     "learned": false,
+     "name": "Legguards of Glory",
+     "outputItemID": 273948,
+     "recipeID": 1292985
+    },
+    {
+     "learned": false,
+     "name": "Legplates of Glory",
+     "outputItemID": 273944,
+     "recipeID": 1292981
+    },
+    {
+     "learned": false,
+     "name": "Azerothium Legplates",
+     "outputItemID": 279265,
+     "recipeID": 1306539
+    },
+    {
+     "learned": false,
+     "name": "Runic Plate Leggings",
+     "outputItemID": 12614,
+     "recipeID": 16732
+    },
+    {
+     "learned": false,
+     "name": "Imperial Plate Leggings",
+     "outputItemID": 12429,
+     "recipeID": 16730
+    },
+    {
+     "learned": false,
+     "name": "Thorium Leggings",
+     "outputItemID": 12414,
+     "recipeID": 16662
+    },
+    {
+     "learned": false,
+     "name": "Blessed Plate Leggings",
+     "outputItemID": 250591,
+     "recipeID": 1252340
+    },
+    {
+     "learned": false,
+     "name": "Shining Mithril Pants",
+     "outputItemID": 250544,
+     "recipeID": 1252293
+    },
+    {
+     "learned": false,
+     "name": "Ornate Mithril Pants",
+     "outputItemID": 7926,
+     "recipeID": 9945
+    },
+    {
+     "learned": false,
+     "name": "Heavy Mithril Pants",
+     "outputItemID": 7921,
+     "recipeID": 9933
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Boots",
+     "outputItemID": 20039,
+     "recipeID": 24399
+    },
+    {
+     "learned": false,
+     "name": "Greaves of Glory",
+     "outputItemID": 273947,
+     "recipeID": 1292984
+    },
+    {
+     "learned": false,
+     "name": "Justice Greaves",
+     "outputItemID": 273911,
+     "recipeID": 1292948
+    },
+    {
+     "learned": false,
+     "name": "Justice Sabatons",
+     "outputItemID": 273919,
+     "recipeID": 1292956
+    },
+    {
+     "learned": false,
+     "name": "Justice Treads",
+     "outputItemID": 273915,
+     "recipeID": 1292952
+    },
+    {
+     "learned": false,
+     "name": "Sabatons of Glory",
+     "outputItemID": 273951,
+     "recipeID": 1292988
+    },
+    {
+     "learned": false,
+     "name": "Depleted Thorium Sabatons",
+     "outputItemID": 279263,
+     "recipeID": 1306537
+    },
+    {
+     "learned": false,
+     "name": "Runic Plate Boots",
+     "outputItemID": 12611,
+     "recipeID": 16665
+    },
+    {
+     "learned": false,
+     "name": "Imperial Plate Boots",
+     "outputItemID": 12426,
+     "recipeID": 16657
+    },
+    {
+     "learned": false,
+     "name": "Radiant Boots",
+     "outputItemID": 12419,
+     "recipeID": 16656
+    },
+    {
+     "learned": false,
+     "name": "Clutchlord's Stompers",
+     "outputItemID": 275627,
+     "recipeID": 1297143
+    },
+    {
+     "learned": false,
+     "name": "Goregasher Stompers",
+     "outputItemID": 275624,
+     "recipeID": 1297140
+    },
+    {
+     "learned": false,
+     "name": "Thorium Boots",
+     "outputItemID": 12409,
+     "recipeID": 16652
+    },
+    {
+     "learned": false,
+     "name": "Blessed Plate Boots",
+     "outputItemID": 250587,
+     "recipeID": 1252336
+    },
+    {
+     "learned": false,
+     "name": "Justicar's Sabatons",
+     "outputItemID": 250565,
+     "recipeID": 1252314
+    },
+    {
+     "learned": false,
+     "name": "Officer's Sabatons",
+     "outputItemID": 250561,
+     "recipeID": 1252310
+    },
+    {
+     "learned": false,
+     "name": "Prefect's Sabatons",
+     "outputItemID": 250564,
+     "recipeID": 1252313
+    },
+    {
+     "learned": false,
+     "name": "Sentinel's Sabatons",
+     "outputItemID": 250562,
+     "recipeID": 1252311
+    },
+    {
+     "learned": false,
+     "name": "Warder's Sabatons",
+     "outputItemID": 250563,
+     "recipeID": 1252312
+    },
+    {
+     "learned": false,
+     "name": "Ornate Mithril Boots",
+     "outputItemID": 7936,
+     "recipeID": 9979
+    },
+    {
+     "learned": false,
+     "name": "Heavy Mithril Boots",
+     "outputItemID": 7933,
+     "recipeID": 9968
+    },
+    {
+     "learned": false,
+     "name": "Shining Mithril Boots",
+     "outputItemID": 250542,
+     "recipeID": 1252291
+    },
+    {
+     "learned": false,
+     "name": "Justicar's Boots",
+     "outputItemID": 250550,
+     "recipeID": 1252299
+    },
+    {
+     "learned": false,
+     "name": "Officer's Boots",
+     "outputItemID": 250546,
+     "recipeID": 1252295
+    },
+    {
+     "learned": false,
+     "name": "Prefect's Boots",
+     "outputItemID": 250549,
+     "recipeID": 1252298
+    },
+    {
+     "learned": false,
+     "name": "Sentinel's Boots",
+     "outputItemID": 250547,
+     "recipeID": 1252296
+    },
+    {
+     "learned": false,
+     "name": "Warder's Boots",
+     "outputItemID": 250548,
+     "recipeID": 1252297
+    },
+    {
+     "learned": false,
+     "name": "Radiant Circlet",
+     "outputItemID": 12417,
+     "recipeID": 16659
+    },
+    {
+     "learned": false,
+     "name": "Mithril Coif",
+     "outputItemID": 7931,
+     "recipeID": 9961
+    },
+    {
+     "learned": false,
+     "name": "Hard Gold Coif",
+     "outputItemID": 250537,
+     "recipeID": 1252286
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Coif",
+     "outputItemID": 3837,
+     "recipeID": 3503
+    },
+    {
+     "learned": false,
+     "name": "Barbaric Iron Helm",
+     "outputItemID": 7915,
+     "recipeID": 9814
+    },
+    {
+     "learned": true,
+     "name": "Green Iron Helm",
+     "outputItemID": 3836,
+     "recipeID": 3502
+    },
+    {
+     "learned": false,
+     "name": "Hard Gold Cuirass",
+     "outputItemID": 250533,
+     "recipeID": 1252282
+    },
+    {
+     "learned": false,
+     "name": "Azure Skyforged Helm",
+     "outputItemID": 277048,
+     "recipeID": 1301534
+    },
+    {
+     "learned": false,
+     "name": "Cloudy Skyforged Helm",
+     "outputItemID": 277040,
+     "recipeID": 1301526
+    },
+    {
+     "learned": true,
+     "name": "Acolyte's Silvered Chain Helm",
+     "outputItemID": 250531,
+     "recipeID": 1252280
+    },
+    {
+     "learned": true,
+     "name": "Crusader's Silvered Chain Helm",
+     "outputItemID": 250532,
+     "recipeID": 1252281
+    },
+    {
+     "learned": false,
+     "name": "Guard's Silvered Chain Helm",
+     "outputItemID": 250529,
+     "recipeID": 1252278
+    },
+    {
+     "learned": true,
+     "name": "Protector's Silvered Chain Helm",
+     "outputItemID": 250530,
+     "recipeID": 1252279
+    },
+    {
+     "learned": false,
+     "name": "Veteran's Silvered Chain Helm",
+     "outputItemID": 250528,
+     "recipeID": 1252277
+    },
+    {
+     "learned": false,
+     "name": "Acolyte's Chain Helm",
+     "outputItemID": 250501,
+     "recipeID": 1252250
+    },
+    {
+     "learned": false,
+     "name": "Crusader's Chain Helm",
+     "outputItemID": 250502,
+     "recipeID": 1252251
+    },
+    {
+     "learned": false,
+     "name": "Guard's Chain Helm",
+     "outputItemID": 250499,
+     "recipeID": 1252248
+    },
+    {
+     "learned": false,
+     "name": "Protector's Chain Helm",
+     "outputItemID": 250500,
+     "recipeID": 1252249
+    },
+    {
+     "learned": false,
+     "name": "Veteran's Chain Helm",
+     "outputItemID": 250498,
+     "recipeID": 1252247
+    },
+    {
+     "learned": false,
+     "name": "Bloodsoul Shoulders",
+     "outputItemID": 19691,
+     "recipeID": 24137
+    },
+    {
+     "learned": false,
+     "name": "Fiery Chain Shoulders",
+     "outputItemID": 16988,
+     "recipeID": 20873
+    },
+    {
+     "learned": false,
+     "name": "Mithril Plate Shoulders",
+     "outputItemID": 7932,
+     "recipeID": 9966
+    },
+    {
+     "learned": false,
+     "name": "Hard Gold Pauldrons",
+     "outputItemID": 250539,
+     "recipeID": 1252288
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Shoulders",
+     "outputItemID": 3841,
+     "recipeID": 3505
+    },
+    {
+     "learned": false,
+     "name": "Azure Skyforged Pauldrons",
+     "outputItemID": 277049,
+     "recipeID": 1301535
+    },
+    {
+     "learned": false,
+     "name": "Cloudy Skyforged Pauldrons",
+     "outputItemID": 277041,
+     "recipeID": 1301527
+    },
+    {
+     "learned": false,
+     "name": "Barbaric Iron Shoulders",
+     "outputItemID": 7913,
+     "recipeID": 9811
+    },
+    {
+     "learned": false,
+     "name": "Green Iron Shoulders",
+     "outputItemID": 3840,
+     "recipeID": 3504
+    },
+    {
+     "learned": false,
+     "name": "Sterling Silver Shoulders",
+     "outputItemID": 250486,
+     "recipeID": 1252235
+    },
+    {
+     "learned": false,
+     "name": "Silvered Bronze Shoulders",
+     "outputItemID": 3481,
+     "recipeID": 3330
+    },
+    {
+     "learned": true,
+     "name": "Rough Bronze Shoulders",
+     "outputItemID": 3480,
+     "recipeID": 3328
+    },
+    {
+     "learned": false,
+     "name": "Obsidian Mail Tunic",
+     "outputItemID": 22191,
+     "recipeID": 27590
+    },
+    {
+     "learned": false,
+     "name": "Bloodsoul Breastplate",
+     "outputItemID": 19690,
+     "recipeID": 24136
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Mail",
+     "outputItemID": 11606,
+     "recipeID": 15293
+    },
+    {
+     "learned": false,
+     "name": "Radiant Breastplate",
+     "outputItemID": 12415,
+     "recipeID": 16648
+    },
+    {
+     "learned": true,
+     "name": "Steel Breastplate",
+     "outputItemID": 7963,
+     "recipeID": 9916
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Cuirass",
+     "outputItemID": 3845,
+     "recipeID": 3511
+    },
+    {
+     "learned": true,
+     "name": "Green Iron Hauberk",
+     "outputItemID": 3844,
+     "recipeID": 3508
+    },
+    {
+     "learned": false,
+     "name": "Barbaric Iron Breastplate",
+     "outputItemID": 7914,
+     "recipeID": 9813
+    },
+    {
+     "learned": false,
+     "name": "Sterling Silver Breastplate",
+     "outputItemID": 250487,
+     "recipeID": 1252236
+    },
+    {
+     "learned": true,
+     "name": "Shining Silver Breastplate",
+     "outputItemID": 2870,
+     "recipeID": 2675
+    },
+    {
+     "learned": false,
+     "name": "Acolyte's Silvered Chain Shirt",
+     "outputItemID": 250521,
+     "recipeID": 1252270
+    },
+    {
+     "learned": false,
+     "name": "Crusader's Silvered Chain Shirt",
+     "outputItemID": 250522,
+     "recipeID": 1252271
+    },
+    {
+     "learned": false,
+     "name": "Guard's Silvered Chain Shirt",
+     "outputItemID": 250519,
+     "recipeID": 1252268
+    },
+    {
+     "learned": true,
+     "name": "Protector's Silvered Chain Shirt",
+     "outputItemID": 250520,
+     "recipeID": 1252269
+    },
+    {
+     "learned": false,
+     "name": "Veteran's Silvered Chain Shirt",
+     "outputItemID": 250518,
+     "recipeID": 1252267
+    },
+    {
+     "learned": false,
+     "name": "Silvered Bronze Breastplate",
+     "outputItemID": 2869,
+     "recipeID": 2673
+    },
+    {
+     "learned": false,
+     "name": "Ironforge Breastplate",
+     "outputItemID": 6731,
+     "recipeID": 8367
+    },
+    {
+     "learned": true,
+     "name": "Rough Bronze Cuirass",
+     "outputItemID": 2866,
+     "recipeID": 2670
+    },
+    {
+     "learned": false,
+     "name": "Runed Copper Breastplate",
+     "outputItemID": 2864,
+     "recipeID": 2667
+    },
+    {
+     "learned": false,
+     "name": "Ironforge Chain",
+     "outputItemID": 6730,
+     "recipeID": 8366
+    },
+    {
+     "learned": false,
+     "name": "Copper Chain Vest",
+     "outputItemID": 3471,
+     "recipeID": 3321
+    },
+    {
+     "learned": false,
+     "name": "Acolyte's Chain Shirt",
+     "outputItemID": 250491,
+     "recipeID": 1252240
+    },
+    {
+     "learned": false,
+     "name": "Crusader's Chain Shirt",
+     "outputItemID": 250492,
+     "recipeID": 1252241
+    },
+    {
+     "learned": false,
+     "name": "Guard's Chain Shirt",
+     "outputItemID": 250489,
+     "recipeID": 1252238
+    },
+    {
+     "learned": false,
+     "name": "Protector's Chain Shirt",
+     "outputItemID": 250490,
+     "recipeID": 1252239
+    },
+    {
+     "learned": false,
+     "name": "Veteran's Chain Shirt",
+     "outputItemID": 250488,
+     "recipeID": 1252237
+    },
+    {
+     "learned": false,
+     "name": "Azure Skyforged Chainmail",
+     "outputItemID": 277016,
+     "recipeID": 1301445
+    },
+    {
+     "learned": false,
+     "name": "Cloudy Skyforged Chainmail",
+     "outputItemID": 276992,
+     "recipeID": 1301421
+    },
+    {
+     "learned": true,
+     "name": "Rough Copper Vest",
+     "outputItemID": 10421,
+     "recipeID": 12260
+    },
+    {
+     "learned": false,
+     "name": "Mithril Plate Bracers",
+     "outputItemID": 7924,
+     "recipeID": 9937
+    },
+    {
+     "learned": true,
+     "name": "Golden Scale Bracers",
+     "outputItemID": 6040,
+     "recipeID": 7223
+    },
+    {
+     "learned": false,
+     "name": "Hard Gold Bracers",
+     "outputItemID": 250535,
+     "recipeID": 1252284
+    },
+    {
+     "learned": true,
+     "name": "Green Iron Bracers",
+     "outputItemID": 3835,
+     "recipeID": 3501
+    },
+    {
+     "learned": true,
+     "name": "Patterned Bronze Bracers",
+     "outputItemID": 2868,
+     "recipeID": 2672
+    },
+    {
+     "learned": false,
+     "name": "Rough Bronze Bracers",
+     "outputItemID": 2867,
+     "recipeID": 2671
+    },
+    {
+     "learned": true,
+     "name": "Runed Copper Bracers",
+     "outputItemID": 2854,
+     "recipeID": 2664
+    },
+    {
+     "learned": false,
+     "name": "Azure Skyforged Wristguards",
+     "outputItemID": 277017,
+     "recipeID": 1301446
+    },
+    {
+     "learned": false,
+     "name": "Cloudy Skyforged Wristguards",
+     "outputItemID": 276993,
+     "recipeID": 1301422
+    },
+    {
+     "learned": true,
+     "name": "Copper Bracers",
+     "outputItemID": 2853,
+     "recipeID": 2663
+    },
+    {
+     "learned": false,
+     "name": "Black Grasp of the Destroyer",
+     "outputItemID": 22194,
+     "recipeID": 27589
+    },
+    {
+     "learned": false,
+     "name": "Bloodsoul Gauntlets",
+     "outputItemID": 19692,
+     "recipeID": 24138
+    },
+    {
+     "learned": false,
+     "name": "Radiant Gloves",
+     "outputItemID": 12418,
+     "recipeID": 16654
+    },
+    {
+     "learned": false,
+     "name": "Mithril Plate Gloves",
+     "outputItemID": 7925,
+     "recipeID": 9942
+    },
+    {
+     "learned": false,
+     "name": "Hard Gold Gauntlet",
+     "outputItemID": 250538,
+     "recipeID": 1252287
+    },
+    {
+     "learned": false,
+     "name": "Justicar's Gauntlet",
+     "outputItemID": 250570,
+     "recipeID": 1252319
+    },
+    {
+     "learned": false,
+     "name": "Officer's Gauntlet",
+     "outputItemID": 250566,
+     "recipeID": 1252315
+    },
+    {
+     "learned": false,
+     "name": "Prefect's Gauntlet",
+     "outputItemID": 250569,
+     "recipeID": 1252318
+    },
+    {
+     "learned": false,
+     "name": "Sentinel's Gauntlet",
+     "outputItemID": 250567,
+     "recipeID": 1252316
+    },
+    {
+     "learned": false,
+     "name": "Warder's Gauntlet",
+     "outputItemID": 250568,
+     "recipeID": 1252317
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Gauntlets",
+     "outputItemID": 9366,
+     "recipeID": 11643
+    },
+    {
+     "learned": false,
+     "name": "Barbaric Iron Gloves",
+     "outputItemID": 7917,
+     "recipeID": 9820
+    },
+    {
+     "learned": true,
+     "name": "Green Iron Gauntlets",
+     "outputItemID": 3485,
+     "recipeID": 3336
+    },
+    {
+     "learned": false,
+     "name": "Ironforge Gauntlets",
+     "outputItemID": 6733,
+     "recipeID": 8368
+    },
+    {
+     "learned": true,
+     "name": "Silvered Bronze Gauntlets",
+     "outputItemID": 3483,
+     "recipeID": 3333
+    },
+    {
+     "learned": false,
+     "name": "Sterling Silver Gauntlet",
+     "outputItemID": 250485,
+     "recipeID": 1252234
+    },
+    {
+     "learned": true,
+     "name": "Acolyte's Gloves",
+     "outputItemID": 250511,
+     "recipeID": 1252260
+    },
+    {
+     "learned": false,
+     "name": "Crusader's Gloves",
+     "outputItemID": 250512,
+     "recipeID": 1252261
+    },
+    {
+     "learned": true,
+     "name": "Guard's Gloves",
+     "outputItemID": 250509,
+     "recipeID": 1252258
+    },
+    {
+     "learned": true,
+     "name": "Protector's Gloves",
+     "outputItemID": 250510,
+     "recipeID": 1252259
+    },
+    {
+     "learned": false,
+     "name": "Veteran's Gloves",
+     "outputItemID": 250508,
+     "recipeID": 1252257
+    },
+    {
+     "learned": false,
+     "name": "Gemmed Copper Gauntlets",
+     "outputItemID": 3474,
+     "recipeID": 3325
+    },
+    {
+     "learned": true,
+     "name": "Runed Copper Gauntlets",
+     "outputItemID": 3472,
+     "recipeID": 3323
+    },
+    {
+     "learned": false,
+     "name": "Azure Skyforged Gauntlets",
+     "outputItemID": 277018,
+     "recipeID": 1301447
+    },
+    {
+     "learned": false,
+     "name": "Cloudy Skyforged Gauntlets",
+     "outputItemID": 276994,
+     "recipeID": 1301423
+    },
+    {
+     "learned": false,
+     "name": "Light Obsidian Belt",
+     "outputItemID": 22195,
+     "recipeID": 27588
+    },
+    {
+     "learned": false,
+     "name": "Fiery Chain Girdle",
+     "outputItemID": 16989,
+     "recipeID": 20872
+    },
+    {
+     "learned": false,
+     "name": "Radiant Belt",
+     "outputItemID": 12416,
+     "recipeID": 16645
+    },
+    {
+     "learned": true,
+     "name": "Justicar's Belt",
+     "outputItemID": 250560,
+     "recipeID": 1252309
+    },
+    {
+     "learned": true,
+     "name": "Officer's Belt",
+     "outputItemID": 250556,
+     "recipeID": 1252305
+    },
+    {
+     "learned": true,
+     "name": "Prefect's Belt",
+     "outputItemID": 250559,
+     "recipeID": 1252308
+    },
+    {
+     "learned": true,
+     "name": "Sentinel's Belt",
+     "outputItemID": 250557,
+     "recipeID": 1252306
+    },
+    {
+     "learned": true,
+     "name": "Warder's Belt",
+     "outputItemID": 250558,
+     "recipeID": 1252307
+    },
+    {
+     "learned": true,
+     "name": "Runed Copper Belt",
+     "outputItemID": 2857,
+     "recipeID": 2666
+    },
+    {
+     "learned": false,
+     "name": "Acolyte's Chain Belt",
+     "outputItemID": 250516,
+     "recipeID": 1252265
+    },
+    {
+     "learned": false,
+     "name": "Crusader's Chain Belt",
+     "outputItemID": 250517,
+     "recipeID": 1252266
+    },
+    {
+     "learned": false,
+     "name": "Guard's Chain Belt",
+     "outputItemID": 250514,
+     "recipeID": 1252263
+    },
+    {
+     "learned": false,
+     "name": "Protector's Chain Belt",
+     "outputItemID": 250515,
+     "recipeID": 1252264
+    },
+    {
+     "learned": false,
+     "name": "Veteran's Chain Belt",
+     "outputItemID": 250513,
+     "recipeID": 1252262
+    },
+    {
+     "learned": true,
+     "name": "Copper Chain Belt",
+     "outputItemID": 2851,
+     "recipeID": 2661
+    },
+    {
+     "learned": false,
+     "name": "Azure Skyforged Chain",
+     "outputItemID": 277019,
+     "recipeID": 1301448
+    },
+    {
+     "learned": false,
+     "name": "Cloudy Skyforged Chain",
+     "outputItemID": 276995,
+     "recipeID": 1301424
+    },
+    {
+     "learned": false,
+     "name": "Enriched Thorium Leggings",
+     "outputItemID": 250596,
+     "recipeID": 1252345
+    },
+    {
+     "learned": false,
+     "name": "Radiant Leggings",
+     "outputItemID": 12420,
+     "recipeID": 16725
+    },
+    {
+     "learned": false,
+     "name": "Orcish War Leggings",
+     "outputItemID": 7929,
+     "recipeID": 9957
+    },
+    {
+     "learned": true,
+     "name": "Mithril Plate Pants",
+     "outputItemID": 7920,
+     "recipeID": 9931
+    },
+    {
+     "learned": false,
+     "name": "Hard Gold Leggings",
+     "outputItemID": 250536,
+     "recipeID": 1252285
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Leggings",
+     "outputItemID": 3843,
+     "recipeID": 3507
+    },
+    {
+     "learned": false,
+     "name": "Acolyte's Silvered Chain Leggings",
+     "outputItemID": 250526,
+     "recipeID": 1252275
+    },
+    {
+     "learned": false,
+     "name": "Crusader's Silvered Chain Leggings",
+     "outputItemID": 250527,
+     "recipeID": 1252276
+    },
+    {
+     "learned": false,
+     "name": "Guard's Silvered Chain Leggings",
+     "outputItemID": 250524,
+     "recipeID": 1252273
+    },
+    {
+     "learned": true,
+     "name": "Protector's Silvered Chain Leggings",
+     "outputItemID": 250525,
+     "recipeID": 1252274
+    },
+    {
+     "learned": true,
+     "name": "Veteran's Silvered Chain Leggings",
+     "outputItemID": 250523,
+     "recipeID": 1252272
+    },
+    {
+     "learned": true,
+     "name": "Green Iron Leggings",
+     "outputItemID": 3842,
+     "recipeID": 3506
+    },
+    {
+     "learned": false,
+     "name": "Silvered Bronze Leggings",
+     "outputItemID": 10423,
+     "recipeID": 12259
+    },
+    {
+     "learned": false,
+     "name": "Sterling Silver Leggings",
+     "outputItemID": 250484,
+     "recipeID": 1252233
+    },
+    {
+     "learned": true,
+     "name": "Rough Bronze Leggings",
+     "outputItemID": 2865,
+     "recipeID": 2668
+    },
+    {
+     "learned": true,
+     "name": "Runed Copper Pants",
+     "outputItemID": 3473,
+     "recipeID": 3324
+    },
+    {
+     "learned": false,
+     "name": "Acolyte's Chain Leggings",
+     "outputItemID": 250496,
+     "recipeID": 1252245
+    },
+    {
+     "learned": false,
+     "name": "Crusader's Chain Leggings",
+     "outputItemID": 250497,
+     "recipeID": 1252246
+    },
+    {
+     "learned": false,
+     "name": "Guard's Chain Leggings",
+     "outputItemID": 250494,
+     "recipeID": 1252243
+    },
+    {
+     "learned": false,
+     "name": "Protector's Chain Leggings",
+     "outputItemID": 250495,
+     "recipeID": 1252244
+    },
+    {
+     "learned": false,
+     "name": "Veteran's Chain Leggings",
+     "outputItemID": 250493,
+     "recipeID": 1252242
+    },
+    {
+     "learned": true,
+     "name": "Copper Chain Pants",
+     "outputItemID": 2852,
+     "recipeID": 2662
+    },
+    {
+     "learned": false,
+     "name": "Azure Skyforged Legguards",
+     "outputItemID": 277020,
+     "recipeID": 1301449
+    },
+    {
+     "learned": false,
+     "name": "Cloudy Skyforged Legguards",
+     "outputItemID": 276996,
+     "recipeID": 1301425
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Boots",
+     "outputItemID": 3847,
+     "recipeID": 3515
+    },
+    {
+     "learned": false,
+     "name": "Polished Steel Boots",
+     "outputItemID": 3846,
+     "recipeID": 3513
+    },
+    {
+     "learned": false,
+     "name": "Barbaric Iron Boots",
+     "outputItemID": 7916,
+     "recipeID": 9818
+    },
+    {
+     "learned": false,
+     "name": "Hard Gold Boots",
+     "outputItemID": 250534,
+     "recipeID": 1252283
+    },
+    {
+     "learned": false,
+     "name": "Green Iron Boots",
+     "outputItemID": 3484,
+     "recipeID": 3334
+    },
+    {
+     "learned": true,
+     "name": "Silvered Bronze Boots",
+     "outputItemID": 3482,
+     "recipeID": 3331
+    },
+    {
+     "learned": false,
+     "name": "Sterling Silver Boots",
+     "outputItemID": 250483,
+     "recipeID": 1252232
+    },
+    {
+     "learned": false,
+     "name": "Acolyte's Boots",
+     "outputItemID": 250506,
+     "recipeID": 1252255
+    },
+    {
+     "learned": false,
+     "name": "Crusader's Boots",
+     "outputItemID": 250507,
+     "recipeID": 1252256
+    },
+    {
+     "learned": false,
+     "name": "Guard's Boots",
+     "outputItemID": 250504,
+     "recipeID": 1252253
+    },
+    {
+     "learned": true,
+     "name": "Protector's Boots",
+     "outputItemID": 250505,
+     "recipeID": 1252254
+    },
+    {
+     "learned": false,
+     "name": "Veteran's Boots",
+     "outputItemID": 250503,
+     "recipeID": 1252252
+    },
+    {
+     "learned": true,
+     "name": "Rough Bronze Boots",
+     "outputItemID": 6350,
+     "recipeID": 7817
+    },
+    {
+     "learned": true,
+     "name": "Copper Chain Boots",
+     "outputItemID": 3469,
+     "recipeID": 3319
+    },
+    {
+     "learned": false,
+     "name": "Rough Copper Chain Boots",
+     "outputItemID": 277672,
+     "recipeID": 1302598
+    },
+    {
+     "learned": false,
+     "name": "Azure Skyforged Greaves",
+     "outputItemID": 277021,
+     "recipeID": 1301450
+    },
+    {
+     "learned": false,
+     "name": "Cloudy Skyforged Greaves",
+     "outputItemID": 276997,
+     "recipeID": 1301426
+    },
+    {
+     "learned": true,
+     "name": "Gemmed Copper Boots",
+     "outputItemID": 250620,
+     "recipeID": 1252229
+    },
+    {
+     "learned": true,
+     "name": "Glowing Copper Boots",
+     "outputItemID": 250482,
+     "recipeID": 1252231
+    },
+    {
+     "learned": true,
+     "name": "Strange Copper Boots",
+     "outputItemID": 250621,
+     "recipeID": 1252230
+    },
+    {
+     "learned": false,
+     "name": "Arcanite Reaper",
+     "outputItemID": 12784,
+     "recipeID": 16994
+    },
+    {
+     "learned": false,
+     "name": "Stormcarver",
+     "outputItemID": 250617,
+     "recipeID": 1252366
+    },
+    {
+     "learned": false,
+     "name": "Forest Defender's Axe",
+     "outputItemID": 279260,
+     "recipeID": 1306534
+    },
+    {
+     "learned": false,
+     "name": "Nightfall",
+     "outputItemID": 19169,
+     "recipeID": 23653
+    },
+    {
+     "learned": false,
+     "name": "Huge Thorium Battleaxe",
+     "outputItemID": 12775,
+     "recipeID": 16971
+    },
+    {
+     "learned": false,
+     "name": "Bleakwood Hew",
+     "outputItemID": 12769,
+     "recipeID": 16965
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Sunderer",
+     "outputItemID": 11607,
+     "recipeID": 15294
+    },
+    {
+     "learned": false,
+     "name": "Charged Mithril Battleaxe",
+     "outputItemID": 250612,
+     "recipeID": 1252361
+    },
+    {
+     "learned": false,
+     "name": "Shadow Crescent Axe",
+     "outputItemID": 3856,
+     "recipeID": 3500
+    },
+    {
+     "learned": false,
+     "name": "Massive Iron Axe",
+     "outputItemID": 3855,
+     "recipeID": 3498
+    },
+    {
+     "learned": true,
+     "name": "Bronze Battle Axe",
+     "outputItemID": 7958,
+     "recipeID": 9987
+    },
+    {
+     "learned": true,
+     "name": "Copper Battle Axe",
+     "outputItemID": 3488,
+     "recipeID": 3293
+    },
+    {
+     "learned": false,
+     "name": "Sulfuron Hammer",
+     "outputItemID": 17193,
+     "recipeID": 21161
+    },
+    {
+     "learned": false,
+     "name": "Hammer of the Titans",
+     "outputItemID": 12796,
+     "recipeID": 16988
+    },
+    {
+     "learned": false,
+     "name": "Enchanted Battlehammer",
+     "outputItemID": 12776,
+     "recipeID": 16973
+    },
+    {
+     "learned": false,
+     "name": "Inlaid Thorium Hammer",
+     "outputItemID": 12772,
+     "recipeID": 16967
+    },
+    {
+     "learned": false,
+     "name": "Thorium Greatmace",
+     "outputItemID": 250613,
+     "recipeID": 1252362
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Pulverizer",
+     "outputItemID": 11608,
+     "recipeID": 15292
+    },
+    {
+     "learned": false,
+     "name": "Mithril Warhammer",
+     "outputItemID": 250608,
+     "recipeID": 1252357
+    },
+    {
+     "learned": false,
+     "name": "Golden Iron Destroyer",
+     "outputItemID": 3852,
+     "recipeID": 3495
+    },
+    {
+     "learned": true,
+     "name": "Bronze Warhammer",
+     "outputItemID": 7956,
+     "recipeID": 9985
+    },
+    {
+     "learned": false,
+     "name": "Solid Iron Maul",
+     "outputItemID": 3851,
+     "recipeID": 3494
+    },
+    {
+     "learned": true,
+     "name": "Heavy Copper Maul",
+     "outputItemID": 6214,
+     "recipeID": 7408
+    },
+    {
+     "learned": false,
+     "name": "Darkspear",
+     "outputItemID": 12802,
+     "recipeID": 16987
+    },
+    {
+     "learned": false,
+     "name": "Blackfury",
+     "outputItemID": 19167,
+     "recipeID": 23639
+    },
+    {
+     "learned": false,
+     "name": "Legionite Glaive",
+     "outputItemID": 250619,
+     "recipeID": 1252368
+    },
+    {
+     "learned": false,
+     "name": "Thorium Poleaxe",
+     "outputItemID": 250615,
+     "recipeID": 1252364
+    },
+    {
+     "learned": false,
+     "name": "Blight",
+     "outputItemID": 7959,
+     "recipeID": 10011
+    },
+    {
+     "learned": false,
+     "name": "Steel Spear",
+     "outputItemID": 250605,
+     "recipeID": 1252354
+    },
+    {
+     "learned": false,
+     "name": "Bronze Dory",
+     "outputItemID": 250603,
+     "recipeID": 1252352
+    },
+    {
+     "learned": false,
+     "name": "Arcanite Champion",
+     "outputItemID": 12790,
+     "recipeID": 16990
+    },
+    {
+     "learned": false,
+     "name": "Corruption",
+     "outputItemID": 12782,
+     "recipeID": 16985
+    },
+    {
+     "learned": false,
+     "name": "Thorium Greatsword",
+     "outputItemID": 12764,
+     "recipeID": 16960
+    },
+    {
+     "learned": false,
+     "name": "Truesilver Champion",
+     "outputItemID": 7960,
+     "recipeID": 10015
+    },
+    {
+     "learned": false,
+     "name": "Mithril Claymore",
+     "outputItemID": 250610,
+     "recipeID": 1252359
+    },
+    {
+     "learned": false,
+     "name": "Frost Tiger Blade",
+     "outputItemID": 3854,
+     "recipeID": 3497
+    },
+    {
+     "learned": false,
+     "name": "Moonsteel Broadsword",
+     "outputItemID": 3853,
+     "recipeID": 3496
+    },
+    {
+     "learned": true,
+     "name": "Bronze Greatsword",
+     "outputItemID": 7957,
+     "recipeID": 9986
+    },
+    {
+     "learned": true,
+     "name": "Heavy Copper Broadsword",
+     "outputItemID": 3487,
+     "recipeID": 3292
+    },
+    {
+     "learned": true,
+     "name": "Copper Claymore",
+     "outputItemID": 7955,
+     "recipeID": 9983
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Destroyer",
+     "outputItemID": 17016,
+     "recipeID": 20897
+    },
+    {
+     "learned": false,
+     "name": "Annihilator",
+     "outputItemID": 12798,
+     "recipeID": 16991
+    },
+    {
+     "learned": false,
+     "name": "Rune Edge",
+     "outputItemID": 12779,
+     "recipeID": 16980
+    },
+    {
+     "learned": false,
+     "name": "Dawn's Edge",
+     "outputItemID": 12774,
+     "recipeID": 16970
+    },
+    {
+     "learned": false,
+     "name": "Ornate Thorium Handaxe",
+     "outputItemID": 12773,
+     "recipeID": 16969
+    },
+    {
+     "learned": false,
+     "name": "Blue Glittering Axe",
+     "outputItemID": 7942,
+     "recipeID": 9995
+    },
+    {
+     "learned": true,
+     "name": "Heavy Mithril Axe",
+     "outputItemID": 7941,
+     "recipeID": 9993
+    },
+    {
+     "learned": false,
+     "name": "Edge of Winter",
+     "outputItemID": 17704,
+     "recipeID": 21913
+    },
+    {
+     "learned": true,
+     "name": "Bronze Axe",
+     "outputItemID": 2849,
+     "recipeID": 2741
+    },
+    {
+     "learned": true,
+     "name": "Thick War Axe",
+     "outputItemID": 3489,
+     "recipeID": 3294
+    },
+    {
+     "learned": true,
+     "name": "Copper Axe",
+     "outputItemID": 2845,
+     "recipeID": 2738
+    },
+    {
+     "learned": false,
+     "name": "Black Amnesty",
+     "outputItemID": 19166,
+     "recipeID": 23638
+    },
+    {
+     "learned": false,
+     "name": "Heartseeker",
+     "outputItemID": 12783,
+     "recipeID": 16995
+    },
+    {
+     "learned": false,
+     "name": "Bold Dirk",
+     "outputItemID": 250616,
+     "recipeID": 1252365
+    },
+    {
+     "learned": false,
+     "name": "Ebon Shiv",
+     "outputItemID": 7947,
+     "recipeID": 10013
+    },
+    {
+     "learned": false,
+     "name": "Mithril Stiletto",
+     "outputItemID": 250611,
+     "recipeID": 1252360
+    },
+    {
+     "learned": false,
+     "name": "Mithril Shortsword",
+     "outputItemID": 250607,
+     "recipeID": 1252356
+    },
+    {
+     "learned": false,
+     "name": "Searing Golden Blade",
+     "outputItemID": 12260,
+     "recipeID": 15973
+    },
+    {
+     "learned": true,
+     "name": "Glinting Steel Dagger",
+     "outputItemID": 12259,
+     "recipeID": 15972
+    },
+    {
+     "learned": true,
+     "name": "Deadly Bronze Poniard",
+     "outputItemID": 3490,
+     "recipeID": 3295
+    },
+    {
+     "learned": true,
+     "name": "Pearl-handled Dagger",
+     "outputItemID": 5540,
+     "recipeID": 6517
+    },
+    {
+     "learned": true,
+     "name": "Big Bronze Knife",
+     "outputItemID": 3848,
+     "recipeID": 3491
+    },
+    {
+     "learned": true,
+     "name": "Copper Dagger",
+     "outputItemID": 7166,
+     "recipeID": 8880
+    },
+    {
+     "learned": false,
+     "name": "Blood Talon",
+     "outputItemID": 12795,
+     "recipeID": 16986
+    },
+    {
+     "learned": false,
+     "name": "Bagh Nakh",
+     "outputItemID": 250618,
+     "recipeID": 1252367
+    },
+    {
+     "learned": false,
+     "name": "Thorium Cestus",
+     "outputItemID": 250614,
+     "recipeID": 1252363
+    },
+    {
+     "learned": false,
+     "name": "Mithril Claws",
+     "outputItemID": 250609,
+     "recipeID": 1252358
+    },
+    {
+     "learned": false,
+     "name": "Iron Fists",
+     "outputItemID": 250604,
+     "recipeID": 1252353
+    },
+    {
+     "learned": false,
+     "name": "Brass Knuckles",
+     "outputItemID": 250602,
+     "recipeID": 1252351
+    },
+    {
+     "learned": false,
+     "name": "Masterwork Stormhammer",
+     "outputItemID": 12794,
+     "recipeID": 16993
+    },
+    {
+     "learned": false,
+     "name": "Persuader",
+     "outputItemID": 22384,
+     "recipeID": 27830
+    },
+    {
+     "learned": false,
+     "name": "Greenhammer",
+     "outputItemID": 279261,
+     "recipeID": 1306535
+    },
+    {
+     "learned": false,
+     "name": "Ebon Hand",
+     "outputItemID": 19170,
+     "recipeID": 23650
+    },
+    {
+     "learned": false,
+     "name": "Volcanic Hammer",
+     "outputItemID": 12792,
+     "recipeID": 16984
+    },
+    {
+     "learned": false,
+     "name": "Serenity",
+     "outputItemID": 12781,
+     "recipeID": 16983
+    },
+    {
+     "learned": false,
+     "name": "Runed Mithril Hammer",
+     "outputItemID": 7946,
+     "recipeID": 10009
+    },
+    {
+     "learned": false,
+     "name": "The Shatterer",
+     "outputItemID": 7954,
+     "recipeID": 10003
+    },
+    {
+     "learned": false,
+     "name": "Big Black Mace",
+     "outputItemID": 7945,
+     "recipeID": 10001
+    },
+    {
+     "learned": false,
+     "name": "Iron Morningstar",
+     "outputItemID": 250606,
+     "recipeID": 1252355
+    },
+    {
+     "learned": false,
+     "name": "Mighty Iron Hammer",
+     "outputItemID": 3492,
+     "recipeID": 3297
+    },
+    {
+     "learned": false,
+     "name": "Iridescent Hammer",
+     "outputItemID": 5541,
+     "recipeID": 6518
+    },
+    {
+     "learned": true,
+     "name": "Heavy Bronze Mace",
+     "outputItemID": 3491,
+     "recipeID": 3296
+    },
+    {
+     "learned": true,
+     "name": "Bronze Mace",
+     "outputItemID": 2848,
+     "recipeID": 2740
+    },
+    {
+     "learned": true,
+     "name": "Copper Mace",
+     "outputItemID": 2844,
+     "recipeID": 2737
+    },
+    {
+     "learned": false,
+     "name": "Dark Iron Reaver",
+     "outputItemID": 17015,
+     "recipeID": 20890
+    },
+    {
+     "learned": false,
+     "name": "Sageblade",
+     "outputItemID": 22383,
+     "recipeID": 27832
+    },
+    {
+     "learned": false,
+     "name": "Frostguard",
+     "outputItemID": 12797,
+     "recipeID": 16992
+    },
+    {
+     "learned": false,
+     "name": "Ironwood Blade",
+     "outputItemID": 279259,
+     "recipeID": 1306533
+    },
+    {
+     "learned": false,
+     "name": "Blackguard",
+     "outputItemID": 19168,
+     "recipeID": 23652
+    },
+    {
+     "learned": false,
+     "name": "Blazing Rapier",
+     "outputItemID": 12777,
+     "recipeID": 16978
+    },
+    {
+     "learned": false,
+     "name": "Phantom Blade",
+     "outputItemID": 7961,
+     "recipeID": 10007
+    },
+    {
+     "learned": false,
+     "name": "Dazzling Mithril Rapier",
+     "outputItemID": 7944,
+     "recipeID": 10005
+    },
+    {
+     "learned": false,
+     "name": "Wicked Mithril Blade",
+     "outputItemID": 7943,
+     "recipeID": 9997
+    },
+    {
+     "learned": false,
+     "name": "Jade Serpentblade",
+     "outputItemID": 3850,
+     "recipeID": 3493
+    },
+    {
+     "learned": true,
+     "name": "Hardened Iron Shortsword",
+     "outputItemID": 3849,
+     "recipeID": 3492
+    },
+    {
+     "learned": true,
+     "name": "Bronze Shortsword",
+     "outputItemID": 2850,
+     "recipeID": 2742
+    },
+    {
+     "learned": true,
+     "name": "Copper Shortsword",
+     "outputItemID": 2847,
+     "recipeID": 2739
+    },
+    {
+     "learned": false,
+     "name": "Jagged Obsidian Shield",
+     "outputItemID": 22198,
+     "recipeID": 27586
+    },
+    {
+     "learned": false,
+     "name": "Evergreen Shield",
+     "outputItemID": 279262,
+     "recipeID": 1306536
+    },
+    {
+     "learned": false,
+     "name": "Arcanite Blacksmith Hammer",
+     "outputItemID": 285281,
+     "recipeID": 1317964
+    },
+    {
+     "learned": false,
+     "name": "Mithril Blacksmith Hammer",
+     "outputItemID": 285280,
+     "recipeID": 1317963
+    },
+    {
+     "learned": false,
+     "name": "Cracked Blacksmith Hammer",
+     "outputItemID": 285279,
+     "recipeID": 1317962
+    },
+    {
+     "learned": false,
+     "name": "Thorium Shield Spike",
+     "outputItemID": 12645,
+     "recipeID": 16651
+    },
+    {
+     "learned": false,
+     "name": "Arcanite Skeleton Key",
+     "outputItemID": 15872,
+     "recipeID": 19669
+    },
+    {
+     "learned": false,
+     "name": "Mithril Spurs",
+     "outputItemID": 7969,
+     "recipeID": 9964
+    },
+    {
+     "learned": false,
+     "name": "Mithril Shield Spike",
+     "outputItemID": 7967,
+     "recipeID": 9939
+    },
+    {
+     "learned": false,
+     "name": "Steel Weapon Chain",
+     "outputItemID": 6041,
+     "recipeID": 7224
+    },
+    {
+     "learned": true,
+     "name": "Truesilver Skeleton Key",
+     "outputItemID": 15871,
+     "recipeID": 19668
+    },
+    {
+     "learned": true,
+     "name": "Iron Counterweight",
+     "outputItemID": 6043,
+     "recipeID": 7222
+    },
+    {
+     "learned": true,
+     "name": "Iron Shield Spike",
+     "outputItemID": 6042,
+     "recipeID": 7221
+    },
+    {
+     "learned": true,
+     "name": "Golden Skeleton Key",
+     "outputItemID": 15870,
+     "recipeID": 19667
+    },
+    {
+     "learned": true,
+     "name": "Silver Skeleton Key",
+     "outputItemID": 15869,
+     "recipeID": 19666
+    },
+    {
+     "learned": false,
+     "name": "Arcanite Rod",
+     "outputItemID": 16206,
+     "recipeID": 20201
+    },
+    {
+     "learned": true,
+     "name": "Truesilver Rod",
+     "outputItemID": 11144,
+     "recipeID": 14380
+    },
+    {
+     "learned": true,
+     "name": "Golden Rod",
+     "outputItemID": 11128,
+     "recipeID": 14379
+    },
+    {
+     "learned": true,
+     "name": "Silver Rod",
+     "outputItemID": 6338,
+     "recipeID": 7818
+    },
+    {
+     "learned": true,
+     "name": "Copper Rod",
+     "outputItemID": 6217,
+     "recipeID": 1245287
+    },
+    {
+     "learned": false,
+     "name": "Sulfuron Hammer",
+     "outputItemID": 227684,
+     "recipeID": 460460
+    },
+    {
+     "learned": false,
+     "name": "Dreamscale Visor",
+     "outputItemID": 234487,
+     "recipeID": 1214309
+    },
+    {
+     "learned": false,
+     "name": "Icebane Bracers",
+     "outputItemID": 236696,
+     "recipeID": 1223791
+    },
+    {
+     "learned": false,
+     "name": "Icebane Breastplate",
+     "outputItemID": 236695,
+     "recipeID": 1223787
+    },
+    {
+     "learned": false,
+     "name": "Icebane Gauntlets",
+     "outputItemID": 236697,
+     "recipeID": 1223789
+    },
+    {
+     "learned": false,
+     "name": "Razorspike Battleplate",
+     "outputItemID": 233492,
+     "recipeID": 1213490
+    },
+    {
+     "learned": false,
+     "name": "Razorspike Headcage",
+     "outputItemID": 233795,
+     "recipeID": 1213481
+    },
+    {
+     "learned": false,
+     "name": "Razorspike Shoulderplate",
+     "outputItemID": 233793,
+     "recipeID": 1213484
+    },
+    {
+     "learned": false,
+     "name": "Black Grasp of the Destroyer",
+     "outputItemID": 234086,
+     "recipeID": 1214257
+    },
+    {
+     "learned": false,
+     "name": "Heavy Obsidian Belt",
+     "outputItemID": 234319,
+     "recipeID": 1213746
+    },
+    {
+     "learned": false,
+     "name": "Ironvine Belt",
+     "outputItemID": 234288,
+     "recipeID": 1213709
+    },
+    {
+     "learned": false,
+     "name": "Ironvine Breastplate",
+     "outputItemID": 234292,
+     "recipeID": 1213715
+    },
+    {
+     "learned": false,
+     "name": "Ironvine Gloves",
+     "outputItemID": 234290,
+     "recipeID": 1213711
+    },
+    {
+     "learned": false,
+     "name": "Jagged Obsidian Shield",
+     "outputItemID": 234459,
+     "recipeID": 1214270
+    },
+    {
+     "learned": false,
+     "name": "Light Obsidian Belt",
+     "outputItemID": 234321,
+     "recipeID": 1213748
+    },
+    {
+     "learned": false,
+     "name": "Obsidian Champion",
+     "outputItemID": 233490,
+     "recipeID": 1213498
+    },
+    {
+     "learned": false,
+     "name": "Obsidian Defender",
+     "outputItemID": 233801,
+     "recipeID": 1213506
+    },
+    {
+     "learned": false,
+     "name": "Obsidian Destroyer",
+     "outputItemID": 233796,
+     "recipeID": 1213500
+    },
+    {
+     "learned": false,
+     "name": "Obsidian Heartseeker",
+     "outputItemID": 234428,
+     "recipeID": 1214137
+    },
+    {
+     "learned": false,
+     "name": "Obsidian Mail Tunic",
+     "outputItemID": 234460,
+     "recipeID": 1214274
+    },
+    {
+     "learned": false,
+     "name": "Obsidian Reaver",
+     "outputItemID": 233491,
+     "recipeID": 1213492
+    },
+    {
+     "learned": false,
+     "name": "Obsidian Reaver",
+     "outputItemID": 233491,
+     "recipeID": 1213492
+    },
+    {
+     "learned": false,
+     "name": "Obsidian Sageblade",
+     "outputItemID": 233798,
+     "recipeID": 1213504
+    },
+    {
+     "learned": false,
+     "name": "Obsidian Stormhammer",
+     "outputItemID": 233797,
+     "recipeID": 1213502
+    },
+    {
+     "learned": false,
+     "name": "Thick Obsidian Breastplate",
+     "outputItemID": 235040,
+     "recipeID": 1215507
+    },
+    {
+     "learned": false,
+     "name": "Hardened Frostguard",
+     "outputItemID": 227887,
+     "recipeID": 461730
+    },
+    {
+     "learned": false,
+     "name": "Refined Arcanite Champion",
+     "outputItemID": 228125,
+     "recipeID": 461669
+    },
+    {
+     "learned": false,
+     "name": "Refined Arcanite Reaper",
+     "outputItemID": 227845,
+     "recipeID": 461675
+    },
+    {
+     "learned": false,
+     "name": "Refined Hammer of the Titans",
+     "outputItemID": 228230,
+     "recipeID": 461712
+    },
+    {
+     "learned": false,
+     "name": "Sageblade of the Archmagus",
+     "outputItemID": 227850,
+     "recipeID": 461743
+    },
+    {
+     "learned": false,
+     "name": "Skyrider's Masterwork Stormhammer",
+     "outputItemID": 227886,
+     "recipeID": 461647
+    },
+    {
+     "learned": false,
+     "name": "Deadly Heartseeker",
+     "outputItemID": 227884,
+     "recipeID": 461716
+    },
+    {
+     "learned": false,
+     "name": "Invincible Mail",
+     "outputItemID": 227876,
+     "recipeID": 461735
+    },
+    {
+     "learned": false,
+     "name": "Desecration",
+     "outputItemID": 227857,
+     "recipeID": 461714
+    },
+    {
+     "learned": false,
+     "name": "Stronger-hold Gauntlets",
+     "outputItemID": 227885,
+     "recipeID": 461671
+    },
+    {
+     "learned": false,
+     "name": "Warcrest of the Great Chief",
+     "outputItemID": 227872,
+     "recipeID": 461739
+    },
+    {
+     "learned": false,
+     "name": "Tranquility",
+     "outputItemID": 227881,
+     "recipeID": 461718
+    },
+    {
+     "learned": false,
+     "name": "Tempest Gauntlets",
+     "outputItemID": 227870,
+     "recipeID": 461737
+    },
+    {
+     "learned": false,
+     "name": "Fiery Plate Gauntlets of the Hidden Technique",
+     "outputItemID": 227865,
+     "recipeID": 461651
+    },
+    {
+     "learned": false,
+     "name": "Finely-Enchanted Battlehammer",
+     "outputItemID": 227880,
+     "recipeID": 461733
+    },
+    {
+     "learned": false,
+     "name": "Obsidian Grinding Stone",
+     "outputItemID": 234004,
+     "recipeID": 1213643
+    },
+    {
+     "learned": false,
+     "name": "Tempered Dark Iron Plate",
+     "outputItemID": 227871,
+     "recipeID": 461667
+    },
+    {
+     "learned": false,
+     "name": "Scarlet Soldier's Chestplate",
+     "outputItemID": 238290,
+     "recipeID": 1224633
+    },
+    {
+     "learned": false,
+     "name": "Scarlet Soldier's Grips",
+     "outputItemID": 238292,
+     "recipeID": 1224636
+    },
+    {
+     "learned": false,
+     "name": "Scarlet Soldier's Helmet",
+     "outputItemID": 238288,
+     "recipeID": 1224631
+    },
+    {
+     "learned": false,
+     "name": "Scarlet Soldier's Legplates",
+     "outputItemID": 238294,
+     "recipeID": 1224638
+    },
+    {
+     "learned": false,
+     "name": "Scarlet Soldier's Protectors",
+     "outputItemID": 238291,
+     "recipeID": 1224635
+    },
+    {
+     "learned": false,
+     "name": "Scarlet Soldier's Spaulders",
+     "outputItemID": 238289,
+     "recipeID": 1224632
+    },
+    {
+     "learned": false,
+     "name": "Scarlet Soldier's Stompers",
+     "outputItemID": 238295,
+     "recipeID": 1224639
+    },
+    {
+     "learned": false,
+     "name": "Scarlet Soldier's Waistguard",
+     "outputItemID": 238293,
+     "recipeID": 1224637
+    },
+    {
+     "learned": false,
+     "name": "Baleful Pauldrons",
+     "outputItemID": 220739,
+     "recipeID": 446191
+    },
+    {
+     "learned": false,
+     "name": "Fearmonger's Shoulderguards",
+     "outputItemID": 220740,
+     "recipeID": 446188
+    },
+    {
+     "learned": false,
+     "name": "Shoulderplates of Dread",
+     "outputItemID": 220738,
+     "recipeID": 446179
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Boots",
+     "outputItemID": 217275,
+     "recipeID": 439122
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Gauntlets",
+     "outputItemID": 217273,
+     "recipeID": 439120
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Cuirass",
+     "outputItemID": 217277,
+     "recipeID": 439124
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Coif",
+     "outputItemID": 217279,
+     "recipeID": 439126
+    },
+    {
+     "learned": false,
+     "name": "Reflective Truesilver Braincage",
+     "outputItemID": 215167,
+     "recipeID": 435906
+    },
+    {
+     "learned": false,
+     "name": "Tempered Interference-Negating Helmet",
+     "outputItemID": 215161,
+     "recipeID": 435908
+    },
+    {
+     "learned": false,
+     "name": "Moonsteel Broadsword",
+     "outputItemID": 217281,
+     "recipeID": 439128
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Shoulders",
+     "outputItemID": 217283,
+     "recipeID": 439130
+    },
+    {
+     "learned": false,
+     "name": "Low-Background Truesilver Plates",
+     "outputItemID": 213376,
+     "recipeID": 435910
+    },
+    {
+     "learned": false,
+     "name": "Golden Scale Leggings",
+     "outputItemID": 217285,
+     "recipeID": 439132
+    },
+    {
+     "learned": false,
+     "name": "Shifting Silver Breastplate",
+     "outputItemID": 210794,
+     "recipeID": 429348
+    },
+    {
+     "learned": false,
+     "name": "Mantle of the Second War",
+     "outputItemID": 210773,
+     "recipeID": 427061
+    },
+    {
+     "learned": false,
+     "name": "Blackfathom Sharpening Stone",
+     "outputItemID": 211845,
+     "recipeID": 430397
+    }
+   ]
   },
   "tradeskill:Cooking": {
    "api": "C_TradeSkillUI",
@@ -9222,6 +12377,1186 @@
      "name": "Extraplanar Spidersilk Boots",
      "outputItemID": 210795,
      "recipeID": 429351
+    }
+   ]
+  },
+  "trainer:Lord Tony Romano": {
+   "at": "2026-10-03 17:52:52",
+   "services": [
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      20,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Crippling Poison",
+      "unavailable",
+      132274,
+      20,
+      "Rank 1",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      20,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Stealth",
+      "unavailable",
+      132320,
+      20,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Distract",
+      "unavailable",
+      132289,
+      22,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Garrote",
+      "unavailable",
+      132297,
+      22,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "unavailable",
+      136189,
+      22,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Vanish",
+      "unavailable",
+      132331,
+      22,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Detect Traps",
+      "unavailable",
+      132319,
+      24,
+      "Passive",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "unavailable",
+      132292,
+      24,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mind-numbing Poison",
+      "unavailable",
+      136066,
+      24,
+      "Rank 1",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Ambush",
+      "unavailable",
+      132282,
+      26,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Cheap Shot",
+      "unavailable",
+      132092,
+      26,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Expose Armor",
+      "unavailable",
+      132354,
+      26,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Kick",
+      "unavailable",
+      132219,
+      26,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      28,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Feint",
+      "unavailable",
+      132294,
+      28,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Instant Poison II",
+      "unavailable",
+      132273,
+      28,
+      "Rank 2",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      28,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sap",
+      "unavailable",
+      132310,
+      28,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Deadly Poison",
+      "unavailable",
+      132290,
+      30,
+      "Rank 1",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Disarm Trap",
+      "unavailable",
+      136162,
+      30,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Garrote",
+      "unavailable",
+      132297,
+      30,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Kidney Shot",
+      "unavailable",
+      132298,
+      30,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "unavailable",
+      136189,
+      30,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "unavailable",
+      132292,
+      32,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Gouge",
+      "unavailable",
+      132155,
+      32,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Wound Poison",
+      "unavailable",
+      134197,
+      32,
+      "Rank 1",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Ambush",
+      "unavailable",
+      132282,
+      34,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Blind",
+      "unavailable",
+      136175,
+      34,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Blinding Powder",
+      "unavailable",
+      133588,
+      34,
+      "",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sprint",
+      "unavailable",
+      132307,
+      34,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      36,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Expose Armor",
+      "unavailable",
+      132354,
+      36,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Instant Poison III",
+      "unavailable",
+      132273,
+      36,
+      "Rank 3",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      36,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Deadly Poison II",
+      "unavailable",
+      132290,
+      38,
+      "Rank 2",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Garrote",
+      "unavailable",
+      132297,
+      38,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mind-numbing Poison II",
+      "unavailable",
+      136066,
+      38,
+      "Rank 2",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "unavailable",
+      136189,
+      38,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "unavailable",
+      132292,
+      40,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Feint",
+      "unavailable",
+      132294,
+      40,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mutilate",
+      "unavailable",
+      236270,
+      40,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Safe Fall",
+      "unavailable",
+      132914,
+      40,
+      "Passive",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Stealth",
+      "unavailable",
+      132320,
+      40,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Wound Poison II",
+      "unavailable",
+      134197,
+      40,
+      "Rank 2",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Ambush",
+      "unavailable",
+      132282,
+      42,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Kick",
+      "unavailable",
+      132219,
+      42,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Slice and Dice",
+      "unavailable",
+      132306,
+      42,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Vanish",
+      "unavailable",
+      132331,
+      42,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      44,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Instant Poison IV",
+      "unavailable",
+      132273,
+      44,
+      "Rank 4",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      44,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Deadly Poison III",
+      "unavailable",
+      132290,
+      46,
+      "Rank 3",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Expose Armor",
+      "unavailable",
+      132354,
+      46,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Garrote",
+      "unavailable",
+      132297,
+      46,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Gouge",
+      "unavailable",
+      132155,
+      46,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "unavailable",
+      136189,
+      46,
+      "Rank 7",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "unavailable",
+      132292,
+      48,
+      "Rank 7",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sap",
+      "unavailable",
+      132310,
+      48,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Wound Poison III",
+      "unavailable",
+      134197,
+      48,
+      "Rank 3",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Ambush",
+      "unavailable",
+      132282,
+      50,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Crippling Poison II",
+      "unavailable",
+      132274,
+      50,
+      "Rank 2",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Kidney Shot",
+      "unavailable",
+      132298,
+      50,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mutilate",
+      "unavailable",
+      236270,
+      50,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      52,
+      "Rank 7",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Feint",
+      "unavailable",
+      132294,
+      52,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Instant Poison V",
+      "unavailable",
+      132273,
+      52,
+      "Rank 5",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mind-numbing Poison III",
+      "unavailable",
+      136066,
+      52,
+      "Rank 3",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      52,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Deadly Poison IV",
+      "unavailable",
+      132290,
+      54,
+      "Rank 4",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Garrote",
+      "unavailable",
+      132297,
+      54,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "unavailable",
+      136189,
+      54,
+      "Rank 8",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "unavailable",
+      132292,
+      56,
+      "Rank 8",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Expose Armor",
+      "unavailable",
+      132354,
+      56,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Wound Poison IV",
+      "unavailable",
+      134197,
+      56,
+      "Rank 4",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Ambush",
+      "unavailable",
+      132282,
+      58,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Kick",
+      "unavailable",
+      132219,
+      58,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sprint",
+      "unavailable",
+      132307,
+      58,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      60,
+      "Rank 8",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Gouge",
+      "unavailable",
+      132155,
+      60,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Instant Poison VI",
+      "unavailable",
+      132273,
+      60,
+      "Rank 6",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mutilate",
+      "unavailable",
+      236270,
+      60,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      60,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Stealth",
+      "unavailable",
+      132320,
+      60,
+      "Rank 4",
+      ""
+     ]
+    }
+   ]
+  },
+  "trainer:Randal Worth": {
+   "at": "2026-10-03 17:51:01",
+   "services": []
+  },
+  "trainer:Simon Tanner": {
+   "at": "2026-10-03 17:51:16",
+   "services": [
+    {
+     "status": "ok",
+     "values": [
+      "Dark Leather Pants",
+      "unavailable",
+      134589,
+      0,
+      "",
+      "Leather Legguards"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Toughened Leather Armor",
+      "unavailable",
+      132725,
+      0,
+      "",
+      "Leather Chestguards"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Nimble Leather Gloves",
+      "unavailable",
+      132939,
+      0,
+      "",
+      "Leather Gauntlets"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Dark Leather Belt",
+      "unavailable",
+      132492,
+      0,
+      "",
+      "Leather Belts"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Fletcher's Gloves",
+      "unavailable",
+      132939,
+      0,
+      "",
+      "Leather Gauntlets"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Hillman's Shoulders",
+      "unavailable",
+      135039,
+      0,
+      "",
+      "Leather Pauldrons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Toughened Leather Gloves",
+      "unavailable",
+      132958,
+      0,
+      "",
+      "Leather Gauntlets"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Hillman's Leather Gloves",
+      "unavailable",
+      132939,
+      0,
+      "",
+      "Leather Gauntlets"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Cured Heavy Hide",
+      "unavailable",
+      134367,
+      0,
+      "",
+      "Reagents"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Heavy Leather Ammo Pouch",
+      "unavailable",
+      133634,
+      0,
+      "",
+      "Ammo Pouches"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Heavy Quiver",
+      "unavailable",
+      134402,
+      0,
+      "",
+      "Quivers"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Hillman's Cloak",
+      "unavailable",
+      133759,
+      0,
+      "",
+      "Cloaks"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Heavy Armor Kit",
+      "unavailable",
+      133610,
+      0,
+      "",
+      "Armor Kits"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Heavy Leather",
+      "unavailable",
+      134256,
+      0,
+      "",
+      "Reagents"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mender's Leather Belt",
+      "unavailable",
+      132515,
+      0,
+      "",
+      "Leather Belts"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Prowler's Leather Belt",
+      "unavailable",
+      236918,
+      0,
+      "",
+      "Leather Belts"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Skirmisher's Leather Belt",
+      "unavailable",
+      236895,
+      0,
+      "",
+      "Leather Belts"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Skulker's Leather Belt",
+      "unavailable",
+      236896,
+      0,
+      "",
+      "Leather Belts"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Skycaller's Leather Belt",
+      "unavailable",
+      236903,
+      0,
+      "",
+      "Leather Belts"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Stalker's Leather Belt",
+      "unavailable",
+      132514,
+      0,
+      "",
+      "Leather Belts"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Warden's Leather Belt",
+      "unavailable",
+      132495,
+      0,
+      "",
+      "Leather Belts"
+     ]
     }
    ]
   }

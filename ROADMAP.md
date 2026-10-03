@@ -15,7 +15,8 @@ Goal: replace every "unconfirmed" in the code with a fact. Data first, features 
 - [x] **Secret values**: which item/character-stat calls are blocked? (none so far)
 - [x] **SavedVariables**: do they survive a relog? (yes)
 - [x] Dump all three Rogue talent trees (names, ranks, tiers) -> `docs/BETA-FINDINGS.md`
-- [x] Open Enchanting to record recipes and their effects (trainer still to do)
+- [x] Open Enchanting to record recipes and their effects; class and profession trainers
+- [x] Encounter Journal: empty on Forever, so loot tables come from the probe's loot log
 - [ ] Inspect other Rogues (`/gwp inspect`) to collect real gear + enchant IDs
 - [ ] Decide: key talents/enchants by name or by ID
 
@@ -44,7 +45,7 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [ ] Refine weights from launch-week feedback and logs
 - [ ] Real UI: per-slot list, "why" breakdown (`Scoring.Breakdown`), talent tree view
 - [ ] Weapon logic: daggers for Mutilate/Hemorrhage, main-hand vs off-hand speed
-- [ ] Gear source tagging (dungeon / quest / crafted / raid)
+- [ ] Gear source tagging (dungeon / quest / crafted / raid), built from the loot log
 - [ ] Raid gear + enchants for Barrow Deeps, Hyjal Summit, Onyxia's Lair (Dec 9)
 - [ ] Multiple builds per spec (raid, dungeon, PvP)
 - [ ] Localization groundwork (IDs instead of English names)
@@ -67,4 +68,5 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 | 2026-10-03 | Engine is pure Lua | Testable offline with `tests/smoke_test.py` |
 | 2026-10-03 | Interface 16001 | Confirmed on beta client 1.60.1 (70205). Classic-style number; whether the APIs are Mainline or Classic is still for the probe to answer |
 | 2026-10-03 | Read talents via Traits API, spec by group ID | Probe: Classic talent API absent; one tree, each node tagged 11580/11573/11572 |
+| 2026-10-03 | Drop the Encounter Journal; log real drops | `LoadAddOn("Blizzard_EncounterJournal")` = WRONG_GAME_TYPE, no instance answers |
 | 2026-10-03 | Score enchants instead of listing them per spec | Recipe descriptions give exact amounts; one table serves every class and spec |
