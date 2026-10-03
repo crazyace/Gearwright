@@ -301,31 +301,76 @@ function P.stats()
 end
 
 -- Character sheet ------------------------------------------------------------------
--- The stat lines on the character window carry their tooltip text on the frame
--- (.tooltip / .tooltip2 on Mainline-style stat frames), which is exactly what the
--- game shows on hover. Opening the window records it.
+-- Most stat lines build their tooltip only on hover, so the probe "hovers" each
+-- visible stat frame (calls its OnEnter), reads GameTooltip, then leaves.
+-- Frames that store the text up front (.tooltip / .tooltip2) are read directly.
 local function fontText(region)
   if type(region) == "table" and type(region.GetText) == "function" then return sanitize(region:GetText()) end
 end
 
-local function collectSheet(frame, out, depth)
-  if depth > 8 or #out >= 200 or type(frame) ~= "table" or type(frame.GetChildren) ~= "function" then return end
-  if type(frame.tooltip) == "string" or type(frame.tooltip2) == "string" then
-    out[#out + 1] = {
-      label = fontText(frame.Label) or fontText(frame.Name),
-      value = fontText(frame.Value),
-      tooltip = sanitize(frame.tooltip),
-      tooltip2 = sanitize(frame.tooltip2),
-    }
+-- Text of a frame's own font strings, e.g. "Agility:" and "66".
+local function regionTexts(frame)
+  local out = {}
+  if type(frame.GetRegions) ~= "function" then return out end
+  for _, r in ipairs({ frame:GetRegions() }) do
+    if type(r.GetObjectType) == "function" and r:GetObjectType() == "FontString" then
+      local t = fontText(r)
+      if type(t) == "string" and t ~= "" then out[#out + 1] = t end
+    end
   end
-  for _, child in ipairs({ frame:GetChildren() }) do collectSheet(child, out, depth + 1) end
+  return out
+end
+
+local function hoverTooltip(frame)
+  local tip = _G.GameTooltip
+  local onEnter = type(frame.GetScript) == "function" and frame:GetScript("OnEnter")
+  if not (tip and onEnter) then return nil end
+  tip:Hide()
+  if not pcall(onEnter, frame) then return nil end
+  local lines = {}
+  if tip:IsShown() then
+    for i = 1, tip:NumLines() do
+      local left = fontText(_G["GameTooltipTextLeft" .. i])
+      local right = fontText(_G["GameTooltipTextRight" .. i])
+      if type(left) == "string" and left ~= "" then
+        lines[#lines + 1] = (type(right) == "string" and right ~= "") and (left .. "  " .. right) or left
+      end
+    end
+  end
+  local onLeave = frame:GetScript("OnLeave")
+  if onLeave then pcall(onLeave, frame) end
+  tip:Hide()
+  return #lines > 0 and lines or nil
+end
+
+local function collectSheet(frame, out, seen, depth)
+  if depth > 10 or #out >= 150 or type(frame) ~= "table" or type(frame.GetChildren) ~= "function" then return end
+  local visible = type(frame.IsVisible) ~= "function" or frame:IsVisible()
+  if visible then
+    local static = type(frame.tooltip) == "string" or type(frame.tooltip2) == "string"
+    local hover = hoverTooltip(frame)
+    local key = hover and hover[1] or (static and tostring(frame.tooltip))
+    if key and not seen[key] then
+      seen[key] = true
+      local texts = regionTexts(frame)
+      out[#out + 1] = {
+        label = fontText(frame.Label) or fontText(frame.Name) or texts[1],
+        value = fontText(frame.Value) or texts[2],
+        tooltip = static and sanitize(frame.tooltip) or nil,
+        tooltip2 = static and sanitize(frame.tooltip2) or nil,
+        hover = hover,
+      }
+    end
+  end
+  for _, child in ipairs({ frame:GetChildren() }) do collectSheet(child, out, seen, depth + 1) end
 end
 
 function P.sheet(quiet)
-  local root = _G.CharacterStatsPane or _G.PaperDollFrame
+  local root = _G.CharacterStatsPane or _G.PaperDollFrame or _G.CharacterFrame
   if not root then return say("no character sheet frame found") end
+  if InCombatLockdown and InCombatLockdown() then return say("leave combat first") end
   local lines = {}
-  collectSheet(root, lines, 0)
+  collectSheet(root, lines, {}, 0)
   local s = snapshot()
   s.level = sanitize(UnitLevel("player"))
   s.sections.sheet = lines
