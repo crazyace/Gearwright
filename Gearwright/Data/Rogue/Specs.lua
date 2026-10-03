@@ -33,6 +33,10 @@ R.unlocks = {
   { class = 2, subclass = 0, talent = "Hack and Slash", spell = 196 }, -- one-handed axe
 }
 
+-- Rogues learn Dual Wield (spell 674) at level 10; before that a weapon can
+-- only go in the main hand.
+R.dualWield = { level = 10, spell = 674 }
+
 R.specs = {
   assassination = {
     label = "Assassination",

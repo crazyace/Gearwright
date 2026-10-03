@@ -202,6 +202,7 @@ local WEAPON_SKILL_SPELLS = {
   [199] = "Two-Handed Maces", [200] = "Polearms", [201] = "One-Handed Swords",
   [202] = "Two-Handed Swords", [227] = "Staves", [1180] = "Daggers", [15590] = "Fist Weapons",
   [264] = "Bows", [266] = "Guns", [5011] = "Crossbows", [2567] = "Thrown", [5009] = "Wands",
+  [674] = "Dual Wield",
 }
 local function weaponSkills()
   local out = { spells = {} }

@@ -182,6 +182,16 @@ L.execute("function IsPlayerSpell(id) return id == 196 end")
 assert compare("item:2005:0:0")[0] > 0
 L.execute("IsPlayerSpell = nil; TABS[2][2][1][2] = 5")
 L.globals().fire("CHARACTER_POINTS_CHANGED")
+# Dual Wield comes at level 10: before that a one-hand weapon only goes in the
+# main hand, and an off-hand-only weapon can't be used yet.
+L.execute("ITEMS['item:2006:0:0'] = { equip='INVTYPE_WEAPONOFFHAND', class=2, sub=15, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")
+assert compare("item:2006:0:0")[1] == 17
+L.execute("UnitLevel = function() return 9 end")
+assert compare("item:2006:0:0")[:2] == [None, "no-dual-wield"]
+assert compare("item:2003:0:0")[1] == 16  # 22-DPS dagger: main hand only, not the empty off hand
+L.execute("function IsPlayerSpell(id) return id == 674 end")
+assert compare("item:2006:0:0")[1] == 17  # Dual Wield already known
+L.execute("IsPlayerSpell = nil; UnitLevel = function() return 30 end")
 # Items above your level still score, and say when you can wear them.
 d = compare("item:1003:0:0")
 assert d[0] > 0 and d[4] == 40, d

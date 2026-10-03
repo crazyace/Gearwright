@@ -34,11 +34,21 @@ function Advisor.Context()
     spec = spec,
     specHow = how,
     proficiency = Advisor.Proficiency(classData),
+    dualWield = Advisor.CanDualWield(classData),
     weights = ns.Weights.Build(classData, spec, ns.API.CharacterSnapshot()),
   }
 end
 
 -- Gear ------------------------------------------------------------------------
+
+-- Whether a weapon can go in the off hand yet: the class's Dual Wield level
+-- reached, or the spell known. Classes without a dualWield entry never can.
+function Advisor.CanDualWield(classData)
+  local dw = classData.dualWield
+  if not dw then return false end
+  local level = ns.API.clean(UnitLevel("player"))
+  return (level and level >= dw.level) or (dw.spell and ns.API.KnowsSpell(dw.spell)) or false
+end
 
 -- The class's proficiency table plus any weapon types unlocked by a talent with
 -- points in it or a known weapon skill spell.
@@ -69,7 +79,8 @@ end
 local DAGGER = 15
 
 -- Slots `link` could go in for this class and spec, or nil + reason:
---   "not-equippable", "not-usable" (armor/weapon type), "wrong-weapon-type" (spec rule).
+--   "not-equippable", "not-usable" (armor/weapon type), "no-dual-wield" (off-hand
+--   weapon before Dual Wield), "wrong-weapon-type" (spec rule).
 function Advisor.CandidateSlots(link, ctx)
   local _, equipLoc, classID, subclassID = ns.API.GetItemBasics(link)
   local slots = equipLoc and EQUIP_LOC_TO_SLOTS[equipLoc]
@@ -78,6 +89,15 @@ function Advisor.CandidateSlots(link, ctx)
   local prof = ctx.proficiency or ctx.class.proficiency
   if prof and classID and prof[classID] and not prof[classID][subclassID] then
     return nil, "not-usable"
+  end
+
+  if classID == 2 and ctx.dualWield == false then
+    local main = {}
+    for _, slot in ipairs(slots) do
+      if slot ~= 17 then main[#main + 1] = slot end
+    end
+    if #main == 0 then return nil, "no-dual-wield" end
+    slots = main
   end
 
   local rules = ctx.class.specs[ctx.spec] and ctx.class.specs[ctx.spec].weapons
