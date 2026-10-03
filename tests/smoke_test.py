@@ -196,9 +196,33 @@ assert L.eval("""function(ns)
 assert L.eval("function(ns, l) return ns.API.GetEnchantID(l) end")(ns, gear["7"]["link"].replace("\\u007c", "|")) == 8481
 
 # Probe
+# Character sheet + stat conversions, shaped like the beta's Agility tooltip.
+L.execute(r"""
+function UnitStat(_, i) local v = ({33, 66, 56, 26, 29})[i] return v, v, 0, 0 end
+function GetCritChanceFromAgility() return 8.7 end
+CR_HIT_MELEE, CR_CRIT_MELEE = 6, 9
+function GetCombatRating(id) return id == 6 and 12 or 0 end
+function GetCombatRatingBonus(id) return id == 6 and 1.2 or 0 end
+local function frame(children, fields)
+  local f = fields or {}
+  f.GetChildren = function() return unpack(children or {}) end
+  return f
+end
+local function text(t) return { GetText = function() return t end } end
+local agility = frame(nil, { Label = text("Agility:"), Value = text("66"),
+  tooltip = "|cffffffffAgility 66 (49|cff20ff20+17|r)|r",
+  tooltip2 = "Increases Critical Strike chance by 8.7%\nIncreases Attack Power by 66" })
+local strength = frame(nil, { Label = text("Strength:"), Value = text("33"), tooltip = "Strength 33" })
+CharacterStatsPane = frame({ frame({ agility, strength }) })
+PaperDollFrame = frame({ CharacterStatsPane }, {
+  HookScript = function(self, _, fn) self.onShow = fn end })
+""")
 load_addon("GearwrightProbe","GearwrightProbe.toc")
 L.globals().fire("ADDON_LOADED","GearwrightProbe"); L.globals().fire("PLAYER_LOGIN")
 L.globals().SlashCmdList.GEARWRIGHTPROBE("all")
+L.execute("PaperDollFrame.onShow()")  # opening the character window records the sheet
+sheet = L.eval("function() local s = GearwrightProbeDB.snapshots[1].sections.sheet return #s, s[1].label, s[1].value end")()
+assert tuple(sheet) == (2, "Agility:", "66"), tuple(sheet)
 
 # Regression: two professions' recipe scans must not overwrite each other.
 L.execute("""
@@ -232,4 +256,7 @@ import subprocess, sys  # noqa: E401
 for f in ("export.json", "GearwrightProbe.lua"):
     r = subprocess.run([sys.executable, str(R/"tools"/"probe_to_json.py"), str(OUT/f)], capture_output=True, text=True)
     assert r.returncode == 0 and "Malice (5/5)" in r.stdout and "10 points spent" in r.stdout, r.stdout + r.stderr
+    for want in ("character sheet: 2 stat lines", "Agility 66 (49+17)", "Increases Attack Power by 66",
+                 "agility per 1% crit: 7.59", "CR_HIT_MELEE (id 6): rating 12, bonus 1.2"):
+        assert want in r.stdout, (want, r.stdout)
 print("\nALL SMOKE TESTS PASSED")

@@ -60,6 +60,7 @@ python tests/smoke_test.py
 | `/gearwright spec <assassination\|combat\|subtlety\|auto>` | Force or auto-detect spec |
 | `/gearwright tooltip` | Toggle the tooltip upgrade line |
 | `/gwp all` | Probe: dump env, APIs, talents, gear, stats |
+| `/gwp sheet` | Probe: record the character sheet's stat lines and tooltips (also automatic when you open it) |
 | `/gwp export` | Probe: copyable JSON of everything recorded |
 
 ## License

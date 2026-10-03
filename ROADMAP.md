@@ -13,7 +13,7 @@ Goal: replace every "unconfirmed" in the code with a fact. Data first, features 
 - [ ] **Stat units**: do items report hit/crit/expertise/haste as ratings or "Equip: +x%"?
       Record every `ITEM_MOD_*` token -> update `Data/Stats.lua`
 - [x] **Secret values**: which item/character-stat calls are blocked? (none so far)
-- [ ] **SavedVariables**: do they survive a relog? (probe reports on login)
+- [x] **SavedVariables**: do they survive a relog? (yes)
 - [x] Dump all three Rogue talent trees (names, ranks, tiers) -> `docs/BETA-FINDINGS.md`
 - [ ] Open Enchanting / a trainer to record recipes and enchant IDs
 - [ ] Inspect other Rogues (`/gwp inspect`) to collect real gear + enchant IDs

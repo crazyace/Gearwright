@@ -250,31 +250,94 @@ function P.gear()
   say("gear: %d items; stat tokens seen: %s", n, #list > 0 and table.concat(list, ", ") or "none")
 end
 
+-- Every character-stat function we know of, Classic and Mainline. Missing ones
+-- are recorded as "missing", so one capture shows what this client has.
 local STAT_CALLS = {
   { "UnitStat", "player", 1 }, { "UnitStat", "player", 2 }, { "UnitStat", "player", 3 },
-  { "UnitAttackPower", "player" }, { "UnitAttackSpeed", "player" },
-  { "GetCritChance" }, { "GetHitModifier" }, { "GetSpellHitModifier" },
-  { "GetExpertise" }, { "GetHaste" }, { "GetMeleeHaste" },
-  { "GetDodgeChance" }, { "GetParryChance" }, { "GetArmorPenetration" },
+  { "UnitStat", "player", 4 }, { "UnitStat", "player", 5 },
+  { "UnitArmor", "player" }, { "UnitHealthMax", "player" }, { "UnitPowerMax", "player" },
+  { "UnitAttackPower", "player" }, { "UnitRangedAttackPower", "player" },
+  { "UnitDamage", "player" }, { "UnitRangedDamage", "player" },
+  { "UnitAttackSpeed", "player" }, { "UnitAttackBothHands", "player" }, { "UnitDefense", "player" },
+  { "GetCritChance" }, { "GetRangedCritChance" }, { "GetSpellCritChance", 2 },
+  { "GetCritChanceFromAgility", "player" }, { "GetSpellCritChanceFromIntellect", "player" },
+  { "GetHitModifier" }, { "GetSpellHitModifier" }, { "GetExpertise" }, { "GetArmorPenetration" },
+  { "GetHaste" }, { "GetMeleeHaste" }, { "GetRangedHaste" }, { "UnitSpellHaste", "player" },
+  { "GetDodgeChance" }, { "GetParryChance" }, { "GetBlockChance" }, { "GetShieldBlock" },
+  { "GetSpellBonusDamage", 2 }, { "GetSpellBonusHealing" }, { "GetManaRegen" }, { "GetPowerRegen" },
+  { "UnitResistance", "player", 1 }, { "UnitResistance", "player", 2 }, { "UnitResistance", "player", 3 },
+  { "UnitResistance", "player", 4 }, { "UnitResistance", "player", 5 }, { "UnitResistance", "player", 6 },
 }
-local RATING_CONSTANTS = { "CR_HIT_MELEE", "CR_CRIT_MELEE", "CR_HASTE_MELEE", "CR_EXPERTISE" }
+
+-- All CR_* combat-rating constants this client defines, sorted by name.
+local function ratingConstants()
+  local out = {}
+  for name, id in pairs(_G) do
+    if type(name) == "string" and name:find("^CR_") and type(id) == "number" then out[#out + 1] = name end
+  end
+  table.sort(out)
+  return out
+end
 
 function P.stats()
-  local out, secret, ok = {}, 0, 0
+  local out, secret, ok, missing = {}, 0, 0, 0
   for _, call in ipairs(STAT_CALLS) do
-    local key = table.concat(call, ":")
+    local parts = {}
+    for i, v in ipairs(call) do parts[i] = tostring(v) end
     local r = capture(unpack(call))
-    out[key] = r
-    if r.status == "secret" then secret = secret + 1 elseif r.status == "ok" then ok = ok + 1 end
+    out[table.concat(parts, ":")] = r
+    if r.status == "secret" then secret = secret + 1
+    elseif r.status == "ok" then ok = ok + 1
+    elseif r.status == "missing" then missing = missing + 1 end
   end
-  for _, c in ipairs(RATING_CONSTANTS) do
+  local ratings = ratingConstants()
+  for _, c in ipairs(ratings) do
     local id = _G[c]
-    out["rating:" .. c] = (type(id) == "number")
-      and { id = id, rating = capture("GetCombatRating", id), bonus = capture("GetCombatRatingBonus", id) }
-      or { status = "constant-missing" }
+    out["rating:" .. c] = { id = id, rating = capture("GetCombatRating", id), bonus = capture("GetCombatRatingBonus", id) }
   end
   snapshot().sections.stats = out
-  say("character stats: %d readable, %d secret, %d other", ok, secret, #STAT_CALLS - ok - secret)
+  say("character stats: %d readable, %d secret, %d missing, %d error; %d combat ratings",
+    ok, secret, missing, #STAT_CALLS - ok - secret - missing, #ratings)
+end
+
+-- Character sheet ------------------------------------------------------------------
+-- The stat lines on the character window carry their tooltip text on the frame
+-- (.tooltip / .tooltip2 on Mainline-style stat frames), which is exactly what the
+-- game shows on hover. Opening the window records it.
+local function fontText(region)
+  if type(region) == "table" and type(region.GetText) == "function" then return sanitize(region:GetText()) end
+end
+
+local function collectSheet(frame, out, depth)
+  if depth > 8 or #out >= 200 or type(frame) ~= "table" or type(frame.GetChildren) ~= "function" then return end
+  if type(frame.tooltip) == "string" or type(frame.tooltip2) == "string" then
+    out[#out + 1] = {
+      label = fontText(frame.Label) or fontText(frame.Name),
+      value = fontText(frame.Value),
+      tooltip = sanitize(frame.tooltip),
+      tooltip2 = sanitize(frame.tooltip2),
+    }
+  end
+  for _, child in ipairs({ frame:GetChildren() }) do collectSheet(child, out, depth + 1) end
+end
+
+function P.sheet(quiet)
+  local root = _G.CharacterStatsPane or _G.PaperDollFrame
+  if not root then return say("no character sheet frame found") end
+  local lines = {}
+  collectSheet(root, lines, 0)
+  local s = snapshot()
+  s.level = sanitize(UnitLevel("player"))
+  s.sections.sheet = lines
+  if not quiet or #lines > 0 then say("character sheet: %d stat lines recorded", #lines) end
+end
+
+local function hookSheet()
+  local frame = _G.PaperDollFrame or _G.CharacterFrame
+  if not frame or P.sheetHooked then return end
+  P.sheetHooked = true
+  -- Stat lines update on show; give them a moment.
+  frame:HookScript("OnShow", function() C_Timer.After(0.5, function() P.sheet(true) end) end)
 end
 
 -- Event-driven scans (open the window, the probe records it) -----------------------
@@ -437,6 +500,7 @@ events:SetScript("OnEvent", function(_, event, arg1)
   if event == "ADDON_LOADED" and arg1 == ADDON then
     persistenceCheck()
   elseif event == "PLAYER_LOGIN" then
+    hookSheet()
     say("%s  -  type /gwp all", persistReport or "")
   elseif event == "TRADE_SKILL_SHOW" then
     C_Timer.After(0.5, scanTradeSkill) -- let the list populate
@@ -449,8 +513,9 @@ end)
 
 local COMMANDS = {
   env = P.env, api = P.api, talents = P.talents, gear = P.gear, stats = P.stats, export = P.export,
+  sheet = function() P.sheet() end,
   all = function()
-    P.env(); P.api(); P.talents(); P.gear(); P.stats()
+    P.env(); P.api(); P.talents(); P.gear(); P.stats(); P.sheet(true)
     say("done. /reload to flush SavedVariables, or /gwp export to copy it out.")
   end,
   inspect = function()
@@ -470,7 +535,7 @@ SlashCmdList.GEARWRIGHTPROBE = function(msg)
     local ok, err = pcall(fn)
     if not ok then say("|cffff5050error:|r %s", tostring(err)) end
   else
-    say("usage: /gwp all | env | api | talents | gear | stats | inspect | persist | export | clear")
-    say("passive: open a profession window or class trainer and it is recorded automatically")
+    say("usage: /gwp all | env | api | talents | gear | stats | sheet | inspect | persist | export | clear")
+    say("passive: open your character sheet, a profession window or class trainer and it is recorded automatically")
   end
 end
