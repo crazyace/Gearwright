@@ -111,10 +111,10 @@ function Advisor.CandidateSlots(link, ctx)
   return out
 end
 
--- Score delta of `link` vs what it would replace, in the slot where it helps most.
--- Returns delta, slotID, newScore, oldScore, requiredLevel  (or nil, reason)
--- requiredLevel is set only when it's above your level.
-function Advisor.CompareToEquipped(link, ctx)
+-- `link` against what's equipped in every slot it could go in, best first:
+--   { { slot, delta, newScore, oldScore, equipped }, ... }   or nil, reason
+-- equipped is the link it would replace, nil for an empty slot.
+function Advisor.CompareSlots(link, ctx)
   local reason
   if not ctx then ctx, reason = Advisor.Context() end
   if not ctx then return nil, reason end
@@ -122,7 +122,7 @@ function Advisor.CompareToEquipped(link, ctx)
   local slots, why = Advisor.CandidateSlots(link, ctx)
   if not slots then return nil, why end
 
-  local best
+  local out = {}
   for _, slot in ipairs(slots) do
     local newScore = ns.Scoring.ScoreLink(link, ctx.weights, slot)
     if not newScore then return nil, "stats-unreadable" end
@@ -134,9 +134,21 @@ function Advisor.CompareToEquipped(link, ctx)
       oldScore = ns.Scoring.ScoreLink(equipped, ctx.weights, slot)
       if not oldScore then return nil, "equipped-unreadable" end
     end
-    local delta = newScore - oldScore
-    if not best or delta > best[1] then best = { delta, slot, newScore, oldScore } end
+    out[#out + 1] = { slot = slot, delta = newScore - oldScore, newScore = newScore, oldScore = oldScore,
+      equipped = equipped }
   end
+  table.sort(out, function(a, b) return a.delta > b.delta end)
+  return out
+end
+
+-- Score delta of `link` vs what it would replace, in the slot where it helps most.
+-- Returns delta, slotID, newScore, oldScore, requiredLevel  (or nil, reason)
+-- requiredLevel is set only when it's above your level.
+function Advisor.CompareToEquipped(link, ctx)
+  local list, why = Advisor.CompareSlots(link, ctx)
+  if not list then return nil, why end
+  local b = list[1]
+  local best = { b.delta, b.slot, b.newScore, b.oldScore }
 
   local reqLevel = ns.API.GetItemDetails(link)
   local level = ns.API.clean(UnitLevel("player"))

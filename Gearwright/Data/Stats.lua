@@ -110,6 +110,41 @@ function Stats.FromEnchantLine(lines)
 end
 
 -- Normalized stats for an item link, or nil if unreadable.
+-- What an item has that the score leaves out, as short labels: stats your
+-- spec doesn't value (e.g. Intellect for a Rogue) and on-hit / on-use effects.
+-- Armor is left out of the list: every piece has it.
+local UNSCORED_SKIP = { RESISTANCE0_NAME = true }
+function Stats.Unscored(raw, lines, weights)
+  local out, seen = {}, {}
+  local function add(label)
+    if not seen[label] then seen[label] = true; out[#out + 1] = label end
+  end
+  local tokens = {}
+  for token in pairs(raw or {}) do tokens[#tokens + 1] = token end
+  table.sort(tokens)
+  for _, token in ipairs(tokens) do
+    local key = Stats.TOKEN_TO_KEY[token]
+    local w = key and (key == "dps" or ns.Weights.For(weights, key))
+    if not UNSCORED_SKIP[token] and not (w and w ~= 0) then
+      add(key and Stats.LABELS[key] or Stats.TokenLabel(token))
+    end
+  end
+  for _, line in ipairs(lines or {}) do
+    if type(line) == "string" then
+      if line:find("^Chance on hit:") then add("chance on hit effect") end
+      if line:find("^Use:") then add("use effect") end
+    end
+  end
+  return out
+end
+
+-- "ITEM_MOD_SPELL_POWER_SHORT" -> "Spell Power", "RESISTANCE4_NAME" -> "resistance"
+function Stats.TokenLabel(token)
+  if token:find("^RESISTANCE") then return "Resistance" end
+  local words = token:gsub("^ITEM_MOD_", ""):gsub("_SHORT$", ""):lower():gsub("_", " ")
+  return (words:gsub("^%l", string.upper))
+end
+
 function Stats.FromLink(link)
   local raw = ns.API.GetItemStats(link)
   if not raw then return nil end
