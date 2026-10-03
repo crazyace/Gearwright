@@ -45,7 +45,7 @@ function UnitFullName() return "Tester","Realm" end
 function UnitName() return "Tester" end
 function UnitExists() return true end
 -- Classic-style talents: 3 tabs, combat has most points
-local TABS = { {"Assassination", {{"Malice",0,5},{"Mutilate",0,1}}}, {"Combat", {{"Hack and Slash",5,5},{"Restless Blades",1,1}}}, {"Subtlety", {{"Hemorrhage",0,1}}} }
+TABS = { {"Assassination", {{"Malice",0,5},{"Mutilate",0,1}}}, {"Combat", {{"Hack and Slash",5,5},{"Restless Blades",1,1}}}, {"Subtlety", {{"Hemorrhage",0,1}}} }
 function GetNumTalentTabs() return #TABS end
 function GetTalentTabInfo(t) return 100+t, TABS[t][1], "desc" end
 function GetNumTalents(t) return #TABS[t][2] end
@@ -129,6 +129,14 @@ for want in ("Spec:|r Subtlety", "(override)", "Stat weights are provisional", "
 L.globals().SlashCmdList.GEARWRIGHT("spec auto")  # refreshes the open window
 txt = L.globals().SCREEN(ns)
 assert "Spec:|r Combat" in txt and "(talents)" in txt, txt
+# No talent points yet (the first comes at level 10): advise for the leveling spec.
+L.execute("SAVED_TABS = TABS; TABS = { {'Assassination', {}}, {'Combat', {}}, {'Subtlety', {}} }")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
+assert list(L.eval("function(ns) return {ns.Spec.Detect()} end")(ns).values()) == ["combat", "leveling"]
+txt = L.globals().SCREEN(ns)
+assert "Spec:|r Combat" in txt and "the first comes at level 10" in txt, txt
+L.execute("TABS = SAVED_TABS")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
 L.globals().SlashCmdList.GEARWRIGHT("")  # toggle closed
 assert not L.eval("function(ns) return ns.UI.frame:IsShown() end")(ns)
 
@@ -171,6 +179,27 @@ L.execute("ITEMS['item:2004:0:0'] = { equip='INVTYPE_WEAPONMAINHAND', class=2, s
 assert compare("item:2004:0:0")[:2] == [None, "wrong-weapon-type"]
 L.eval("function(ns) ns.db.specOverride = false end")(ns)
 L.execute("INV[17] = nil")
+# One-handed axes: unlocked by Hack and Slash (5/5 in the mock), or by
+# knowing the One-Handed Axes skill; otherwise a Rogue can't use them.
+L.execute("ITEMS['item:2005:0:0'] = { equip='INVTYPE_WEAPON', class=2, sub=0, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")
+assert compare("item:2005:0:0")[0] > 0
+L.execute("TABS[2][2][1][2] = 0")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
+assert compare("item:2005:0:0")[:2] == [None, "not-usable"]
+L.execute("function IsPlayerSpell(id) return id == 196 end")
+assert compare("item:2005:0:0")[0] > 0
+L.execute("IsPlayerSpell = nil; TABS[2][2][1][2] = 5")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
+# Dual Wield comes at level 10: before that a one-hand weapon only goes in the
+# main hand, and an off-hand-only weapon can't be used yet.
+L.execute("ITEMS['item:2006:0:0'] = { equip='INVTYPE_WEAPONOFFHAND', class=2, sub=15, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")
+assert compare("item:2006:0:0")[1] == 17
+L.execute("UnitLevel = function() return 9 end")
+assert compare("item:2006:0:0")[:2] == [None, "no-dual-wield"]
+assert compare("item:2003:0:0")[1] == 16  # 22-DPS dagger: main hand only, not the empty off hand
+L.execute("function IsPlayerSpell(id) return id == 674 end")
+assert compare("item:2006:0:0")[1] == 17  # Dual Wield already known
+L.execute("IsPlayerSpell = nil; UnitLevel = function() return 30 end")
 # Items above your level still score, and say when you can wear them.
 d = compare("item:1003:0:0")
 assert d[0] > 0 and d[4] == 40, d
@@ -384,11 +413,11 @@ L.execute("""
 for _, id in ipairs({1002, 1003, 3001}) do ITEMS["item:" .. id] = ITEMS["item:" .. id .. ":0:0"] end
 ITEMS["item:1005"] = { equip="INVTYPE_HEAD", class=4, sub=2, stats={ITEM_MOD_AGILITY_SHORT=40}, tip={"Crafted Cap"}, uncached=true }
 C_Item.RequestLoadItemDataByID = function(id) if ITEMS["item:" .. id] then ITEMS["item:" .. id].uncached = nil end end
-local OUTPUT = { 1002, 1003, 3001, false, 1005 }
+CRAFT_OUTPUT = { 1002, 1003, 3001, false, 1005 }
 RECIPES = { 1, 2, 3, 4, 5 }
 C_TradeSkillUI = { GetAllRecipeIDs = function() return RECIPES end,
   GetRecipeInfo = function(id) return { name = "recipe " .. id, learned = id == 1 } end,
-  GetRecipeSchematic = function(id) return { outputItemID = OUTPUT[id] or nil } end,
+  GetRecipeSchematic = function(id) return { outputItemID = CRAFT_OUTPUT[id] or nil } end,
   GetBaseProfessionInfo = function() return { professionName = "Leatherworking" } end }
 printed = {}
 """)
@@ -399,10 +428,38 @@ cap_delta = L.eval("function(ns) return ns.Advisor.CompareToEquipped('item:1002:
 print("craft:", crafted)
 assert [r[0] for r in crafted] == [5, 1] and abs(crafted[1][1] - cap_delta) < 1e-9, crafted
 out = "\n".join(L.globals().printed.values())
-assert "reading 1 Leatherworking items" in out and "Leatherworking upgrades:" in out and "(not learned)" in out, out
+assert "reading 1 crafted items" in out and "crafted upgrades:" in out, out
+assert "learn the recipe (Leatherworking)" in out and "you can craft it (Leatherworking)" in out, out
+# Professions you don't have still count: the 25-DPS sword over the 20-DPS
+# dagger is an upgrade to have crafted. Once GetProfessions says you're a
+# blacksmith it's yours to check; opening Blacksmithing says the recipe isn't learned.
+L.execute("""
+ITEMS["item:2002"] = ITEMS["item:2002:0:0"]
+CRAFT_OUTPUT[6] = 2002
+""")
+L.eval("""function(ns) SAVED_CRAFTED = ns.Data.CRAFTED
+  ns.Data.CRAFTED = { professions = { "Blacksmithing" }, recipes = { { 1, 6, 2002, "Sword" } } } end""")(ns)
+def sword():
+    return L.eval("""function(ns) local rows = ns.Advisor.CraftReport()
+      for _, r in ipairs(rows) do if r.itemID == 2002 then return r.status, ns.Advisor.CraftStatusText(r) end end end""")(ns)
+L.execute("RECIPES = {}")  # Leatherworking window closed
+assert sword() == ("order", "have it crafted (Blacksmithing)"), sword()
+L.execute("""function GetProfessions() return 1, 2 end
+function GetProfessionInfo(i) return ({ "Leatherworking", "Blacksmithing" })[i], "icon", 50 end""")
+assert sword()[0] == "yours", sword()
+L.execute("""RECIPES = { 6 }
+C_TradeSkillUI.GetBaseProfessionInfo = function() return { professionName = "Blacksmithing" } end""")
+L.globals().fire("TRADE_SKILL_SHOW")
 L.execute("RECIPES = {}; printed = {}")
+assert sword()[0] == "learn", sword()
 L.globals().SlashCmdList.GEARWRIGHT("craft")
-assert "open a profession window first" in L.globals().printed[1], L.globals().printed[1]
+out = "\n".join(L.globals().printed.values())
+assert "learn the recipe (Blacksmithing)" in out and "learn the recipe (Leatherworking)" in out, out
+L.execute("GetProfessions, GetProfessionInfo = nil, nil; printed = {}")
+L.eval("function(ns) ns.db.recipes = nil; ns.Data.CRAFTED = nil end")(ns)
+L.globals().SlashCmdList.GEARWRIGHT("craft")
+assert "no recipes known yet" in L.globals().printed[1], L.globals().printed[1]
+L.eval("function(ns) ns.Data.CRAFTED = SAVED_CRAFTED end")(ns)
 L.execute("C_TradeSkillUI = nil")
 
 # Dungeons ------------------------------------------------------------------------
@@ -614,11 +671,51 @@ drop = L.eval("""function() local e = GearwrightProbeDB.scans.loot.items["5540"]
   local f = e.from["Creature:1732"] return e.name, f.count, f.where, f.name end""")()
 assert tuple(drop) == ("Pearl-handled Dagger", 2, "The Deadmines", "Defias Squallshaper"), tuple(drop)
 L.execute("LOOT = {}; GetLootSourceInfo, GetInstanceInfo, UnitGUID = nil, nil, nil; function UnitName() return 'Tester' end")
+# Auction house full scan: gear gets its full record and lowest buyout; other
+# items only a unit price; a gear item whose data never loads is counted.
+L.execute("""
+function time() return NOW or 100000 end
+ITEMS[2002] = ITEMS["item:2002:0:0"]
+ITEMS[7777] = { equip="INVTYPE_HEAD", class=4, sub=2 }
+ITEMS["item:7777"] = { equip="INVTYPE_HEAD", class=4, sub=2, uncached=true }
+AH_ROWS = {
+  { "Sword", 1, 5000, 2002, "item:2002:0:0" }, { "Sword", 1, 4000, 2002, "item:2002:0:0" },
+  { "Linen Cloth", 20, 2000, 2589, "item:2589" }, { "Linen Cloth", 5, 1000, 2589, "item:2589" },
+  { "Odd Cap", 1, 900, 7777, "item:7777" },
+}
+C_AuctionHouse = {
+  ReplicateItems = function() fire("REPLICATE_ITEM_LIST_UPDATE") end,
+  GetNumReplicateItems = function() return #AH_ROWS end,
+  GetReplicateItemInfo = function(i) local r = AH_ROWS[i + 1]
+    return r[1], 0, r[2], 2, true, 20, 0, 0, 0, r[3], 0, false, nil, "Seller", "Seller-Realm", 0, r[4], true end,
+  GetReplicateItemLink = function(i) return AH_ROWS[i + 1][5] end,
+}
+printed = {}
+""")
+L.globals().SlashCmdList.GEARWRIGHTPROBE("ah")
+assert "open the auction house first" in L.globals().printed[1], L.globals().printed[1]
+L.globals().fire("AUCTION_HOUSE_SHOW")
+L.globals().SlashCmdList.GEARWRIGHTPROBE("ah")
+ahs = L.eval("""function() local a = GearwrightProbeDB.scans.auction local g = a.gear["2002:Sword"]
+  return a.listings, g.minBuyout, g.listings, g.stats.ITEM_MOD_DAMAGE_PER_SECOND_SHORT, g.equip, a.prices["2589"], a.missing,
+    a.gear["7777:Odd Cap"] == nil end""")()
+assert tuple(ahs) == (5, 4000, 2, 25, "INVTYPE_WEAPON", 100, 1, True), tuple(ahs)
+out = "\n".join(L.globals().printed.values())
+assert "5 listings, 1 gear items recorded, 1 other items priced, 1 gear items had no data" in out, out
+assert "Seller" not in L.eval("function() local b = {} for k, v in pairs(GearwrightProbeDB.scans.auction.gear) do b[#b+1] = v.link end return table.concat(b) end")()
+L.execute("printed = {}")
+L.globals().SlashCmdList.GEARWRIGHTPROBE("ah")
+assert "one full scan every 15 minutes; try again in 15 min" in L.globals().printed[1], L.globals().printed[1]
+L.globals().SlashCmdList.GEARWRIGHTPROBE("export ah")
+assert '"auction"' in L.globals().EXPORTTEXT and '"snapshots"' not in L.globals().EXPORTTEXT
+L.globals().fire("AUCTION_HOUSE_CLOSED")
+L.execute("C_AuctionHouse = nil")
 L.globals().SlashCmdList.GEARWRIGHTPROBE("export")
 print("---- probe export title ----"); print(L.globals().LASTTEXT)
 for p in L.globals().printed.values(): print("  >", p)
 
 open(OUT/"export.json","w").write(L.globals().EXPORTTEXT)
+assert '"auction"' not in L.globals().EXPORTTEXT  # the big auction scan has its own export
 # The probe's loot log turns into Gearwright's own dungeon loot table.
 gen = OUT / "DungeonLoot.lua"
 subprocess.run([sys.executable, str(R / "tools" / "loot_from_probe.py"), str(OUT / "export.json"), "-o", str(gen)],
@@ -628,6 +725,10 @@ assert 'itemID = 5540, name = "Pearl-handled Dagger", dungeon = "The Deadmines",
 assert subprocess.run([sys.executable, str(R / "tools" / "loot_from_probe.py"), *map(str, sorted((R / "data" / "probe").glob("*.json"))),
                        "-o", str(OUT / "check.lua")], capture_output=True).returncode == 0
 assert (OUT / "check.lua").read_text() == (R / "Gearwright" / "Data" / "DungeonLoot.lua").read_text(), "rerun tools/loot_from_probe.py"
+# Data/Crafted.lua is current with the saved probe scans.
+assert subprocess.run([sys.executable, str(R / "tools" / "crafted_from_probe.py"), *map(str, sorted((R / "data" / "probe").glob("*.json"))),
+                       "-o", str(OUT / "crafted.lua")], check=True, capture_output=True).returncode == 0
+assert (OUT / "crafted.lua").read_text() == (R / "Gearwright" / "Data" / "Crafted.lua").read_text(), "rerun tools/crafted_from_probe.py"
 # also write a SavedVariables-style Lua file
 L.execute(r"""
 local function ser(v, ind)
@@ -649,4 +750,6 @@ for f in ("export.json", "GearwrightProbe.lua"):
                  "Equip: Improves your chance to hit by 2.0%.",
                  "encounter journal: 1 instances, 1 tiers", "1 of 20 known IDs answered", "The Deadmines (dungeon, 2 bosses, loot"):
         assert want in r.stdout, (want, r.stdout)
+    if f == "GearwrightProbe.lua":  # the SavedVariables file has the auction scan too
+        assert "auction house scan 2026-10-03 16:00:00: 5 listings, 1 gear items, 1 other items priced" in r.stdout, r.stdout
 print("\nALL SMOKE TESTS PASSED")

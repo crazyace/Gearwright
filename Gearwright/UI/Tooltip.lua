@@ -21,6 +21,12 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tool
     tooltip:AddLine(("|cff4fc3f7Gearwright|r |cffaaaaaa%s wants a dagger here|r"):format(spec and spec.label or "Your spec"))
     return
   end
+  if slot == "no-dual-wield" then
+    local ctx = ns.Advisor.Context()
+    local dw = ctx and ctx.class.dualWield
+    tooltip:AddLine(("|cff4fc3f7Gearwright|r |cffaaaaaaoff hand: you learn Dual Wield at level %d|r"):format(dw and dw.level or 10))
+    return
+  end
   if type(delta) ~= "number" then return end
 
   local color = (delta > 0.05 and UP) or (delta < -0.05 and DOWN) or SAME

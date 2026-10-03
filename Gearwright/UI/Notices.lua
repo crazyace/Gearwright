@@ -120,36 +120,39 @@ ns:On("LOOT_OPENED", function() Notices.Loot() end)
 ns:On("START_LOOT_ROLL", function(rollID) Notices.Roll(rollID) end)
 
 -- Crafting ---------------------------------------------------------------------
--- /gearwright craft, with a profession window open.
+-- /gearwright craft: crafted upgrades from every profession, with whether you
+-- can make it yourself, need to learn the recipe, or should have it crafted.
 
 local CRAFT_REASONS = {
-  ["no-profession-open"] = "open a profession window first",
-  ["no-tradeskill-api"] = "this client has no profession API Gearwright knows",
+  ["no-craft-data"] = "no recipes known yet; open a profession window with the probe or Gearwright loaded",
 }
 local CRAFT_SHOWN = 8
 
 function Notices.Craft(retried)
-  local rows, profession, pending = ns.Advisor.CraftReport()
+  local rows, mine, pending = ns.Advisor.CraftReport()
   if not rows then
-    ns.util.print("craft: %s", CRAFT_REASONS[profession] or tostring(profession))
+    ns.util.print("craft: %s", CRAFT_REASONS[mine] or tostring(mine))
     return
   end
   if pending > 0 and not retried and C_Timer then
-    ns.util.print("reading %d %s items...", pending, profession or "recipe")
+    ns.util.print("reading %d crafted items...", pending)
     C_Timer.After(2, function() Notices.Craft(true) end)
     return
   end
   if #rows == 0 then
-    ns.util.print("no %s upgrades for you up to level %d", profession or "crafted",
+    ns.util.print("no crafted upgrades for you up to level %d",
       (ns.API.clean(UnitLevel("player")) or 0) + ns.Advisor.CRAFT_LOOKAHEAD)
   else
-    ns.util.print("%s upgrades:", profession or "crafted")
+    ns.util.print("crafted upgrades:")
     for i = 1, math.min(#rows, CRAFT_SHOWN) do
       local r = rows[i]
       local s = describe({ link = r.link or r.name or ("item " .. r.itemID), delta = r.delta, slot = r.slot, reqLevel = r.reqLevel })
-      print("  " .. s .. (r.learned and "" or " |cff999999(not learned)|r"))
+      print("  " .. s .. " |cff999999- " .. ns.Advisor.CraftStatusText(r) .. "|r")
     end
-    if #rows > CRAFT_SHOWN then print(("  ...and %d more"):format(#rows - CRAFT_SHOWN)) end
+    if #rows > CRAFT_SHOWN then print(("  ...and %d more (see /gearwright -> Crafting)"):format(#rows - CRAFT_SHOWN)) end
+  end
+  if #mine == 0 then
+    ns.util.print("open your professions once so Gearwright knows which recipes you have")
   end
   if pending > 0 then ns.util.print("%d items still not cached; run it again in a moment", pending) end
   return rows

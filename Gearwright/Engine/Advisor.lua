@@ -33,24 +33,71 @@ function Advisor.Context()
     class = classData,
     spec = spec,
     specHow = how,
+    proficiency = Advisor.Proficiency(classData),
+    dualWield = Advisor.CanDualWield(classData),
     weights = ns.Weights.Build(classData, spec, ns.API.CharacterSnapshot()),
   }
 end
 
 -- Gear ------------------------------------------------------------------------
 
+-- Whether a weapon can go in the off hand yet: the class's Dual Wield level
+-- reached, or the spell known. Classes without a dualWield entry never can.
+function Advisor.CanDualWield(classData)
+  local dw = classData.dualWield
+  if not dw then return false end
+  local level = ns.API.clean(UnitLevel("player"))
+  return (level and level >= dw.level) or (dw.spell and ns.API.KnowsSpell(dw.spell)) or false
+end
+
+-- The class's proficiency table plus any weapon types unlocked by a talent with
+-- points in it or a known weapon skill spell.
+function Advisor.Proficiency(classData)
+  local base = classData.proficiency
+  if not base or not classData.unlocks then return base end
+  local talents = ns.API.ReadTalents(classData.traitTabGroups)
+  local ranks = {}
+  for _, tab in ipairs(talents and talents.tabs or {}) do
+    for _, t in ipairs(tab.talents or {}) do
+      if t.name then ranks[t.name] = math.max(ranks[t.name] or 0, t.rank or 0) end
+    end
+  end
+  local out = {}
+  for classID, subs in pairs(base) do
+    out[classID] = {}
+    for sub, ok in pairs(subs) do out[classID][sub] = ok end
+  end
+  for _, u in ipairs(classData.unlocks) do
+    if (u.talent and (ranks[u.talent] or 0) > 0) or (u.spell and ns.API.KnowsSpell(u.spell)) then
+      out[u.class] = out[u.class] or {}
+      out[u.class][u.subclass] = true
+    end
+  end
+  return out
+end
+
 local DAGGER = 15
 
 -- Slots `link` could go in for this class and spec, or nil + reason:
---   "not-equippable", "not-usable" (armor/weapon type), "wrong-weapon-type" (spec rule).
+--   "not-equippable", "not-usable" (armor/weapon type), "no-dual-wield" (off-hand
+--   weapon before Dual Wield), "wrong-weapon-type" (spec rule).
 function Advisor.CandidateSlots(link, ctx)
   local _, equipLoc, classID, subclassID = ns.API.GetItemBasics(link)
   local slots = equipLoc and EQUIP_LOC_TO_SLOTS[equipLoc]
   if not slots then return nil, "not-equippable" end
 
-  local prof = ctx.class.proficiency
+  local prof = ctx.proficiency or ctx.class.proficiency
   if prof and classID and prof[classID] and not prof[classID][subclassID] then
     return nil, "not-usable"
+  end
+
+  if classID == 2 and ctx.dualWield == false then
+    local main = {}
+    for _, slot in ipairs(slots) do
+      if slot ~= 17 then main[#main + 1] = slot end
+    end
+    if #main == 0 then return nil, "no-dual-wield" end
+    slots = main
   end
 
   local rules = ctx.class.specs[ctx.spec] and ctx.class.specs[ctx.spec].weapons
@@ -209,42 +256,97 @@ end
 Advisor.CRAFT_LOOKAHEAD = 5 -- also show items up to this many levels above you
 local CRAFT_UPGRADE = 0.5
 
--- Upgrades among the recipes of the open profession window, best first:
---   rows = { { recipeID, name, learned, itemID, link, delta, slot, reqLevel } }
--- Returns rows, professionName, pending  (pending = items not cached yet)
+-- Crafted upgrades from every profession, yours or not, best first. Recipes
+-- come from Data/Crafted.lua (every profession the probe has scanned) and from
+-- the profession windows you've opened (Engine/Professions.lua).
+--   rows = { { recipeID, name, itemID, link, delta, slot, reqLevel, profession, status } }
+--   status: "craft"  your profession, recipe learned
+--           "learn"  your profession, recipe not learned yet
+--           "yours"  your profession, but its window hasn't been opened to check
+--           "order"  not your profession: have someone craft it
+-- Returns rows, mine (sorted names of your professions), pending
 --   or nil, reason
 function Advisor.CraftReport()
   local ctx, reason = Advisor.Context()
   if not ctx then return nil, reason end
-  local recipes, profession = ns.API.ReadRecipes()
-  if not recipes then return nil, profession end
+
+  local known = ns.Professions.Known()          -- [prof] = { recipes } you've opened
+  local have = ns.API.PlayerProfessions()        -- [prof] = skill
+  for name in pairs(known) do have[name] = have[name] or true end
+  local mine = {}
+  for name in pairs(have) do mine[#mine + 1] = name end
+  table.sort(mine)
+
+  -- One entry per (profession, item): your own scan wins, it knows "learned".
+  local recipes, seen = {}, {}
+  local function add(prof, r)
+    local key = prof .. ":" .. tostring(r.itemID)
+    if r.itemID and not seen[key] then
+      seen[key] = true
+      recipes[#recipes + 1] = { prof = prof, recipeID = r.recipeID, name = r.name, itemID = r.itemID, learned = r.learned }
+    end
+  end
+  for prof, list in pairs(known) do
+    for _, r in ipairs(list) do add(prof, r) end
+  end
+  local data = ns.Data.CRAFTED
+  for _, r in ipairs(data and data.recipes or {}) do
+    add(data.professions[r[1]], { recipeID = r[2], itemID = r[3], name = r[4] })
+  end
+  if #recipes == 0 then return nil, "no-craft-data" end
 
   local level = ns.API.clean(UnitLevel("player")) or 1
-  local rows, pending = {}, 0
+  local rows, pending, best = {}, 0, {}
   for _, r in ipairs(recipes) do
-    local item = r.itemID and ("item:" .. r.itemID)
-    local reqLevel = item and ns.API.GetItemDetails(item)
-    if item and not reqLevel then
+    local item = "item:" .. r.itemID
+    local reqLevel = ns.API.GetItemDetails(item)
+    if not reqLevel then
       -- Not cached yet, or not an item we can read; equippability works uncached.
       if ns.API.GetItemBasics(item) and Advisor.CandidateSlots(item, ctx) then
         pending = pending + 1
         ns.API.RequestItem(r.itemID)
       end
-    elseif item and reqLevel <= level + Advisor.CRAFT_LOOKAHEAD then
+    elseif reqLevel <= level + Advisor.CRAFT_LOOKAHEAD then
       local delta, slot = Advisor.CompareToEquipped(item, ctx)
       if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
         pending = pending + 1
       elseif type(delta) == "number" and delta > CRAFT_UPGRADE then
-        rows[#rows + 1] = {
-          recipeID = r.recipeID, name = r.name, learned = r.learned, itemID = r.itemID,
-          link = ns.API.GetItemLink(item), delta = delta, slot = slot,
-          reqLevel = reqLevel > level and reqLevel or nil,
+        local status = "order"
+        if have[r.prof] then
+          status = (r.learned == true and "craft") or (r.learned == false and "learn") or "yours"
+        end
+        local row = {
+          recipeID = r.recipeID, name = r.name, itemID = r.itemID, link = ns.API.GetItemLink(item),
+          delta = delta, slot = slot, reqLevel = reqLevel > level and reqLevel or nil,
+          profession = r.prof, status = status,
         }
+        -- An item several professions make: keep the one you can do most about.
+        local prev = best[r.itemID]
+        if not prev then
+          best[r.itemID] = row
+          rows[#rows + 1] = row
+        elseif Advisor.CRAFT_STATUS_ORDER[status] < Advisor.CRAFT_STATUS_ORDER[prev.status] then
+          for k, v in pairs(row) do prev[k] = v end
+        end
       end
     end
   end
-  table.sort(rows, function(a, b) return a.delta > b.delta end)
-  return rows, profession, pending
+  table.sort(rows, function(x, y)
+    if x.delta ~= y.delta then return x.delta > y.delta end
+    return x.itemID < y.itemID
+  end)
+  return rows, mine, pending
+end
+
+Advisor.CRAFT_STATUS_ORDER = { craft = 1, learn = 2, yours = 3, order = 4 }
+
+-- "you can craft this" / "learn it: Leatherworking" / "have it crafted: Blacksmithing"
+function Advisor.CraftStatusText(row)
+  local s = row.status
+  if s == "craft" then return "you can craft it (" .. row.profession .. ")" end
+  if s == "learn" then return "learn the recipe (" .. row.profession .. ")" end
+  if s == "yours" then return row.profession .. ": open it to check the recipe" end
+  return "have it crafted (" .. row.profession .. ")"
 end
 
 -- Dungeons ---------------------------------------------------------------------

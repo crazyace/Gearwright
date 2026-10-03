@@ -295,6 +295,17 @@ def summarize(db):
                     lines.append(f"   {item_id} {rec.get('name')}: {e.get('count')}x from "
                                  f"{e.get('name') or src} in {e.get('where')}")
             continue
+        if key == "auction":
+            gear = scan.get("gear") or {}
+            lines.append(f"auction house scan {scan.get('at')}: {scan.get('listings')} listings, "
+                         f"{len(gear)} gear items, {len(scan.get('prices') or {})} other items priced, "
+                         f"{scan.get('missing') or 0} gear items without data")
+            by_slot = {}
+            for g in gear.values():
+                by_slot[g.get("equip")] = by_slot.get(g.get("equip"), 0) + 1
+            for slot, n in sorted(by_slot.items(), key=lambda kv: -kv[1]):
+                lines.append(f"   {slot}: {n}")
+            continue
         if key.startswith("trainer:"):
             services = scan.get("services") or []
             lines.append(f"{key}: {len(services)} services")

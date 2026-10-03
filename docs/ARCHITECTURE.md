@@ -7,7 +7,8 @@
      |
  Data/ ............... what's "right": stat keys, enchant effects, weights and builds (per class)
      |
- Engine/ ............. pure logic: Spec.Detect -> Scoring -> Advisor (gear/talents/enchants/crafting)
+ Engine/ ............. pure logic: Spec.Detect -> Scoring -> Advisor (gear/talents/enchants/crafting);
+                       Professions remembers each profession's recipes per character
      |
  UI/ ................. Tooltip line, main window. Renders Advisor output, no logic.
 ```

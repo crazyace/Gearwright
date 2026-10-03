@@ -9,7 +9,10 @@ function Spec.ClassData()
   return ns.Data[classToken], classToken
 end
 
--- Returns specKey, how ("override" | "talents"), or nil, reason.
+-- Returns specKey, how, or nil, reason.
+-- how: "override" (/gearwright spec), "talents" (most points spent), or
+-- "leveling" (no points spent yet: the class's leveling spec). The first
+-- talent point comes at level 10, so below that every character is "leveling".
 function Spec.Detect()
   local classData, classToken = Spec.ClassData()
   if not classData then return nil, "class-not-supported:" .. tostring(classToken) end
@@ -25,7 +28,10 @@ function Spec.Detect()
   for tab, info in ipairs(talents.tabs) do
     if info.points > bestPoints then bestTab, bestPoints = tab, info.points end
   end
-  if not bestTab then return nil, "no-talent-points" end
+  if not bestTab then
+    if classData.levelingSpec then return classData.levelingSpec, "leveling" end
+    return nil, "no-talent-points"
+  end
 
   local spec = classData.tabToSpec[bestTab]
   if not spec then return nil, "unknown-tab:" .. bestTab end

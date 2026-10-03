@@ -53,6 +53,17 @@ New or reworked IDs: Mutilate 1310707, Venom 1310703, Flawless Execution 1310711
 Thousand Cuts 1310721, Quietus 1310728, Puncturing Wounds 1224716, Dirty Tricks 1224782,
 Cutthroat 462708.
 
+The first talent point comes at **level 10**. Until a point is spent Gearwright
+advises for the leveling spec (Combat for Rogues: any weapon in either hand).
+
+**Hack and Slash** (Combat row 5, 5 ranks, 20 points in Combat) replaces Classic's
+Sword and Mace Specialization. Per rank: Axe/Sword 1% chance on a melee hit to get
+an extra attack; Dagger/Fist 1% crit; Mace ignores 3% of the target's armor
+(screenshot, 2026-10-03). Its Axe bonus suggests Rogues can use one-handed axes
+here. Gearwright allows them once Hack and Slash has a point or the One-Handed
+Axes skill (spell 196) is known. The probe now records which weapon skills are
+known, to confirm.
+
 ## Items and stats
 
 - `C_Item.GetItemStats` works and returns `ITEM_MOD_*_SHORT` tokens. Seen so far:
@@ -211,6 +222,12 @@ Forever-specific amounts worth knowing:
 | Skinning | 133/150 | 3 | 1 | 3 |
 | Blacksmithing | 208/225 | 507 | 91 | 507 |
 
+- Forever allows **two primary professions**. The API only lists the open profession's
+  recipes, so Gearwright saves them per character whenever a profession window opens.
+- Crafted gear from other professions comes from the probe scans (`Data/Crafted.lua`):
+  Blacksmithing, Enchanting, Leatherworking and Tailoring so far; no Engineering scan yet.
+  Which professions you have comes from `GetProfessions`/`GetProfessionInfo`, if the
+  client has them (the probe now records whether it does).
 - `C_TradeSkillUI.GetAllRecipeIDs` lists every recipe of the profession, learned or not.
 - `GetRecipeSchematic(id, false).outputItemID` gives the crafted item, so crafted gear
   can be scored like any other item (`/gearwright craft`).
@@ -258,6 +275,17 @@ Gearwright's settings (`GearwrightDB`) can rely on this; `/gwp export` is a conv
 not a workaround. The second snapshot (gear only) matched the first, so it wasn't
 committed as a separate capture.
 
+## Auction house
+
+Auctionator 340 runs on Forever with its **modern** auction house code
+(`C_AuctionHouse`), not the Classic one. So Forever's AH API is Mainline's:
+`C_AuctionHouse.ReplicateItems()` asks for every listing at once (allowed once per
+15 minutes), `REPLICATE_ITEM_LIST_UPDATE` says it arrived, then
+`GetNumReplicateItems` / `GetReplicateItemInfo(i)` / `GetReplicateItemLink(i)` (0-based)
+read it. Some listings come without item data and need `RequestLoadItemDataByID` first.
+Auctionator is "All Rights Reserved"; none of its code is used, only the API it shows.
+`/gwp ah` does that scan (not yet run on the beta).
+
 ## Still open
 
 - [x] Encounter Journal loot tables: not available on Forever (`WRONG_GAME_TYPE`)
@@ -270,3 +298,5 @@ committed as a separate capture.
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety
 - [ ] Agility-per-crit at more levels (`/gwp all` every few levels; beta cap is 30)
 - [ ] Does any gear carry weapon-skill bonuses ("+N Daggers")?
+- [ ] Can a Rogue equip one-handed axes, and only with Hack and Slash? (`/gwp talents`
+      before and after putting a point in it; try equipping an axe)

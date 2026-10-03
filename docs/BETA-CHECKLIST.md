@@ -14,7 +14,8 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 ## Once each
 
 - [x] Fresh level-10 Rogue with talents in **Assassination** -> `/gwp all`
-- [ ] Respec into **Combat** -> `/gwp talents`
+- [ ] Respec into **Combat** -> `/gwp talents`; again after a point in **Hack and Slash**
+      (records known weapon skills: are one-handed axes added?)
 - [ ] Respec into **Subtlety** -> `/gwp talents`
 - [x] `/gwp items` -> reads six reference items by ID (hit, crit, haste/expertise gear) without
       owning them. Settles the stat units. `/gwp items 1234 5678` reads any other IDs.
@@ -22,7 +23,11 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 - [x] Open your **class trainer** (recorded automatically)
 - [x] Open **Enchanting** on any character (recorded automatically)
 - [ ] Run a dungeon with the probe loaded: every loot window is logged with what dropped it
-- [ ] Open a profession and run `/gearwright craft`; check `/gearwright` -> Enchants
+- [ ] Open both your professions once, then check `/gearwright` -> Crafting and Enchants
+- [ ] On an engineer (any character): open Engineering with the probe loaded
+- [ ] At the auction house: `/gwp ah` and keep the window open until it says done (once per
+      15 minutes, server rule). Send the SavedVariables file (`WTF/Account/<ACCOUNT>/SavedVariables/
+      GearwrightProbe.lua`, after `/reload` or logout), or `/gwp export ah` if it's small enough
 - [ ] Target another Rogue -> `/gwp inspect`
 - [ ] Hover items with **Gearwright** loaded: does the tooltip line appear?
 - [ ] Open `/gearwright`: does spec detection match what you specced?
