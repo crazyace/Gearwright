@@ -16,6 +16,6 @@ read_globals = {
   "UnitClass", "UnitFullName", "UnitLevel", "UnitName", "UnitExists",
   "UnitDamage", "UnitAttackSpeed", "GetItemInfo", "GetCoinTextureString",
   "GetNumQuestChoices", "GetQuestItemLink", "GetNumLootItems", "GetLootSlotLink", "GetLootRollItemLink",
-  "EJ_GetInstanceByIndex", "EJ_SelectInstance",
+  "EJ_GetInstanceByIndex", "EJ_SelectInstance", "EJ_SelectTier", "LoadAddOn",
   "issecretvalue", "InCombatLockdown", "geterrorhandler", "tinsert", "date",
 }

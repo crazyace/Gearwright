@@ -106,6 +106,7 @@ local API_PATHS = {
   -- dungeon/raid loot tables, if this client has the Encounter Journal
   "EJ_SelectInstance", "EJ_GetNumLoot", "EJ_GetLootInfoByIndex", "C_EncounterJournal.GetLootInfoByIndex",
   "EJ_GetNumTiers", "EJ_GetInstanceByIndex", "EJ_GetEncounterInfoByIndex", "EJ_GetLootFilter",
+  "EJ_SelectTier", "EJ_GetInstanceInfo", "C_AddOns.LoadAddOn",
   "C_TradeSkillUI.GetRecipeSchematic", "C_Spell.GetSpellDescription",
   -- character stats
   "UnitStat", "UnitAttackPower", "UnitAttackSpeed", "GetCritChance", "GetHitModifier",
@@ -702,14 +703,41 @@ end
 -- Dungeon and raid loot tables, if this client fills them. Lists every instance
 -- in the current tier with its bosses, then reads loot a moment later (the
 -- client loads it on request).
-local function ejInstances()
-  local list = {}
-  for _, raid in ipairs({ false, true }) do
-    for i = 1, 60 do
-      local r = capture("EJ_GetInstanceByIndex", i, raid)
-      local id = r.values and r.values[1]
-      if type(id) ~= "number" then break end
-      list[#list + 1] = { id = id, name = r.values[2], raid = raid, bosses = {} }
+-- Journal instance IDs of Classic dungeons and raids in the modern Encounter
+-- Journal (Deadmines 63, Wailing Caverns 240, Ragefire 226, Shadowfang 64,
+-- Stockade 238, Blackfathom 227, Gnomeregan 231, Molten Core 741, Onyxia 760...).
+-- Asked for directly when the tier listing comes back empty.
+local KNOWN_INSTANCES = { 63, 240, 226, 64, 238, 227, 231, 233, 311, 316, 234, 241, 230, 229, 236, 741, 742, 743, 744, 760 }
+
+local function ejInstances(diag)
+  local list, seen = {}, {}
+  local tiers = capture("EJ_GetNumTiers")
+  local numTiers = tiers.values and tonumber(tiers.values[1]) or 0
+  diag.tiers = numTiers
+  diag.currentTier = capture("EJ_GetCurrentTier")
+  for tier = 1, math.max(numTiers, 1) do
+    if EJ_SelectTier and numTiers > 0 then pcall(EJ_SelectTier, tier) end
+    for _, raid in ipairs({ false, true }) do
+      for i = 1, 60 do
+        local r = capture("EJ_GetInstanceByIndex", i, raid)
+        local id = r.values and r.values[1]
+        if type(id) ~= "number" then break end
+        if not seen[id] then
+          seen[id] = true
+          list[#list + 1] = { id = id, name = r.values[2], raid = raid, tier = tier, bosses = {} }
+        end
+      end
+    end
+  end
+  if #list == 0 then
+    diag.known = {}
+    for _, id in ipairs(KNOWN_INSTANCES) do
+      local r = capture("EJ_GetInstanceInfo", id)
+      local name = r.values and r.values[1]
+      diag.known[#diag.known + 1] = { id = id, status = r.status, name = name }
+      if type(name) == "string" and name ~= "<nil>" then
+        list[#list + 1] = { id = id, name = name, raid = r.values[9] == true, bosses = {}, byID = true }
+      end
     end
   end
   return list
@@ -726,8 +754,14 @@ end
 
 function P.ej()
   if not EJ_GetInstanceByIndex then return say("no Encounter Journal API on this client") end
-  local out = { at = now(), tiers = capture("EJ_GetNumTiers"), filter = capture("EJ_GetLootFilter") }
-  out.instances = ejInstances()
+  local out = { at = now(), filter = capture("EJ_GetLootFilter"), diag = {} }
+  -- The journal's data may only be filled once its UI module is loaded.
+  local load = C_AddOns and C_AddOns.LoadAddOn or LoadAddOn
+  if load then
+    local ok, loaded, reason = pcall(load, "Blizzard_EncounterJournal")
+    out.diag.loadUI = { ok = ok, loaded = sanitize(loaded), reason = sanitize(reason) }
+  end
+  out.instances = ejInstances(out.diag)
   for _, inst in ipairs(out.instances) do
     if EJ_SelectInstance then pcall(EJ_SelectInstance, inst.id) end
     for e = 1, 30 do
@@ -738,7 +772,11 @@ function P.ej()
     end
   end
   db().scans.ej = out
-  say("encounter journal: %d instances; reading loot...", #out.instances)
+  local found = 0
+  for _, k in ipairs(out.diag.known or {}) do if type(k.name) == "string" and k.name ~= "<nil>" then found = found + 1 end end
+  say("encounter journal: %d tiers, %d instances%s; UI module %s; reading loot...", out.diag.tiers or 0,
+    #out.instances, out.diag.known and (" (by ID: " .. found .. " of " .. #KNOWN_INSTANCES .. ")") or "",
+    out.diag.loadUI and tostring(out.diag.loadUI.loaded) or "not loadable")
   local function readAll()
     local withLoot = 0
     for _, inst in ipairs(out.instances) do

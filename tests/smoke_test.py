@@ -443,6 +443,17 @@ ej = L.eval("""function() local e = GearwrightProbeDB.scans.ej
     e.instances[1].loot[1].values[1].name, e.instances[2].raid, e.instances[2].lootCount end""")()
 assert tuple(ej) == (2, "The Deadmines", 2, 1, "Cape of the Brotherhood", True, 0), tuple(ej)
 assert "loot listed for 1 of 2 instances" in L.globals().printed[len(L.globals().printed)]
+# Like the beta: the tier listing is empty, but asking by journal ID works.
+L.execute("""
+local byIndex = EJ_GetInstanceByIndex
+EJ_GetInstanceByIndex = function() return nil end
+function EJ_GetInstanceInfo(id) if id == 63 then return "The Deadmines" end end
+SlashCmdList.GEARWRIGHTPROBE("ej")
+EJ_GetInstanceByIndex, EJ_GetInstanceInfo = byIndex, nil
+""")
+p = L.globals().printed
+assert "1 tiers, 1 instances (by ID: 1 of 20)" in p[len(p) - 1], p[len(p) - 1]
+assert L.eval("function() return GearwrightProbeDB.scans.ej.instances[1].byID end")()
 
 # Regression: two professions' recipe scans must not overwrite each other.
 L.execute("""
@@ -484,6 +495,6 @@ for f in ("export.json", "GearwrightProbe.lua"):
                  "agility per 1% crit: 7.59  (from the sheet", "Reduces Physical Damage taken by 19.46%", "CR_HIT_MELEE (id 6): rating 12, bonus 1.2",
                  "items by ID: 1", "13404 Mask of the Unforgiven (req 52): ITEM_MOD_HIT_RATING_SHORT=20",
                  "Equip: Improves your chance to hit by 2.0%.",
-                 "encounter journal: 2 instances", "The Deadmines (dungeon, 2 bosses, loot 1)", "Cape of the Brotherhood [Back] Cloth"):
+                 "encounter journal: 1 instances, 1 tiers", "1 of 20 known IDs answered", "The Deadmines (dungeon, 2 bosses, loot"):
         assert want in r.stdout, (want, r.stdout)
 print("\nALL SMOKE TESTS PASSED")
