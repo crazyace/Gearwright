@@ -84,6 +84,12 @@ Bixi 62.1, 89.5, Ironforge, both in the Timberline Arms weapon shop
 (`data/probe/2026-10-03-ironforge-weapon-masters.json`).
 (The probe saved unknown skills as "error" in this capture; fixed.)
 
+Cross-check (2026-10-04): the TrainerSpells addon (D4KiR, all rights reserved,
+nothing copied) ships Forever weapon master data with the same eight trainers as
+`Data/WeaponMasters.lua`, and Woo Ping, Buliwyf and Bixi where the probe found them.
+It also prices one-handed weapon skills at 10s and polearms at 1g; the probe now
+records trainer costs (`GetTrainerServiceCost`) to confirm.
+
 Weapon masters (`Data/WeaponMasters.lua`) are seeded from Classic. Checked so far:
 **Woo Ping, Stormwind, at 63.9, 69.0, inside the Just Maces shop** (probe at his
 window, 19:26; the seed had 57.2, 57.6, so expect the other seeded positions to be off

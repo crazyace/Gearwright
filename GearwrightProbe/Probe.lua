@@ -550,6 +550,8 @@ local trainerBusy = false
 local function readTrainer(out)
   for i = 1, (GetNumTrainerServices and GetNumTrainerServices() or 0) do
     out.services[i] = capture("GetTrainerServiceInfo", i)
+    out.services[i].cost = capture("GetTrainerServiceCost", i).values -- copper (+ talent/profession points)
+    out.services[i].level = capture("GetTrainerServiceLevelReq", i).values
   end
   local counts = {}
   for _, svc in ipairs(out.services) do
