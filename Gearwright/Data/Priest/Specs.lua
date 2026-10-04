@@ -6,15 +6,16 @@ local P = ns.Data.PRIEST
 -- Talent tab index -> spec key (Classic's tab order).
 P.tabToSpec = { [1] = "discipline", [2] = "holy", [3] = "shadow" }
 
--- No Priest talent capture yet, so no traitTabGroups: Core/API.lua works the
--- spec groups out from the tree's layout, as it would for the Rogue's. Once a
--- Priest capture is in data/probe/, copy the groups it finds here (/gearwright
--- debug prints them on the first talent read).
--- P.traitTabGroups = { [discipline group] = 1, [holy group] = 2, [shadow group] = 3 }
+-- Forever puts all three specs in one Traits tree (treeID 1114). Every node
+-- carries exactly one of these group IDs, which says which spec it belongs to.
+-- From the 2026-10-04 beta capture (data/probe/2026-10-04-priest.json, level 12
+-- Gnome Priest); the tree-layout inference in Core/API.lua finds the same.
+P.traitTabGroups = { [11608] = 1, [11615] = 2, [11622] = 3 }
 
 -- What a Priest can equip, by item class -> subclass (Enum.ItemClass /
--- Enum.ItemWeaponSubclass / Enum.ItemArmorSubclass). Classic's list; not yet
--- checked on Forever.
+-- Enum.ItemWeaponSubclass / Enum.ItemArmorSubclass). Classic's list. On the
+-- 2026-10-04 beta a level 12 Priest wore cloth, a one-handed mace and a wand;
+-- staves and daggers are still unchecked.
 P.proficiency = {
   [2] = { -- weapons
     [4] = true,  -- one-handed mace

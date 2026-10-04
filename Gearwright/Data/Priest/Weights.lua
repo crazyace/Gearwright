@@ -35,6 +35,9 @@ ns.Data.PRIEST.weights = {
 -- Mind Blast (~540) is ~12.
 ns.Data.PRIEST.powerPerPercent = { { 20, 3 }, { 60, 12 } }
 
--- Intellect per 1% spell crit. 60: Classic's Priest value; nothing measured on
--- Forever, so it's used at every level.
-ns.Data.PRIEST.intPerSpellCrit = { { 60, 59.5 } }
+-- Intellect per 1% spell crit, by level. Linear between known points.
+-- 12: measured on the beta (2026-10-04 character sheet: 48 Intellect = 5.0%;
+--     in a later snapshot 43 Intellect gave 5.31% spell crit, which with
+--     Classic's 0.8% base is 9.5 per 1%).
+-- 60: Classic's Priest value, unconfirmed on Forever.
+ns.Data.PRIEST.intPerSpellCrit = { { 12, 9.6 }, { 60, 59.5 } }

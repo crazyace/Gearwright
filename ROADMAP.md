@@ -62,9 +62,11 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [x] Priest data for Discipline, Holy and Shadow (`Data/Priest/`, Classic values): cloth,
       maces/staves/daggers/wands, orbs in the off hand, caster weights in healing / spell damage
 - [x] Spec groups worked out from the talent tree's layout when a class has none yet
-- [ ] Priest talent capture: spec groups, talent names, builds (`docs/BETA-CHECKLIST.md`)
+- [x] Priest talent capture: spec groups and talent names (`data/probe/2026-10-04-priest.json`)
+- [ ] One recommended build per Priest spec
 - [ ] Priest trainer capture -> `Data/Priest/Trainer.lua`
-- [ ] Measure Intellect per spell crit and check the caster weights in game
+- [x] Measure Intellect per spell crit (level 12: 9.6)
+- [ ] Check the caster weights in game
 
 ## Phase 2 - Raid tier 1 (Nov 4 - Dec 9)
 

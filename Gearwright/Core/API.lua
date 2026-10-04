@@ -375,6 +375,10 @@ local function readTraits(tabGroups)
   for _, tab in pairs(tabGroups) do
     for i = #result.tabs + 1, tab do result.tabs[i] = { points = 0, talents = {} } end
   end
+  -- The Priest tree has a second "Holy Specialization" node far below the
+  -- others (posY 21300, no tier groups): of two nodes with one name, keep
+  -- the one with ranks, else the higher one, so builds see the real rank.
+  local byName = {}
   for _, treeID in ipairs(treeIDs) do
     for _, nodeID in ipairs(C_Traits.GetTreeNodes(treeID) or {}) do
       local info = C_Traits.GetNodeInfo(configID, nodeID)
@@ -386,10 +390,17 @@ local function readTraits(tabGroups)
         local rank = API.clean(info.activeRank) or API.clean(info.ranksPurchased) or 0
         local entry = result.tabs[tab]
         entry.points = entry.points + rank
-        entry.talents[#entry.talents + 1] = {
+        local t = {
           name = name, rank = rank, max = info.maxRanks, spellID = spellID, nodeID = nodeID,
           y = info.posY or 0, x = info.posX or 0,
         }
+        local old = byName[name]
+        if not old then
+          byName[name] = t
+          entry.talents[#entry.talents + 1] = t
+        elseif t.rank > old.rank or (t.rank == old.rank and t.y < old.y) then
+          for k, v in pairs(t) do old[k] = v end
+        end
       end
     end
   end
