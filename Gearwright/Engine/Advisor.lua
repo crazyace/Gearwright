@@ -20,7 +20,7 @@ local EQUIP_LOC_TO_SLOTS = {
   INVTYPE_HAND = { 10 }, INVTYPE_FINGER = { 11, 12 }, INVTYPE_TRINKET = { 13, 14 },
   INVTYPE_CLOAK = { 15 }, INVTYPE_WEAPON = { 16, 17 }, INVTYPE_WEAPONMAINHAND = { 16 },
   INVTYPE_WEAPONOFFHAND = { 17 }, INVTYPE_2HWEAPON = { 16 }, INVTYPE_RANGED = { 18 },
-  INVTYPE_THROWN = { 18 }, INVTYPE_RANGEDRIGHT = { 18 },
+  INVTYPE_THROWN = { 18 }, INVTYPE_RANGEDRIGHT = { 18 }, INVTYPE_HOLDABLE = { 17 },
 }
 
 -- Everything an advisor needs, or nil + reason.
@@ -142,6 +142,8 @@ function Advisor.CandidateSlots(link, ctx)
   local _, equipLoc, classID, subclassID = ns.API.GetItemBasics(link)
   local slots = equipLoc and EQUIP_LOC_TO_SLOTS[equipLoc]
   if not slots then return nil, "not-equippable" end
+  -- Orbs and tomes: only for classes that list them (Specs.lua: holdables).
+  if equipLoc == "INVTYPE_HOLDABLE" and not ctx.class.holdables then return nil, "not-usable" end
 
   local prof = ctx.proficiency or ctx.class.proficiency
   if prof and classID and prof[classID] and not prof[classID][subclassID] then
@@ -179,17 +181,32 @@ function Advisor.CompareSlots(link, ctx)
   local slots, why = Advisor.CandidateSlots(link, ctx)
   if not slots then return nil, why end
 
+  -- A two-hander replaces both hands, and anything in the off hand takes the
+  -- place of an equipped two-hander, so those count as what you'd lose too.
+  local _, equipLoc = ns.API.GetItemBasics(link)
+  local mainHand = ns.API.GetEquippedLink(16)
+  local mainIs2H = mainHand and select(2, ns.API.GetItemBasics(mainHand)) == "INVTYPE_2HWEAPON"
+
   local out = {}
   for _, slot in ipairs(slots) do
     local newScore = ns.Scoring.ScoreLink(link, ctx.weights, slot)
     if not newScore then return nil, "stats-unreadable" end
     local oldScore = 0 -- empty slot
     local equipped = ns.API.GetEquippedLink(slot)
-    if equipped then
-      -- Unreadable (e.g. not cached yet) is not the same as empty: scoring it
-      -- as 0 would make anything look like an upgrade.
-      oldScore = ns.Scoring.ScoreLink(equipped, ctx.weights, slot)
-      if not oldScore then return nil, "equipped-unreadable" end
+    local lose = { { slot, equipped } } -- { slot, link } pairs
+    if slot == 16 and equipLoc == "INVTYPE_2HWEAPON" then lose[2] = { 17, ns.API.GetEquippedLink(17) } end
+    if slot == 17 and mainIs2H then
+      equipped = mainHand
+      lose = { { 16, mainHand } }
+    end
+    for _, l in ipairs(lose) do
+      if l[2] then
+        -- Unreadable (e.g. not cached yet) is not the same as empty: scoring it
+        -- as 0 would make anything look like an upgrade.
+        local score = ns.Scoring.ScoreLink(l[2], ctx.weights, l[1])
+        if not score then return nil, "equipped-unreadable" end
+        oldScore = oldScore + score
+      end
     end
     out[#out + 1] = { slot = slot, delta = newScore - oldScore, newScore = newScore, oldScore = oldScore,
       equipped = equipped }

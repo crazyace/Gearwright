@@ -1,0 +1,64 @@
+-- Gearwright: Priest spec definitions.
+local _, ns = ...
+ns.Data.PRIEST = ns.Data.PRIEST or {}
+local P = ns.Data.PRIEST
+
+-- Talent tab index -> spec key (Classic's tab order).
+P.tabToSpec = { [1] = "discipline", [2] = "holy", [3] = "shadow" }
+
+-- No Priest talent capture yet, so no traitTabGroups: Core/API.lua works the
+-- spec groups out from the tree's layout, as it would for the Rogue's. Once a
+-- Priest capture is in data/probe/, copy the groups it finds here (/gearwright
+-- debug prints them on the first talent read).
+-- P.traitTabGroups = { [discipline group] = 1, [holy group] = 2, [shadow group] = 3 }
+
+-- What a Priest can equip, by item class -> subclass (Enum.ItemClass /
+-- Enum.ItemWeaponSubclass / Enum.ItemArmorSubclass). Classic's list; not yet
+-- checked on Forever.
+P.proficiency = {
+  [2] = { -- weapons
+    [4] = true,  -- one-handed mace
+    [10] = true, -- staff
+    [15] = true, -- dagger
+    [19] = true, -- wand
+  },
+  [4] = { [0] = true, [1] = true }, -- armor: misc (rings, necks, trinkets, off-hand items), cloth
+}
+
+-- Off-hand items ("Held In Off-hand": orbs, tomes) go in the off hand.
+P.holdables = true
+
+-- Weapon skills, by weapon subclass. As in Classic, a Priest starts with Maces
+-- and Wands (left out: there's no weapon master to send you to) and trains
+-- Staves and Daggers at a weapon master. Not yet checked on Forever.
+P.weaponSkills = {
+  [4] = { spell = 198, name = "One-Handed Maces" },
+  [10] = { spell = 227, name = "Staves" },
+  [15] = { spell = 1180, name = "Daggers" },
+}
+
+P.unlocks = {}
+
+-- No dualWield entry: a one-hand weapon only goes in the main hand.
+
+-- Spec to advise for before any talent point is spent (the first comes at
+-- level 10). Priests level by damage (Smite, Shadow Word: Pain, a wand).
+P.levelingSpec = "shadow"
+
+P.specs = {
+  discipline = {
+    label = "Discipline",
+    summary = "Shields and mana; Power Word: Shield, Inner Focus, Power Infusion.",
+    icon = "Interface\\Icons\\Spell_Holy_PowerWordShield",
+  },
+  holy = {
+    label = "Holy",
+    summary = "Throughput healing; Spiritual Guidance turns Spirit into healing.",
+    icon = "Interface\\Icons\\Spell_Holy_HolyBolt",
+  },
+  shadow = {
+    label = "Shadow",
+    summary = "Damage over time; Mind Flay, Shadowform, Vampiric Embrace.",
+    icon = "Interface\\Icons\\Spell_Shadow_ShadowWordPain",
+  },
+}

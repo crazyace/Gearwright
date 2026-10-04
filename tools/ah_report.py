@@ -15,6 +15,7 @@ Usage:
   python tools/ah_report.py GearwrightProbe.lua --level 20 --spec combat
   python tools/ah_report.py data/probe/*auction*.json --level 20
   python tools/ah_report.py export.json --level 25 --spec assassination --top 3
+  python tools/ah_report.py data/probe/*auction*.json --class PRIEST --spec holy --level 25
 """
 import argparse
 import json
@@ -40,6 +41,7 @@ SLOTS = {
     "INVTYPE_WEAPONMAINHAND": ("Main hand", 16), "INVTYPE_WEAPONOFFHAND": ("Off hand", 17),
     "INVTYPE_2HWEAPON": ("Two-hand", 16), "INVTYPE_RANGED": ("Ranged", 18),
     "INVTYPE_RANGEDRIGHT": ("Ranged", 18), "INVTYPE_THROWN": ("Ranged", 18),
+    "INVTYPE_HOLDABLE": ("Off hand", 17),
 }
 ORDER = ["Head", "Neck", "Shoulder", "Back", "Chest", "Wrist", "Hands", "Waist", "Legs", "Feet",
          "Finger", "Trinket", "One-hand", "Main hand", "Off hand", "Two-hand", "Ranged"]
@@ -68,7 +70,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("probe", nargs="+", help="GearwrightProbe.lua (SavedVariables) or /gwp export ah .json files")
     ap.add_argument("--class", dest="cls", default="ROGUE")
-    ap.add_argument("--spec", default="combat")
+    ap.add_argument("--spec", default=None, help="default: the class's leveling spec")
     ap.add_argument("--level", type=int, default=20)
     ap.add_argument("--mh-dps", type=float, default=None, help="your main-hand DPS (sets crit/hit value)")
     ap.add_argument("--top", type=int, default=5)
@@ -81,8 +83,12 @@ def main():
     scans.sort(key=lambda s: str(s.get("at")))
     L, ns = lua_env(args.cls)
     cls = ns.Data[args.cls]
+    args.spec = args.spec or cls.levelingSpec
     spec = cls.specs[args.spec]
+    if spec is None:
+        sys.exit(f"no spec {args.spec!r} for {args.cls}")
     rules = spec.weapons
+    caster = cls.weights.model == "caster"
     prof = cls.proficiency
     weights = ns.Weights.Build(cls, args.spec, L.table_from({"level": args.level, "mainHandDps": args.mh_dps}))
     score = L.eval("""function(ns, raw, lines, weights, slot)
@@ -111,6 +117,8 @@ def main():
         group = SLOTS.get(rec.get("equip"))
         if not group or req > args.level:
             continue
+        if rec.get("equip") == "INVTYPE_HOLDABLE" and not cls.holdables:
+            continue
         cl, sub = rec.get("class"), rec.get("sub")
         if prof[cl] is not None and not prof[cl][sub]:
             continue
@@ -128,7 +136,8 @@ def main():
 
     print(f"{args.cls.capitalize()} {spec.label}, level {args.level}: "
           + ", ".join(f"{s.get('listings')} listings at {s.get('at')}" for s in scans))
-    print("score = attack-power equivalents (Gearwright's weights, provisional)\n")
+    unit = ("healing" if cls.weights[args.spec].healing == 1 else "spell damage") if caster else "attack-power"
+    print(f"score = {unit} equivalents (Gearwright's weights, provisional)\n")
     for name in ORDER:
         rows = sorted(best.get(name, []), key=lambda r: (-r[0], r[2].get("minBuyout") or 0))[:args.top]
         if not rows:

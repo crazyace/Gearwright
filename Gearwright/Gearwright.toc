@@ -25,6 +25,9 @@ Data\Rogue\Specs.lua
 Data\Rogue\Weights.lua
 Data\Rogue\Talents.lua
 Data\Rogue\Trainer.lua
+Data\Priest\Specs.lua
+Data\Priest\Weights.lua
+Data\Priest\Talents.lua
 
 Engine\Spec.lua
 Engine\Weights.lua

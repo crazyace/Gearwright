@@ -350,14 +350,16 @@ TABS.settings = {
 
     rows[#rows + 1] = { header = true, title = "Spec" }
     local classData = ns.Spec.ClassData()
-    local choices = { { key = false, label = "Automatic", sub = "From your talents (Combat before level 10)" } }
-    for _, key in ipairs({ "assassination", "combat", "subtlety" }) do
+    local leveling = classData and classData.specs[classData.levelingSpec or ""]
+    local choices = { { key = false, label = "Automatic", sub = "From your talents"
+      .. (leveling and (" (" .. leveling.label .. " before level 10)") or "") } }
+    for _, key in ipairs(classData and classData.tabToSpec or {}) do
       local spec = classData and classData.specs[key]
-      if spec then choices[#choices + 1] = { key = key, label = spec.label, sub = spec.summary } end
+      if spec then choices[#choices + 1] = { key = key, label = spec.label, sub = spec.summary, icon = spec.icon } end
     end
     for _, c in ipairs(choices) do
       local on = (ns.db.specOverride or false) == c.key
-      rows[#rows + 1] = { icon = "Interface\\Icons\\Ability_Stealth", title = c.label, sub = c.sub,
+      rows[#rows + 1] = { icon = c.icon or "Interface\\Icons\\Ability_Stealth", title = c.label, sub = c.sub,
         value = on and "selected" or "", valueColor = "good", hint = on and nil or "Click to score gear for this",
         onClick = function() ns.db.specOverride = c.key end }
     end

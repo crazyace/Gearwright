@@ -32,8 +32,35 @@ end
 
 local DEFAULT_SPEED = 2.0 -- when the snapshot has no weapon speed
 
+-- Casters (Data/<CLASS>/Weights.lua: model = "caster") score in points of their
+-- spec's main power instead of attack power: bonus healing for a healer, spell
+-- damage for a damage spec. Ratings are valued like the melee ones, as a share
+-- of your output: 1% is worth powerPerPercent (by level) points of power.
+-- Melee weapon DPS counts for nothing; a wand's DPS (ranged slot) does.
+function Weights.BuildCaster(classData, spec, char)
+  local base = classData.weights[spec]
+  local level = char and char.level
+  local pct = Weights.Interpolate(classData.powerPerPercent, level) or 1
+  local w = {
+    sta = base.sta or 0, int = base.int or 0, spi = base.spi or 0, mp5 = base.mp5 or 0,
+    healing = base.healing or 0, spellDamage = base.spellDamage or 0,
+    mainHandDps = 0, offHandDps = 0, rangedDps = base.wandDps or 0,
+    spellHit = (base.spellHit or 0) * pct, spellCrit = (base.spellCrit or 0) * pct,
+    haste = (base.haste or 0) * pct,
+  }
+  w.sp = w.healing + w.spellDamage -- "damage and healing done by magical spells"
+  for _, school in ipairs(ns.Stats.SCHOOLS) do
+    w[school .. "Damage"] = (base.schools and base.schools[school]) and w.spellDamage or 0
+  end
+  local intPerCrit = Weights.Interpolate(classData.intPerSpellCrit, level)
+  if intPerCrit and intPerCrit > 1 then w.int = w.int + w.spellCrit / intPerCrit end
+  w.powerPerPercent = pct
+  return w
+end
+
 -- char: { level = n, mainHandDps = n, mainHandSpeed = n, offHandSpeed = n }  (any may be nil)
 function Weights.Build(classData, spec, char)
+  if classData.weights.model == "caster" then return Weights.BuildCaster(classData, spec, char) end
   local base = classData.weights[spec]
   local pct = Weights.APPerPercent(char)
   local w = {

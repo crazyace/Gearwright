@@ -9,13 +9,21 @@ local _, ns = ...
 local Stats = {}
 ns.Stats = Stats
 
-Stats.KEYS = { "agi", "str", "sta", "ap", "hit", "crit", "haste", "expertise", "dps" }
+Stats.KEYS = { "agi", "str", "sta", "ap", "hit", "crit", "haste", "expertise", "dps",
+  "int", "spi", "mp5", "sp", "spellDamage", "healing", "spellHit", "spellCrit" }
+
+-- Spell damage for one school ("Increases damage done by Shadow spells ...").
+Stats.SCHOOLS = { "holy", "shadow", "arcane", "fire", "frost", "nature" }
 
 Stats.LABELS = {
   agi = "Agility", str = "Strength", sta = "Stamina", ap = "Attack Power",
   hit = "Hit", crit = "Crit", haste = "Haste", expertise = "Expertise", dps = "Weapon DPS",
   int = "Intellect", spi = "Spirit", armor = "Armor", defense = "Defense",
   dodge = "Dodge", block = "Block", weaponDamage = "Weapon Damage",
+  mp5 = "Mana per 5 sec", sp = "Spell Power", spellDamage = "Spell Damage", healing = "Healing",
+  spellHit = "Spell Hit", spellCrit = "Spell Crit",
+  holyDamage = "Holy Damage", shadowDamage = "Shadow Damage", arcaneDamage = "Arcane Damage",
+  fireDamage = "Fire Damage", frostDamage = "Frost Damage", natureDamage = "Nature Damage",
 }
 
 -- Names used on the "Enchanted: Stamina +2 and Armor +16" tooltip line.
@@ -27,10 +35,34 @@ Stats.ENCHANT_NAMES = {
 
 -- GetItemStats tokens -> our keys. Extend from probe output (tools/probe_to_json.py
 -- prints every token it sees).
+--
+-- Caster stats, from the 2026-10-03 auction house scans (5,295 gear items), where
+-- every token below matches its item's "Equip:" line:
+--   SPELL_POWER                       "damage and healing done by magical spells ... by up to N" (605 items)
+--   SPELL_HEALING_DONE + _DAMAGE_DONE "healing done by up to N and damage done by up to M" (368),
+--                                     or HEALING_DONE alone, "healing done by ... up to N" (23)
+--   <SCHOOL>_DAMAGE_DONE              "damage done by Shadow spells and effects by up to N"
+--   MANA_REGENERATION                 "Restores N Mana per 5 sec." (15)
+-- Spell hit and crit weren't on any scanned item: the SPELL_*_RATING tokens are
+-- Classic's names, assumed to use the melee rating per 1%.
 Stats.TOKEN_TO_KEY = {
   ITEM_MOD_AGILITY_SHORT = "agi",
   ITEM_MOD_STRENGTH_SHORT = "str",
   ITEM_MOD_STAMINA_SHORT = "sta",
+  ITEM_MOD_INTELLECT_SHORT = "int",
+  ITEM_MOD_SPIRIT_SHORT = "spi",
+  ITEM_MOD_MANA_REGENERATION_SHORT = "mp5",
+  ITEM_MOD_SPELL_POWER_SHORT = "sp",
+  ITEM_MOD_SPELL_DAMAGE_DONE_SHORT = "spellDamage",
+  ITEM_MOD_SPELL_HEALING_DONE_SHORT = "healing",
+  ITEM_MOD_HOLY_DAMAGE_DONE_SHORT = "holyDamage",
+  ITEM_MOD_SHADOW_DAMAGE_DONE_SHORT = "shadowDamage",
+  ITEM_MOD_ARCANE_DAMAGE_DONE_SHORT = "arcaneDamage",
+  ITEM_MOD_FIRE_DAMAGE_DONE_SHORT = "fireDamage",
+  ITEM_MOD_FROST_DAMAGE_DONE_SHORT = "frostDamage",
+  ITEM_MOD_NATURE_DAMAGE_DONE_SHORT = "natureDamage",
+  ITEM_MOD_SPELL_HIT_RATING_SHORT = "spellHit",
+  ITEM_MOD_SPELL_CRIT_RATING_SHORT = "spellCrit",
   ITEM_MOD_ATTACK_POWER_SHORT = "ap",
   ITEM_MOD_HIT_RATING_SHORT = "hit",
   ITEM_MOD_HIT_MELEE_RATING_SHORT = "hit",
@@ -44,7 +76,7 @@ Stats.TOKEN_TO_KEY = {
 -- Rating per 1%, the same at every item level. Found on 40 Forever items on
 -- Wowhead, then confirmed in the beta client (/gwp items, 2026-10-03): hit 3 ->
 -- "0.3%", 20 -> "2.0%"; crit 14 -> "1.0%"; haste and expertise 10 -> "1.0%".
-Stats.RATING_PER_PERCENT = { hit = 10, crit = 14, haste = 10, expertise = 10 }
+Stats.RATING_PER_PERCENT = { hit = 10, crit = 14, haste = 10, expertise = 10, spellHit = 10, spellCrit = 14 }
 
 -- English-only "Equip:" patterns. Forever writes "by 2.0%", Classic "by 2%".
 -- Localize later.
@@ -56,6 +88,9 @@ Stats.TOOLTIP_PATTERNS = {
   { pattern = "Dodged or Parried by ([%d%.]+)%%", key = "expertise" },
   { pattern = "[Hh]aste by ([%d%.]+)%%", key = "haste" },
   { pattern = "attack speed.- by ([%d%.]+)%%", key = "haste" },
+  -- Classic's wording; not seen on a Forever item yet.
+  { pattern = "chance to hit with spells by ([%d%.]+)%%", key = "spellHit" },
+  { pattern = "critical strike with spells by ([%d%.]+)%%", key = "spellCrit" },
 }
 
 function Stats.FromRaw(raw)
