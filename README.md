@@ -49,6 +49,7 @@ tools/                 probe_to_json.py - turns probe output into JSON + a summa
                        loot_from_probe.py - builds Data/DungeonLoot.lua from probe loot logs
                        crafted_from_probe.py - builds Data/Crafted.lua from profession scans
                        ah_report.py - ranks auction house gear with Gearwright's scoring
+                       trainer_from_probe.py - builds Data/<Class>/Trainer.lua from trainer captures
 tests/                 smoke_test.py - runs both addons against a mocked WoW API
 docs/                  Architecture, beta checklist
 data/probe/            Probe captures you commit (raw research data)
@@ -86,6 +87,7 @@ python tests/smoke_test.py
 | `/gearwright spec <assassination\|combat\|subtlety\|auto>` | Force or auto-detect spec |
 | `/gearwright tooltip` | Toggle the tooltip upgrade line |
 | `/gearwright notices` | Toggle quest reward / loot upgrade messages |
+| `/gearwright spells` | Class spells to train now (and their cost), and what's coming up |
 | `/gearwright train` | Weapon skills you can still train, who teaches them, pinned on the world map |
 | `/gearwright craft` | Crafted upgrades up to 5 levels ahead, and who can make them |
 | `/gwp all` | Probe: dump env, APIs, talents, gear, stats |

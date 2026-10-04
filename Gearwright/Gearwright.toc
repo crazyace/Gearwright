@@ -22,6 +22,7 @@ Data\WeaponMasters.lua
 Data\Rogue\Specs.lua
 Data\Rogue\Weights.lua
 Data\Rogue\Talents.lua
+Data\Rogue\Trainer.lua
 
 Engine\Spec.lua
 Engine\Weights.lua
@@ -30,6 +31,7 @@ Engine\Sources.lua
 Engine\Professions.lua
 Engine\Trainers.lua
 Engine\WeaponSkills.lua
+Engine\ClassTrainer.lua
 Engine\Advisor.lua
 
 UI\Theme.lua

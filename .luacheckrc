@@ -12,7 +12,7 @@ read_globals = {
   "CreateFrame", "UIParent", "UISpecialFrames", "GameTooltip", "ItemRefTooltip", "ChatFontNormal",
   "GetAddOnMetadata", "GetItemStats", "GetItemInfoInstant", "GetInventoryItemLink",
   "GetNumTalentTabs", "GetTalentTabInfo", "GetNumTalents", "GetTalentInfo",
-  "GetNumTradeSkills", "GetTradeSkillLine", "GetNumTrainerServices", "GetTrainerServiceInfo", "GetTrainerServiceTypeFilter", "SetTrainerServiceTypeFilter", "NotifyInspect", "GetLocale", "WOW_PROJECT_ID",
+  "GetNumTradeSkills", "GetTradeSkillLine", "GetNumTrainerServices", "GetTrainerServiceInfo", "GetTrainerServiceTypeFilter", "SetTrainerServiceTypeFilter", "GetTrainerServiceCost", "GetTrainerServiceLevelReq", "NotifyInspect", "GetLocale", "WOW_PROJECT_ID",
   "UnitClass", "UnitFullName", "UnitLevel", "UnitName", "UnitExists",
   "UnitDamage", "UnitAttackSpeed", "GetItemInfo", "GetCoinTextureString",
   "GetNumQuestChoices", "GetQuestItemLink", "GetNumLootItems", "GetLootSlotLink", "GetLootRollItemLink", "GetLootSourceInfo", "UnitGUID", "GetRealZoneText", "UnitFactionGroup", "IsModifiedClick", "ChatEdit_InsertLink", "IsPlayerSpell", "IsSpellKnown", "C_SpellBook", "GetNumSkillLines", "GetSkillLineInfo", "GetProfessions", "GetProfessionInfo", "GetRealmName",

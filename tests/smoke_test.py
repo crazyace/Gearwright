@@ -587,6 +587,50 @@ assert "no recipes known yet" in L.globals().printed[1], L.globals().printed[1]
 L.eval("function(ns) ns.Data.CRAFTED = SAVED_CRAFTED end")(ns)
 L.execute("C_TradeSkillUI = nil")
 
+# Class trainer reminders ----------------------------------------------------------
+# Before any visit Gearwright only knows the spell list (Data/Rogue/Trainer.lua):
+# a level-up names the new spells; /gearwright spells asks for a visit.
+L.execute("printed = {}")
+new = L.eval("function(ns) local n = ns.Notices.LevelUp(30) local o = {} for i, s in ipairs(n) do o[i] = ns.ClassTrainer.Label(s) end return table.concat(o, ', ') end")(ns)
+assert new == "Deadly Poison 1, Disarm Trap, Garrote 3, Kidney Shot 1, Sinister Strike 5", new
+out = "\n".join(L.globals().printed.values())
+assert "level 30: new at the trainer: Deadly Poison 1, Disarm Trap, Garrote 3, Kidney Shot 1, Sinister Strike 5" in out, out
+assert "train at Fenthwick, Ironforge or Lord Tony Romano, Stormwind" in out, out
+L.execute("printed = {}")
+L.globals().SlashCmdList.GEARWRIGHT("spells")
+out = "\n".join(L.globals().printed.values())
+assert "visit your class trainer once" in out and "  32: Eviscerate 5, Gouge 3, Wound Poison 1" in out, out
+# A visit at level 30: the window lists what's left to learn (Rupture 2, Kidney
+# Shot) and what's coming; everything else up to 30 isn't listed, so it's learned.
+L.execute("""
+SERVICES = {
+  { "Rupture", "available", 1, 28, "Rank 2", "", 1500 },
+  { "Kidney Shot", "available", 1, 30, "Rank 1", "", 2000 },
+  { "Eviscerate", "unavailable", 1, 32, "Rank 5", "", 2500 },
+}
+function GetNumTrainerServices() return #SERVICES end
+function GetTrainerServiceInfo(i) local s = SERVICES[i] return s[1], s[2], s[3], s[4], s[5], s[6] end
+function GetTrainerServiceCost(i) return SERVICES[i][7] end
+function UnitGUID() return "Creature-0-1-0-1-5167-0001" end
+function UnitName(u) return u == "npc" and "Fenthwick" or "Tester" end
+""")
+L.globals().fire("TRAINER_SHOW")
+L.execute("printed = {}")
+todo = L.eval("function(ns) local t = ns.ClassTrainer.ToTrain(30) local o = {} for i, s in ipairs(t) do o[i] = ns.ClassTrainer.Label(s) end return table.concat(o, ', ') end")(ns)
+assert todo == "Rupture 2, Kidney Shot 1", todo
+L.globals().SlashCmdList.GEARWRIGHT("spells")
+out = "\n".join(L.globals().printed.values())
+assert "to train now (0g 35s 0c):" in out and "  28: Rupture 2" in out and "  30: Kidney Shot 1" in out, out
+# Reaching 32: the new spells, plus the two still untrained.
+L.execute("printed = {}")
+L.eval("function(ns) ns.Notices.LevelUp(32) end")(ns)
+out = "\n".join(L.globals().printed.values())
+assert "level 32: new at the trainer: Eviscerate 5, Gouge 3, Wound Poison 1" in out, out
+assert "still to train from earlier levels: Rupture 2, Kidney Shot 1" in out, out
+L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, GetTrainerServiceCost, UnitGUID = nil, nil, nil, nil
+function UnitName() return "Tester" end; printed = {}""")
+L.eval("function(ns) ns.db.trained = nil; ns.db.classSpells = nil; ns.db.classTrainers = nil end")(ns)
+
 # Dungeons ------------------------------------------------------------------------
 # Forever Dungeon Journal's table, in its own shape: boss loot {id, name, slot,
 # quality}, quest rewards {id, name, quality}. Gearwright only reads it.
@@ -877,6 +921,12 @@ assert (OUT / "check.lua").read_text() == (R / "Gearwright" / "Data" / "DungeonL
 assert subprocess.run([sys.executable, str(R / "tools" / "crafted_from_probe.py"), *map(str, sorted((R / "data" / "probe").glob("*.json"))),
                        "-o", str(OUT / "crafted.lua")], check=True, capture_output=True).returncode == 0
 assert (OUT / "crafted.lua").read_text() == (R / "Gearwright" / "Data" / "Crafted.lua").read_text(), "rerun tools/crafted_from_probe.py"
+# Data/Rogue/Trainer.lua is current with the saved trainer captures.
+assert subprocess.run([sys.executable, str(R / "tools" / "trainer_from_probe.py"), "--class", "ROGUE",
+                       "--trainer", "Fenthwick", "--trainer", "Lord Tony Romano", "--city", "Lord Tony Romano=Stormwind",
+                       *map(str, sorted((R / "data" / "probe").glob("*.json"))), "-o", str(OUT / "trainer.lua")],
+                      check=True, capture_output=True).returncode == 0
+assert (OUT / "trainer.lua").read_text() == (R / "Gearwright" / "Data" / "Rogue" / "Trainer.lua").read_text(), "rerun tools/trainer_from_probe.py"
 # also write a SavedVariables-style Lua file
 L.execute(r"""
 local function ser(v, ind)
