@@ -253,8 +253,8 @@ out = list(L.globals().printed.values())
 print("train:", out)
 assert out[1] == "  Woo Ping, Stormwind (inside the Just Maces shop) |cff40ff40(here)|r: Crossbows, One-Handed Swords", out
 # (axes too: the mock has Hack and Slash 5/5; only Daggers is trained)
-assert out[2] == "  Buliwyf Stonehand, Ironforge: Fist Weapons, Guns, One-Handed Axes, One-Handed Maces", out
-assert out[3] == "  Bixi Wobblebonk, Ironforge: Thrown", out
+assert out[2] == "  Buliwyf Stonehand, Ironforge (in the Timberline Arms weapon shop): Fist Weapons, Guns, One-Handed Axes, One-Handed Maces", out
+assert out[3] == "  Bixi Wobblebonk, Ironforge (in the Timberline Arms weapon shop): Thrown", out
 assert out[4] == "  Ilyenia Moonfire, Darnassus |cff999999(other continent)|r: Bows", out
 assert L.eval("function() return WorldMapFrame.mapID end")() == 1453
 L.execute("UnitFactionGroup = nil; C_Map = nil")
