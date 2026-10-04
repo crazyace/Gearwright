@@ -262,7 +262,7 @@ function Notices.Craft(retried)
   end
   if #rows == 0 then
     ns.util.print("no crafted upgrades for you up to level %d",
-      (ns.API.clean(UnitLevel("player")) or 0) + ns.Advisor.CRAFT_LOOKAHEAD)
+      (ns.API.clean(UnitLevel("player")) or 0) + ns.Advisor.Lookahead())
   else
     ns.util.print("crafted upgrades:")
     for i = 1, math.min(#rows, CRAFT_SHOWN) do

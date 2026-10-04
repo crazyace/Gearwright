@@ -10,6 +10,8 @@ stat weights, and tells you:
   (chat messages; `/gearwright notices` turns them off)
 - **Talents** - where does your build differ from the recommended one?
 - **Enchants** - the best stat enchant for each slot, and what it adds over the one you have
+- **Training** - class spells to train now (and their cost) and coming up, and every weapon
+  skill: trained, its level, or who teaches it (click to pin them on the map)
 - **Crafting** - crafted upgrades from every profession, yours or not: whether you can craft
   it, one of your other characters can (same realm and faction, not bind-on-pickup), you
   need to learn the recipe, or should have someone craft it (`/gearwright` -> Crafting,

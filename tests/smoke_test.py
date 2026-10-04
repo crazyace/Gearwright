@@ -621,6 +621,19 @@ assert todo == "Rupture 2, Kidney Shot 1", todo
 L.globals().SlashCmdList.GEARWRIGHT("spells")
 out = "\n".join(L.globals().printed.values())
 assert "to train now (0g 35s 0c):" in out and "  28: Rupture 2" in out and "  30: Kidney Shot 1" in out, out
+# The Training tab: spells to train now (with the cost), what's next, and every
+# weapon skill (here only Daggers is known: the rest say where to train them).
+L.execute("function IsPlayerSpell(id) return id == 1180 end")
+rows = L.eval("function(ns) return (ns.UI.BuildRows('training')) end")(ns)
+rows = [dict(r.items()) for r in rows.values()]
+print("training tab:", [(r.get("title"), r.get("value")) for r in rows])
+titles = [r.get("title") for r in rows]
+assert titles[0] == "Train now - 0g 35s 0c" and titles[1:3] == ["Rupture 2", "Kidney Shot 1"], titles
+assert "Coming up" in titles and "Eviscerate 5" in titles and "Weapon skills" in titles, titles
+swords = next(r for r in rows if r.get("title") == "One-Handed Swords")
+assert swords["value"] == "train" and "Woo Ping, Stormwind" in swords["sub"], swords
+assert next(r for r in rows if r.get("title") == "Daggers")["value"] == "?"
+L.execute("IsPlayerSpell = nil")
 # Reaching 32: the new spells, plus the two still untrained.
 L.execute("printed = {}")
 L.eval("function(ns) ns.Notices.LevelUp(32) end")(ns)

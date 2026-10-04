@@ -76,6 +76,28 @@ function Advisor.TrainingNeeded(link, ctx)
   if skill and not ctx.weaponSkills[subclassID] then return skill.name end
 end
 
+-- Every weapon skill your class can use, for the Training tab:
+--   { { sub, name, known, current, max, old, where }, ... } in the class's order
+--   known: true / false / nil (the client doesn't say); current/max: skill level
+--   when Gearwright has seen it; where: nearest trainer ("Woo Ping, Stormwind").
+function Advisor.WeaponSkillReport(ctx)
+  if not ctx then ctx = Advisor.Context() end
+  if not (ctx and ctx.class.weaponSkills) then return nil end
+  local prof = ctx.proficiency or ctx.class.proficiency or {}
+  local out = {}
+  for sub, skill in pairs(ctx.class.weaponSkills) do
+    if not prof[2] or prof[2][sub] then
+      local known
+      if ctx.weaponSkills then known = ctx.weaponSkills[sub] == true end
+      local cur, max, old = ns.WeaponSkills.Get(sub)
+      out[#out + 1] = { sub = sub, name = skill.name, known = known, current = cur, max = max, old = old,
+        where = known == false and ns.Trainers.Where(skill.name) or nil }
+    end
+  end
+  table.sort(out, function(a, b) return a.name < b.name end)
+  return out
+end
+
 -- Whether a weapon can go in the off hand yet: the class's Dual Wield level
 -- reached, or the spell known. Classes without a dualWield entry never can.
 function Advisor.CanDualWield(classData)
@@ -300,7 +322,13 @@ end
 
 -- Crafting ----------------------------------------------------------------------
 
-Advisor.CRAFT_LOOKAHEAD = 5 -- also show items up to this many levels above you
+Advisor.CRAFT_LOOKAHEAD = 5 -- default: also show items up to this many levels above you
+
+-- How many levels ahead the Dungeons and Crafting lists look (settings).
+function Advisor.Lookahead()
+  local n = ns.db and tonumber(ns.db.lookahead)
+  return n or Advisor.CRAFT_LOOKAHEAD
+end
 local CRAFT_UPGRADE = 0.5
 
 -- Crafted upgrades from every profession, yours or not, best first. Recipes
@@ -361,7 +389,7 @@ function Advisor.CraftReport()
         pending = pending + 1
         ns.API.RequestItem(r.itemID)
       end
-    elseif reqLevel <= level + Advisor.CRAFT_LOOKAHEAD then
+    elseif reqLevel <= level + Advisor.Lookahead() then
       local delta, slot = Advisor.CompareToEquipped(item, ctx)
       if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
         pending = pending + 1
@@ -459,7 +487,7 @@ function Advisor.DungeonReport()
           if not reqLevel then
             pending = pending + 1
             ns.API.RequestItem(s.itemID)
-          elseif reqLevel <= level + Advisor.CRAFT_LOOKAHEAD then
+          elseif reqLevel <= level + Advisor.Lookahead() then
             local delta, slot = Advisor.CompareToEquipped(item, ctx)
             if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
               pending = pending + 1

@@ -30,7 +30,11 @@ local function plus(v) return (v >= 0 and "+" or "") .. num(v) end
 local function slotName(slot) return ns.Advisor.SLOT_NAMES[slot] or "?" end
 
 -- Tabs ---------------------------------------------------------------------------
--- A row: { icon, title, sub, value, valueColor, link }. Returns rows, message.
+-- A tab's build() returns rows, message. A row:
+--   { icon, title, sub, value, valueColor, link, train,
+--     hint = "line" or { "line", ... }   -- hover text (after the item tooltip)
+--     onClick = function(button) end     -- left or right click (shift-click links)
+--     header = true }                    -- a section heading: just `title`
 
 local TABS = {}
 
@@ -74,7 +78,7 @@ TABS.upgrades = {
     if pending and pending > 0 then
       message = ("Reading %d more items from the server..."):format(pending)
     elseif #rows == 0 then
-      message = "No dungeon upgrades for you up to " .. ns.Advisor.CRAFT_LOOKAHEAD .. " levels ahead."
+      message = "No dungeon upgrades for you up to " .. ns.Advisor.Lookahead() .. " levels ahead."
     end
     return rows, message
   end,
@@ -103,7 +107,7 @@ TABS.crafting = {
     if pending and pending > 0 then
       message = ("Reading %d more items from the server..."):format(pending)
     elseif #rows == 0 then
-      message = "No crafted upgrades for you up to " .. ns.Advisor.CRAFT_LOOKAHEAD .. " levels ahead."
+      message = "No crafted upgrades for you up to " .. ns.Advisor.Lookahead() .. " levels ahead."
     end
     return rows, message
   end,
@@ -150,7 +154,102 @@ TABS.talents = {
   end,
 }
 
-UI.TAB_ORDER = { "gear", "upgrades", "crafting", "enchants", "talents" }
+local SKILL_ICONS = {
+  [15] = "Interface\\Icons\\INV_Weapon_ShortBlade_01", [7] = "Interface\\Icons\\INV_Sword_04",
+  [4] = "Interface\\Icons\\INV_Mace_01", [0] = "Interface\\Icons\\INV_Axe_01",
+  [13] = "Interface\\Icons\\INV_Gauntlets_04", [2] = "Interface\\Icons\\INV_Weapon_Bow_01",
+  [3] = "Interface\\Icons\\INV_Weapon_Rifle_01", [18] = "Interface\\Icons\\INV_Weapon_Crossbow_01",
+  [16] = "Interface\\Icons\\INV_ThrowingKnife_02",
+}
+local SPELL_ICON = "Interface\\Icons\\INV_Misc_Book_11"
+
+local function money(copper)
+  if GetCoinTextureString then return GetCoinTextureString(copper) end
+  return ("%dg %ds %dc"):format(math.floor(copper / 10000), math.floor(copper / 100) % 100, copper % 100)
+end
+
+local function spellIcon(name)
+  if C_Spell and C_Spell.GetSpellTexture then
+    local ok, tex = pcall(C_Spell.GetSpellTexture, name)
+    if ok and tex then return tex end
+  end
+  return SPELL_ICON
+end
+
+local function spellRow(s, value, color)
+  local cost = s.cost and (" - " .. money(s.cost)) or ""
+  return { icon = spellIcon(s.name), title = ns.ClassTrainer.Label(s), sub = "Level " .. s.level .. cost,
+    value = value, valueColor = color }
+end
+
+TABS.training = {
+  label = "Training", icon = "Interface\\Icons\\INV_Misc_Book_11",
+  build = function()
+    local rows = {}
+    local level = ns.API.clean(UnitLevel("player")) or 1
+    local trainers = {}
+    for i, t in ipairs(ns.ClassTrainer.Trainers()) do
+      if i > 2 then break end
+      trainers[#trainers + 1] = t.name .. (t.city and (", " .. t.city) or "")
+    end
+    local where = #trainers > 0 and table.concat(trainers, " or ") or "your class trainer"
+
+    -- Class spells: what to train now, then the next levels.
+    local now, visited = ns.ClassTrainer.ToTrain(level)
+    local cost = ns.ClassTrainer.Cost(now)
+    rows[#rows + 1] = { header = true, title = "Train now" .. (cost and #now > 0 and (" - " .. money(cost)) or "") }
+    if not visited then
+      rows[#rows + 1] = { icon = SPELL_ICON, title = "Visit your class trainer once",
+        sub = "Then Gearwright knows which spells you've learned. " .. where, valueColor = "muted" }
+    elseif #now == 0 then
+      rows[#rows + 1] = { icon = SPELL_ICON, title = "Nothing to train", sub = "Everything up to level " .. level .. " is learned" }
+    else
+      for _, sp in ipairs(now) do
+        local r = spellRow(sp, "train", "good")
+        r.hint = "Train at " .. where
+        rows[#rows + 1] = r
+      end
+    end
+    local shown = 0
+    for l = level + 1, level + 10 do
+      local new = ns.ClassTrainer.NewAt(l)
+      if #new > 0 then
+        if shown == 0 then rows[#rows + 1] = { header = true, title = "Coming up" } end
+        for _, sp in ipairs(new) do rows[#rows + 1] = spellRow(sp, "level " .. l, "muted") end
+        shown = shown + 1
+        if shown == 2 then break end
+      end
+    end
+
+    -- Weapon skills: trained or not, how far levelled, who teaches the rest.
+    local skills = ns.Advisor.WeaponSkillReport()
+    if skills then
+      rows[#rows + 1] = { header = true, title = "Weapon skills" }
+      for _, w in ipairs(skills) do
+        local r = { icon = SKILL_ICONS[w.sub] or SPELL_ICON, title = w.name }
+        if w.known == false then
+          r.sub = "Not trained" .. (w.where and (" - " .. w.where) or "")
+          r.value, r.valueColor = "train", "warn"
+          r.hint = "Click: show the weapon master on the map"
+          local name = w.name
+          r.onClick = function() ns.Trainers.Show(name) end
+        elseif w.current then
+          local low = w.current + ns.WeaponSkills.WARN_BELOW < w.max
+          r.sub = low and "Fight with this weapon type to level it" or "Trained"
+          if w.old then r.sub = r.sub .. " (level seen at an earlier character level)" end
+          r.value, r.valueColor = w.current .. "/" .. w.max, low and "warn" or "good"
+        else
+          r.sub = "Trained - hover Main Hand on your character sheet with one equipped to read its level"
+          r.value, r.valueColor = "?", "muted"
+        end
+        rows[#rows + 1] = r
+      end
+    end
+    return rows
+  end,
+}
+
+UI.TAB_ORDER = { "gear", "upgrades", "crafting", "enchants", "talents", "training" }
 UI.TABS = TABS
 
 function UI.BuildRows(tab)
@@ -201,22 +300,33 @@ local function makeRow(parent)
   row.sub:SetJustifyH("LEFT")
   Theme.Color(row.sub, "muted")
 
+  if row.RegisterForClicks then row:RegisterForClicks("LeftButtonUp", "RightButtonUp") end
   row:SetScript("OnEnter", function(self)
+    if self.isHeader then return end
     self:SetBackdropColor(unpack(Theme.rowHover))
-    if self.link and GameTooltip then
-      GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-      GameTooltip:SetHyperlink(self.link)
-      if self.train then GameTooltip:AddLine("Click: show where to train " .. self.train, 1, 0.6, 0) end
-      GameTooltip:Show()
+    if not GameTooltip or not (self.link or self.hint or self.train) then return end
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    if self.link then GameTooltip:SetHyperlink(self.link) end
+    if self.train then GameTooltip:AddLine("Click: show where to train " .. self.train, 1, 0.6, 0) end
+    local hint = self.hint
+    if type(hint) == "string" then hint = { hint } end
+    for i, line in ipairs(hint or {}) do
+      if i == 1 and not self.link then GameTooltip:SetText(line, 1, 0.82, 0.4) else GameTooltip:AddLine(line, 0.8, 0.8, 0.8, true) end
     end
+    GameTooltip:Show()
   end)
   row:SetScript("OnLeave", function(self)
+    if self.isHeader then return end
     self:SetBackdropColor(unpack(Theme.row))
     if GameTooltip then GameTooltip:Hide() end
   end)
-  row:SetScript("OnClick", function(self)
+  row:SetScript("OnClick", function(self, button)
+    if self.isHeader then return end
     if self.link and IsModifiedClick and IsModifiedClick("CHATLINK") and ChatEdit_InsertLink then
       ChatEdit_InsertLink(self.link)
+    elseif self.onClick then
+      self.onClick(button)
+      UI.Refresh()
     elseif self.train then
       ns.Trainers.Show(self.train) -- where to train the weapon skill this item needs
     end
@@ -316,24 +426,51 @@ function UI.Create()
   return f
 end
 
+local HEADER_HEIGHT = 26
+
 local function drawRows(f, rows, message)
+  local y = 0
   for i, r in ipairs(rows) do
     local row = f.rows[i] or makeRow(f.list)
     f.rows[i] = row
     row:ClearAllPoints()
-    row:SetPoint("TOPLEFT", 0, -(i - 1) * ROW_HEIGHT)
+    row:SetPoint("TOPLEFT", 0, -y)
     row:SetPoint("RIGHT", f.list, "RIGHT", 0, 0)
-    row.icon:SetTexture(r.icon or EMPTY_ICON)
+    row.isHeader = r.header
+    if r.header then
+      row:SetHeight(HEADER_HEIGHT - 4)
+      row:SetBackdropColor(unpack(Theme.nav))
+      row.icon:Hide()
+      row.title:ClearAllPoints()
+      row.title:SetPoint("LEFT", 10, 0)
+      row.title:SetPoint("RIGHT", -10, 0)
+      row.title:SetFontObject("GameFontNormalLarge")
+      Theme.Color(row.title, "title")
+      y = y + HEADER_HEIGHT
+    else
+      row:SetHeight(ROW_HEIGHT - 4)
+      row:SetBackdropColor(unpack(Theme.row))
+      row.icon:Show()
+      row.icon:SetTexture(r.icon or EMPTY_ICON)
+      row.title:ClearAllPoints()
+      row.title:SetPoint("TOPLEFT", row.icon, "TOPRIGHT", 10, -1)
+      row.title:SetPoint("RIGHT", row.value, "LEFT", -8, 0)
+      row.title:SetFontObject("GameFontNormal")
+      Theme.Color(row.title, "title")
+      y = y + ROW_HEIGHT
+    end
     row.title:SetText(r.title or "")
-    row.sub:SetText(r.sub or "")
-    row.value:SetText(r.value or "")
+    row.sub:SetText(r.header and "" or (r.sub or ""))
+    row.value:SetText(r.header and "" or (r.value or ""))
     Theme.Color(row.value, r.valueColor or "text")
     row.link = r.link
     row.train = r.train
+    row.hint = r.hint
+    row.onClick = r.onClick
     row:Show()
   end
   for i = #rows + 1, #f.rows do f.rows[i]:Hide() end
-  f.list:SetHeight(math.max(#rows * ROW_HEIGHT, 1))
+  f.list:SetHeight(math.max(y, 1))
   f.message:SetText(message or "")
   f.message:SetShown(message ~= nil)
   f.scroll:ClearAllPoints()
