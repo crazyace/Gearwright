@@ -93,3 +93,12 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 | 2026-10-03 | Read Forever Dungeon Journal at runtime, don't copy it | It has no license file; its data stays its author's. Gearwright builds its own table from observed drops |
 | 2026-10-03 | Drop the Encounter Journal; log real drops | `LoadAddOn("Blizzard_EncounterJournal")` = WRONG_GAME_TYPE, no instance answers |
 | 2026-10-03 | Score enchants instead of listing them per spec | Recipe descriptions give exact amounts; one table serves every class and spec |
+
+## Battlewright (rotation helper, separate addon)
+
+- [x] Addon skeleton: state reader (secret-aware), spec from talent spells, icon display, /bw
+- [x] Rogue priorities, first version (Slice and Dice, Rupture, Eviscerate, builders, openers)
+- [ ] `/gwp combat` on the beta: can addons read energy, combo points, auras and cooldowns in combat?
+- [ ] Tune the priorities against Forever's talents (Venom, Restless Blades, Thousand Cuts...)
+- [ ] Interrupts (Kick when the target is casting), multiple targets (Blade Flurry)
+
