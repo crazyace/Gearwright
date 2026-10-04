@@ -44,7 +44,7 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [x] Training tab (class spells, weapon skills)
 - [x] Gear tab overview: each slot with its best known upgrade and where to get it
 - [x] Settings tab (tooltip, chat messages, spec, look-ahead, map pins, debug) + AddOns settings entry
-- [ ] Next-goal button (minimap / LibDataBroker) and a per-character wishlist
+- [x] Next-goal button (minimap / LibDataBroker) and a per-character wishlist
 - [ ] Engineering recipes (needs a probe scan from an engineer)
 - [x] Probe: auction house full scan (`/gwp ah`) for gear stats and prices in bulk
 - [ ] Auction house upgrades in Gearwright itself: gear on the AH that beats yours, with prices

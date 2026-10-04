@@ -195,7 +195,25 @@ function Notices.LevelUp(level)
   return new, older
 end
 
-ns:On("PLAYER_LEVEL_UP", function(level) Notices.LevelUp(ns.API.clean(level)) end)
+-- Wishlist items that just became wearable.
+function Notices.WishlistLevelUp(level)
+  if not enabled() then return end
+  local ready = {}
+  for _, w in ipairs(ns.Wishlist.Report()) do
+    if not w.equipped and w.reqLevel == level and w.delta and w.delta > 0.05 then
+      ready[#ready + 1] = ("%s (|cff40ff40+%.1f|r)"):format(w.link or w.entry.name or "?", w.delta)
+    end
+  end
+  if #ready > 0 then ns.util.print("wishlist: you can wear %s now", table.concat(ready, ", ")) end
+  return ready
+end
+
+ns:On("PLAYER_LEVEL_UP", function(level)
+  level = ns.API.clean(level)
+  Notices.LevelUp(level)
+  -- Required levels are checked against UnitLevel, which may lag the event.
+  if C_Timer then C_Timer.After(1, function() Notices.WishlistLevelUp(level) end) end
+end)
 
 function Notices.SpellsAtLogin()
   if not enabled() then return end

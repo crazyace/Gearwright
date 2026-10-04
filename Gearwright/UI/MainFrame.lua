@@ -29,6 +29,28 @@ local function num(v) return ("%.1f"):format(v) end
 local function plus(v) return (v >= 0 and "+" or "") .. num(v) end
 local function slotName(slot) return ns.Advisor.SLOT_NAMES[slot] or "?" end
 
+-- Wishlist: right-click any upgrade row to add it (or take it off again);
+-- wished items get a check mark.
+local WISHED = "|TInterface\\RaidFrame\\ReadyCheck-Ready:14|t "
+local function wishable(row, entry)
+  local has = ns.Wishlist.Has(entry.itemID)
+  if has then row.title = WISHED .. (row.title or "") end
+  local hint = row.hint
+  if type(hint) == "string" then hint = { hint } end
+  hint = hint or {}
+  hint[#hint + 1] = has and "Right-click: remove from your wishlist" or "Right-click: add to your wishlist"
+  row.hint = hint
+  local train = row.train
+  row.onClick = function(button)
+    if button == "RightButton" then
+      ns.Wishlist.Toggle(entry)
+    elseif train then
+      ns.Trainers.Show(train)
+    end
+  end
+  return row
+end
+
 -- Tabs ---------------------------------------------------------------------------
 -- A tab's build() returns rows, message. A row:
 --   { icon, title, sub, value, valueColor, link, train,
@@ -54,6 +76,7 @@ TABS.gear = {
         r.sub, r.value, r.valueColor = sub, plus(b.delta), "good"
         r.link, r.train = b.link, b.train -- hover and shift-click show the upgrade
         r.hint = { g.name .. ": you wear " .. (g.link or "nothing") .. (g.score and (" (" .. num(g.score) .. ")") or "") }
+        if b.itemID then wishable(r, { itemID = b.itemID, link = b.link, name = b.name, from = b.from }) end
       else
         r.sub = g.name .. Theme.Hex("muted") .. "  no known upgrade|r"
         r.value, r.valueColor = g.score and num(g.score), "text"
@@ -78,11 +101,11 @@ TABS.upgrades = {
       if r.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(r.reqLevel) end
       if r.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(r.train) end
       if r.lowSkill then sub = sub .. Theme.Hex("warn") .. (" - %s, level it|r"):format(r.lowSkill) end
-      rows[#rows + 1] = {
+      rows[#rows + 1] = wishable({
         icon = ns.API.GetItemIcon("item:" .. r.itemID) or EMPTY_ICON,
         title = r.link or r.name, sub = sub, link = r.link, train = r.train,
         value = plus(r.delta), valueColor = "good",
-      }
+      }, { itemID = r.itemID, link = r.link, name = r.name, from = ns.Sources.Describe(s) })
     end
     local message
     if pending and pending > 0 then
@@ -107,11 +130,11 @@ TABS.crafting = {
       if r.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(r.reqLevel) end
       if r.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(r.train) end
       if r.lowSkill then sub = sub .. Theme.Hex("warn") .. (" - %s, level it|r"):format(r.lowSkill) end
-      rows[#rows + 1] = {
+      rows[#rows + 1] = wishable({
         icon = ns.API.GetItemIcon("item:" .. r.itemID) or EMPTY_ICON,
         title = r.link or r.name, sub = sub, link = r.link, train = r.train,
         value = plus(r.delta), valueColor = "good",
-      }
+      }, { itemID = r.itemID, link = r.link, name = r.name, from = ns.Advisor.CraftStatusText(r) })
     end
     local message
     if pending and pending > 0 then
@@ -259,15 +282,58 @@ TABS.training = {
   end,
 }
 
+TABS.wishlist = {
+  label = "Wishlist", icon = "Interface\\Icons\\INV_Misc_Note_02",
+  build = function()
+    local rows = {}
+    local goal = ns.Wishlist.NextGoal()
+    rows[#rows + 1] = { header = true, title = "Next goal" }
+    if goal then
+      rows[#rows + 1] = { icon = goal.link and ns.API.GetItemIcon(goal.link) or EMPTY_ICON,
+        title = goal.link or goal.name, link = goal.link,
+        sub = ns.Wishlist.When(goal.levelsAway) .. Theme.Hex("muted") .. "  " .. (goal.from or "") .. "|r"
+          .. (goal.wished and "" or (Theme.Hex("muted") .. "  (best known upgrade)|r")),
+        value = plus(goal.delta), valueColor = "good" }
+    else
+      rows[#rows + 1] = { icon = EMPTY_ICON, title = "No upgrade known yet", sub = "Gearwright looks in dungeon loot and crafted items" }
+    end
+    local report = ns.Wishlist.Report()
+    rows[#rows + 1] = { header = true, title = "Wishlist" }
+    if #report == 0 then
+      rows[#rows + 1] = { icon = EMPTY_ICON, title = "Empty",
+        sub = "Right-click an upgrade in Gear, Dungeons or Crafting to add it here" }
+    end
+    for _, w in ipairs(report) do
+      local e = w.entry
+      local status, value, color
+      if w.equipped then
+        status, value, color = "wearing it", "done", "good"
+      elseif not w.delta then
+        status, value, color = "can't score it right now", "?", "muted"
+      elseif w.delta <= 0.05 then
+        status, value, color = "no longer an upgrade", plus(w.delta), "muted"
+      else
+        status, value, color = ns.Wishlist.When(w.levelsAway), plus(w.delta), "good"
+      end
+      local sub = status .. (w.slot and ("  -  " .. slotName(w.slot)) or "") .. Theme.Hex("muted") .. "  " .. (e.from or "") .. "|r"
+      local id = e.itemID
+      rows[#rows + 1] = { icon = ns.API.GetItemIcon("item:" .. id) or EMPTY_ICON, title = w.link or e.name,
+        link = w.link, sub = sub, value = value, valueColor = color, hint = "Right-click: remove from your wishlist",
+        onClick = function(button) if button == "RightButton" then ns.Wishlist.Remove(id) end end }
+    end
+    return rows
+  end,
+}
+
 -- Settings: every row is a control. Left-click toggles or picks; on the
 -- look-ahead row, left-click adds a level and right-click takes one away.
 local function onOff(v) return v and "On" or "Off", v and "good" or "muted" end
 
-local function toggleRow(title, sub, key)
+local function toggleRow(title, sub, key, after)
   local value, color = onOff(ns.db[key])
   return { icon = "Interface\\Icons\\INV_Misc_Note_01", title = title, sub = sub, value = value,
     valueColor = color, hint = "Click to turn " .. (ns.db[key] and "off" or "on"),
-    onClick = function() ns.db[key] = not ns.db[key] end }
+    onClick = function() ns.db[key] = not ns.db[key]; if after then after() end end }
 end
 
 TABS.settings = {
@@ -279,7 +345,8 @@ TABS.settings = {
     rows[#rows + 1] = toggleRow("Tooltip line", "Gearwright's score on item tooltips", "showTooltip")
     rows[#rows + 1] = toggleRow("Chat messages", "Quest rewards, loot, rolls, training reminders", "notices")
     if ns.MinimapButton then
-      rows[#rows + 1] = toggleRow("Minimap button", "Your next goal; click it to open this window", "minimap")
+      rows[#rows + 1] = toggleRow("Minimap button", "Your next goal; click it to open this window", "minimap",
+        ns.MinimapButton.Update)
     end
 
     rows[#rows + 1] = { header = true, title = "Spec" }
@@ -320,7 +387,7 @@ TABS.settings = {
   end,
 }
 
-UI.TAB_ORDER = { "gear", "upgrades", "crafting", "enchants", "talents", "training", "settings" }
+UI.TAB_ORDER = { "gear", "wishlist", "upgrades", "crafting", "enchants", "talents", "training", "settings" }
 UI.TABS = TABS
 
 function UI.BuildRows(tab)

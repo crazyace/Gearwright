@@ -693,6 +693,25 @@ head = L.eval("""function(ns) local rows = ns.UI.BuildRows('gear')
 print("gear head:", head)
 assert head[0] == "item:1001:0:0" and "Upgrade: item:1005" in head[1] and "quest The Restless Dead" in head[1], head
 assert head[2].startswith("+") and head[3] == "item:1005" and "no known upgrade" in head[4], head
+# Wishlist: with nothing wished, the next goal is the best known upgrade.
+# Right-clicking a dungeon row wishes it (check mark); the Wishlist tab lists
+# it, and right-clicking it there takes it off again.
+goal = L.eval("function(ns) local g = ns.Wishlist.NextGoal() return g.link, g.wished, ns.MinimapButton.ShortText() end")(ns)
+assert goal[0] == "item:1005" and not goal[1], goal
+L.eval("function(ns) local rows = ns.UI.BuildRows('upgrades') rows[2].onClick('RightButton') end")(ns)  # 1002
+wl = L.eval("""function(ns) local up = ns.UI.BuildRows('upgrades') local w = ns.UI.BuildRows('wishlist')
+  return up[2].title, w[2].title, w[4].title, w[4].value, w[4].sub, #w end""")(ns)
+print("wishlist:", wl)
+assert wl[0].startswith("|TInterface") and wl[1] == "item:1002" and wl[2] == "item:1002", wl  # next goal = the wished one
+assert wl[3].startswith("+") and "available now" in wl[4] and "Faldrim Anvilmar" in wl[4] and wl[5] == 4, wl
+L.eval("function(ns) local w = ns.UI.BuildRows('wishlist') w[4].onClick('RightButton') end")(ns)
+assert L.eval("function(ns) return #ns.Wishlist.Items(), ns.UI.BuildRows('wishlist')[4].title end")(ns) == (0, "Empty")
+# The minimap button builds on the minimap and follows the setting.
+L.execute("Minimap = CreateFrame('Frame'); function GetCursorPosition() return 0, 0 end")
+mb = L.eval("""function(ns) ns.MinimapButton.Update() local shown = ns.MinimapButton.frame:IsShown()
+  ns.db.minimap = false ns.MinimapButton.Update() local hidden = not ns.MinimapButton.frame:IsShown()
+  ns.db.minimap = true return shown, hidden end""")(ns)
+assert tuple(mb) == (True, True), tuple(mb)
 
 # Gearwright's own table (from probe loot logs) works without that addon.
 L.execute("ForeverDungeonJournal_NS = nil")

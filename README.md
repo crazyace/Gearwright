@@ -5,7 +5,11 @@ Gear, talent and enchant advice for your build in **World of Warcraft: Forever**
 Gearwright reads your talents to work out your spec, scores items with spec-specific
 stat weights, and tells you:
 
-- **Gear** - is this item an upgrade, and by how much? (tooltip line + gear summary)
+- **Gear** - is this item an upgrade, and by how much? (tooltip line), and for every slot the best
+  known upgrade and where to get it
+- **Wishlist and next goal** - right-click any upgrade to wishlist it; the minimap button (or your
+  info bar, via LibDataBroker) shows the next one you can wear
+- **Settings** - in the window's Settings tab (also reachable from the game's AddOns settings)
 - **Quest rewards and loot** - which reward to take, and which drops or rolls are upgrades
   (chat messages; `/gearwright notices` turns them off)
 - **Talents** - where does your build differ from the recommended one?

@@ -33,6 +33,7 @@ Engine\Trainers.lua
 Engine\WeaponSkills.lua
 Engine\ClassTrainer.lua
 Engine\Advisor.lua
+Engine\Wishlist.lua
 
 UI\Theme.lua
 UI\MapPins.lua
@@ -40,5 +41,6 @@ UI\Tooltip.lua
 UI\MainFrame.lua
 UI\Notices.lua
 UI\Options.lua
+UI\MinimapButton.lua
 
 Core\Commands.lua
