@@ -24,17 +24,28 @@ local getItemStats = (C_Item and C_Item.GetItemStats) or GetItemStats
 local getItemInfoInstant = (C_Item and C_Item.GetItemInfoInstant) or GetItemInfoInstant
 local getItemInfo = (C_Item and C_Item.GetItemInfo) or GetItemInfo
 
+-- The client can drop item data it already sent (it does on Forever when
+-- hundreds of items are asked for), so what was read once is remembered for
+-- the session: the live answer wins, the remembered one fills in when the
+-- client has forgotten. Without this, upgrade lists flicker and keep asking.
+local remembered = { stats = {}, details = {}, link = {}, tooltip = {} }
+local function remember(kind, key, value)
+  if key == nil then return value end
+  if value ~= nil then remembered[kind][key] = value; return value end
+  return remembered[kind][key]
+end
+
 -- Raw stat table keyed by ITEM_MOD_*_SHORT tokens, or nil.
 function API.GetItemStats(link)
   if not link or not getItemStats then return nil end
   local ok, stats = pcall(getItemStats, link)
-  if not ok or type(stats) ~= "table" then return nil end
+  if not ok or type(stats) ~= "table" then return remember("stats", link, nil) end
   local out = {}
   for token, value in pairs(stats) do
     local v = API.clean(value)
     if v then out[token] = v end
   end
-  return out
+  return remember("stats", link, out)
 end
 
 -- itemID, equipLoc, classID, subclassID for a link or ID. Works for uncached items.
@@ -49,8 +60,11 @@ end
 function API.GetItemDetails(item)
   if not item or not getItemInfo then return nil end
   local ok, name, _, _, _, reqLevel, _, _, _, _, _, sellPrice = pcall(getItemInfo, item)
-  if not ok or not name then return nil end
-  return API.clean(reqLevel), API.clean(sellPrice)
+  local d
+  if ok and name then d = { API.clean(reqLevel), API.clean(sellPrice) } end
+  d = remember("details", item, d)
+  if not d then return nil end
+  return d[1], d[2]
 end
 
 -- Whose profession window is open: "mine", or "linked" (+ the player's name),
@@ -130,8 +144,7 @@ end
 function API.GetItemLink(item)
   if not item or not getItemInfo then return nil end
   local ok, name, link = pcall(getItemInfo, item)
-  if not ok or not name then return nil end
-  return API.clean(link)
+  return remember("link", item, ok and name and API.clean(link) or nil)
 end
 
 -- Icon file ID for a link or ID. Works for uncached items.
@@ -185,7 +198,7 @@ end
 ns:On("GET_ITEM_INFO_RECEIVED", function(itemID, success)
   itemID = API.clean(itemID)
   if not itemID then return end
-  if success == false then gaveUp[itemID] = true else asked[itemID] = nil end
+  if success == false then gaveUp[itemID] = true end
 end)
 
 -- Recipes -----------------------------------------------------------------------
@@ -254,13 +267,17 @@ end
 function API.GetItemTooltipLines(link)
   if not link or not (C_TooltipInfo and C_TooltipInfo.GetHyperlink) then return nil end
   local ok, data = pcall(C_TooltipInfo.GetHyperlink, link)
-  if not ok or type(data) ~= "table" or type(data.lines) ~= "table" then return nil end
+  if not ok or type(data) ~= "table" or type(data.lines) ~= "table" then return remember("tooltip", link, nil) end
   local lines = {}
   for _, line in ipairs(data.lines) do
     local text = API.clean(line.leftText)
     if type(text) == "string" and text ~= "" then lines[#lines + 1] = text end
   end
-  return lines
+  -- An item not loaded yet shows "Retrieving item information": don't keep that.
+  if #lines == 0 or (RETRIEVING_ITEM_INFO and lines[1] == RETRIEVING_ITEM_INFO) then
+    return remember("tooltip", link, nil) or lines
+  end
+  return remember("tooltip", link, lines)
 end
 
 -- Talents -----------------------------------------------------------------------
