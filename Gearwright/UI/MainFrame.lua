@@ -54,6 +54,7 @@ end
 -- Tabs ---------------------------------------------------------------------------
 -- A tab's build() returns rows, message. A row:
 --   { icon, title, sub, value, valueColor, link, train,
+--     note = "level 20"                  -- small text under the value
 --     hint = "line" or { "line", ... }   -- hover text (after the item tooltip)
 --     onClick = function(button) end     -- left or right click (shift-click links)
 --     header = true }                    -- a section heading: just `title`
@@ -71,9 +72,9 @@ TABS.gear = {
       local r = { icon = g.link and ns.API.GetItemIcon(g.link) or EMPTY_ICON, title = current, link = g.link }
       if b then
         local sub = "Upgrade: " .. (b.link or b.name or "?") .. Theme.Hex("muted") .. "  " .. b.from .. "|r"
-        if b.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(b.reqLevel) end
         if b.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(b.train) end
         r.sub, r.value, r.valueColor = sub, plus(b.delta), "good"
+        r.note = b.reqLevel and ("level " .. b.reqLevel)
         r.link, r.train = b.link, b.train -- hover and shift-click show the upgrade
         r.hint = { g.name .. ": you wear " .. (g.link or "nothing") .. (g.score and (" (" .. num(g.score) .. ")") or "") }
         if b.itemID then wishable(r, { itemID = b.itemID, link = b.link, name = b.name, from = b.from }) end
@@ -98,13 +99,12 @@ TABS.upgrades = {
       local s = r.sources[1]
       local sub = slotName(r.slot) .. "  -  " .. ns.Sources.Describe(s)
       if #r.sources > 1 then sub = sub .. (" (+%d more)"):format(#r.sources - 1) end
-      if r.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(r.reqLevel) end
       if r.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(r.train) end
       if r.lowSkill then sub = sub .. Theme.Hex("warn") .. (" - %s, level it|r"):format(r.lowSkill) end
       rows[#rows + 1] = wishable({
         icon = ns.API.GetItemIcon("item:" .. r.itemID) or EMPTY_ICON,
         title = r.link or r.name, sub = sub, link = r.link, train = r.train,
-        value = plus(r.delta), valueColor = "good",
+        value = plus(r.delta), valueColor = "good", note = r.reqLevel and ("level " .. r.reqLevel),
       }, { itemID = r.itemID, link = r.link, name = r.name, from = ns.Sources.Describe(s) })
     end
     local message
@@ -127,13 +127,12 @@ TABS.crafting = {
     local rows = {}
     for _, r in ipairs(list) do
       local sub = slotName(r.slot) .. "  -  " .. Theme.Hex(CRAFT_COLOR[r.status]) .. ns.Advisor.CraftStatusText(r) .. "|r"
-      if r.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(r.reqLevel) end
       if r.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(r.train) end
       if r.lowSkill then sub = sub .. Theme.Hex("warn") .. (" - %s, level it|r"):format(r.lowSkill) end
       rows[#rows + 1] = wishable({
         icon = ns.API.GetItemIcon("item:" .. r.itemID) or EMPTY_ICON,
         title = r.link or r.name, sub = sub, link = r.link, train = r.train,
-        value = plus(r.delta), valueColor = "good",
+        value = plus(r.delta), valueColor = "good", note = r.reqLevel and ("level " .. r.reqLevel),
       }, { itemID = r.itemID, link = r.link, name = r.name, from = ns.Advisor.CraftStatusText(r) })
     end
     local message
@@ -427,6 +426,11 @@ local function makeRow(parent)
   row.value:SetPoint("RIGHT", -12, 0)
   row.value:SetJustifyH("RIGHT")
 
+  row.note = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  row.note:SetPoint("TOPRIGHT", row.value, "BOTTOMRIGHT", 0, -1)
+  row.note:SetJustifyH("RIGHT")
+  Theme.Color(row.note, "warn")
+
   row.title = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
   row.title:SetPoint("TOPLEFT", row.icon, "TOPRIGHT", 10, -1)
   row.title:SetPoint("RIGHT", row.value, "LEFT", -8, 0)
@@ -437,17 +441,22 @@ local function makeRow(parent)
   row.sub:SetPoint("RIGHT", row.value, "LEFT", -8, 0)
   row.sub:SetJustifyH("LEFT")
   Theme.Color(row.sub, "muted")
+  -- One line each: long text is cut short ("...") instead of running into the
+  -- next row; the full text is on the hover tooltip.
+  if row.title.SetWordWrap then row.title:SetWordWrap(false) end
+  if row.sub.SetWordWrap then row.sub:SetWordWrap(false) end
 
   if row.RegisterForClicks then row:RegisterForClicks("LeftButtonUp", "RightButtonUp") end
   row:SetScript("OnEnter", function(self)
     if self.isHeader then return end
     self:SetBackdropColor(unpack(Theme.rowHover))
-    if not GameTooltip or not (self.link or self.hint or self.train) then return end
+    if not GameTooltip or not (self.link or self.hint or self.train or self.fullSub) then return end
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
     if self.link then GameTooltip:SetHyperlink(self.link) end
     if self.train then GameTooltip:AddLine("Click: show where to train " .. self.train, 1, 0.6, 0) end
     local hint = self.hint
     if type(hint) == "string" then hint = { hint } end
+    if self.fullSub and self.link then GameTooltip:AddLine(self.fullSub, 0.8, 0.8, 0.8, true) end
     for i, line in ipairs(hint or {}) do
       if i == 1 and not self.link then GameTooltip:SetText(line, 1, 0.82, 0.4) else GameTooltip:AddLine(line, 0.8, 0.8, 0.8, true) end
     end
@@ -600,10 +609,15 @@ local function drawRows(f, rows, message)
     row.title:SetText(r.title or "")
     row.sub:SetText(r.header and "" or (r.sub or ""))
     row.value:SetText(r.header and "" or (r.value or ""))
+    row.note:SetText(r.header and "" or (r.note or ""))
+    -- With a note, lift the score so the two sit together, centred.
+    row.value:ClearAllPoints()
+    row.value:SetPoint("RIGHT", -12, r.note and 6 or 0)
     Theme.Color(row.value, r.valueColor or "text")
     row.link = r.link
     row.train = r.train
     row.hint = r.hint
+    row.fullSub = r.sub
     row.onClick = r.onClick
     row:Show()
   end
@@ -638,6 +652,8 @@ function UI.Refresh()
   end
   local rows, message = UI.BuildRows(UI.tab)
   UI.shown = { rows = rows, message = message } -- what's on screen; read by tests
+  -- Still waiting for items from the server: redraw when they arrive.
+  UI.waiting = type(message) == "string" and message:find("^Reading") ~= nil
   drawRows(f, rows, message)
 end
 
@@ -656,8 +672,7 @@ for _, event in ipairs(ns.API.TALENT_EVENTS) do ns:On(event, refreshIfShown) end
 -- Dungeon items arrive from the server a few at a time; redraw once they settle.
 local refreshQueued
 ns:On("GET_ITEM_INFO_RECEIVED", function()
-  local itemTab = UI.tab == "upgrades" or UI.tab == "crafting" or UI.tab == "gear"
-  if refreshQueued or not itemTab or not (UI.frame and UI.frame:IsShown()) then return end
+  if refreshQueued or not UI.waiting or not (UI.frame and UI.frame:IsShown()) then return end
   refreshQueued = true
-  C_Timer.After(0.5, function() refreshQueued = false; refreshIfShown() end)
+  C_Timer.After(1, function() refreshQueued = false; refreshIfShown() end)
 end)

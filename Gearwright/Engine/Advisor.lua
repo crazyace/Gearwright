@@ -385,14 +385,13 @@ function Advisor.CraftReport()
     local reqLevel = ns.API.GetItemDetails(item)
     if not reqLevel then
       -- Not cached yet, or not an item we can read; equippability works uncached.
-      if ns.API.GetItemBasics(item) and Advisor.CandidateSlots(item, ctx) then
+      if ns.API.GetItemBasics(item) and Advisor.CandidateSlots(item, ctx) and ns.API.RequestItem(r.itemID) then
         pending = pending + 1
-        ns.API.RequestItem(r.itemID)
       end
     elseif reqLevel <= level + Advisor.Lookahead() then
       local delta, slot = Advisor.CompareToEquipped(item, ctx)
-      if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
-        pending = pending + 1
+      if delta == nil and slot == "stats-unreadable" then
+        if ns.API.RequestItem(r.itemID) then pending = pending + 1 end
       elseif type(delta) == "number" and delta > CRAFT_UPGRADE then
         local status, alt = "order", nil
         if have[r.prof] then
@@ -485,12 +484,11 @@ function Advisor.DungeonReport()
         if ns.API.GetItemBasics(item) and Advisor.CandidateSlots(item, ctx) then
           local reqLevel = ns.API.GetItemDetails(item)
           if not reqLevel then
-            pending = pending + 1
-            ns.API.RequestItem(s.itemID)
+            if ns.API.RequestItem(s.itemID) then pending = pending + 1 end
           elseif reqLevel <= level + Advisor.Lookahead() then
             local delta, slot = Advisor.CompareToEquipped(item, ctx)
-            if delta == nil and (slot == "stats-unreadable" or slot == "equipped-unreadable") then
-              pending = pending + 1
+            if delta == nil and slot == "stats-unreadable" then
+              if ns.API.RequestItem(s.itemID) then pending = pending + 1 end
             elseif type(delta) == "number" and delta > CRAFT_UPGRADE then
               local row = {
                 itemID = s.itemID, name = s.name, link = ns.API.GetItemLink(item), delta = delta, slot = slot,
@@ -505,7 +503,10 @@ function Advisor.DungeonReport()
       end
     end
   end
-  table.sort(rows, function(a, b) return a.delta > b.delta end)
+  table.sort(rows, function(a, b)
+    if a.delta ~= b.delta then return a.delta > b.delta end
+    return a.itemID < b.itemID
+  end)
   return rows, ctx, pending
 end
 
@@ -520,7 +521,10 @@ function Advisor.GearOverview()
   if not gear then return nil, reason end
   local best, pending = {}, 0
   local function offer(slot, cand)
-    if slot and (not best[slot] or cand.delta > best[slot].delta) then best[slot] = cand end
+    local b = slot and best[slot]
+    if slot and (not b or cand.delta > b.delta or (cand.delta == b.delta and (cand.itemID or 0) < (b.itemID or 0))) then
+      best[slot] = cand
+    end
   end
   local dungeon, _, p1 = Advisor.DungeonReport()
   pending = pending + (p1 or 0)

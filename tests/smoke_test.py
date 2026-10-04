@@ -587,6 +587,17 @@ assert "no recipes known yet" in L.globals().printed[1], L.globals().printed[1]
 L.eval("function(ns) ns.Data.CRAFTED = SAVED_CRAFTED end")(ns)
 L.execute("C_TradeSkillUI = nil")
 
+# Items that never arrive are given up on (after 3 asks over 10 s, or when the
+# server says no), so lists stop "reading more items" forever.
+L.execute("NOW = 0; function GetTime() return NOW end")
+asks = L.eval("""function(ns) local o = {}
+  for i = 1, 4 do o[i] = ns.API.RequestItem(9998) end
+  NOW = 11; o[5] = ns.API.RequestItem(9998); o[6] = ns.API.RequestItem(9998)
+  o[7] = ns.API.RequestItem(9997); fire("GET_ITEM_INFO_RECEIVED", 9997, false); o[8] = ns.API.RequestItem(9997)
+  return o end""")(ns)
+assert list(asks.values()) == [True, True, True, True, False, False, True, False], list(asks.values())
+L.execute("GetTime = nil")
+
 # Class trainer reminders ----------------------------------------------------------
 # Before any visit Gearwright only knows the spell list (Data/Rogue/Trainer.lua):
 # a level-up names the new spells; /gearwright spells asks for a visit.
