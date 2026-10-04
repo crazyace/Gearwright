@@ -76,8 +76,13 @@ at 1/100 misses a lot), and whether Hack and Slash lets Rogues train axes.
 (The probe saved unknown skills as "error" in this capture; fixed.)
 
 Weapon masters (`Data/WeaponMasters.lua`) are seeded from Classic. Checked so far:
-**Woo Ping, Stormwind, at 63.6, 69.2** (2026-10-04; the seed had 57.2, 57.6, so expect
-the other seeded positions to be off too until visited).
+**Woo Ping, Stormwind, at 63.9, 69.0, inside the Just Maces shop** (probe at his
+window, 19:26; the seed had 57.2, 57.6, so expect the other seeded positions to be off
+too until visited). His window lists only what a Rogue can learn from him: Crossbows
+and One-Handed Swords (`GetTrainerServiceInfo`), so a trainer's window doesn't show
+everything they teach. At 19:28 Sassy knew One-Handed Swords and Crossbows.
+Tailoring and Enchanting were opened again at 19:14 as **Gray Magus's** linked
+professions (`data/probe/2026-10-03-woo-ping.json`).
 
 ## Items and stats
 

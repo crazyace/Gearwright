@@ -11,8 +11,8 @@
 local _, ns = ...
 
 ns.Data.WEAPON_MASTERS = {
-  -- Woo Ping: checked on the Forever beta, 2026-10-04 (63.6, 69.2).
-  { npcID = 11867, name = "Woo Ping", faction = "Alliance", mapID = 1453, x = 0.636, y = 0.692, checked = true,
+  -- Woo Ping: checked on the Forever beta, 2026-10-03 (probe at his window: 63.9, 69.0).
+  { npcID = 11867, name = "Woo Ping", faction = "Alliance", mapID = 1453, x = 0.639, y = 0.690, checked = true,
     city = "Stormwind", continent = 1415, detail = "inside the Just Maces shop",
     skills = { "Daggers", "One-Handed Swords", "Two-Handed Swords", "Polearms", "Staves", "Crossbows" } },
   { npcID = 11865, name = "Buliwyf Stonehand", faction = "Alliance", mapID = 1455, x = 0.612, y = 0.895,

@@ -20,7 +20,17 @@ function Trainers.All()
   for _, t in ipairs(ns.Data.WEAPON_MASTERS or {}) do seed[t.npcID] = t end
   for npcID, t in pairs(ns.db and ns.db.trainers or {}) do
     -- A visit saves the real position; keep the seed's directions with it.
-    if t.detail == nil and seed[npcID] then t.detail = seed[npcID].detail end
+    -- The trainer's window only lists what your class can learn, so keep the
+    -- seed's other skills too.
+    local s = seed[npcID]
+    if s then
+      if t.detail == nil then t.detail = s.detail end
+      local have = {}
+      for _, k in ipairs(t.skills) do have[k] = true end
+      for _, k in ipairs(s.skills) do
+        if not have[k] then t.skills[#t.skills + 1] = k end
+      end
+    end
     if not faction or not t.faction or t.faction == faction then
       out[#out + 1] = t
       seen[npcID] = true

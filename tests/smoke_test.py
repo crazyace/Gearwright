@@ -238,7 +238,7 @@ printed = {}
 """)
 L.eval("function(ns) ns.Trainers.Show('One-Handed Swords') end")(ns)
 pins = L.eval("function() local p = PINPOINTS[#PINPOINTS] return WorldMapFrame.mapID, p[1], p[2] end")()
-assert pins[0] == 1453 and abs(pins[1] - 636) < 1e-6 and abs(pins[2] + 415.2) < 1e-6, tuple(pins)  # 63.6, 69.2
+assert pins[0] == 1453 and abs(pins[1] - 639) < 1e-6 and abs(pins[2] + 414) < 1e-6, tuple(pins)  # 63.9, 69.0
 assert L.globals().printed[1].endswith("train One-Handed Swords with Woo Ping in Stormwind, inside the Just Maces shop"), L.globals().printed[1]  # checked
 # An Alliance Rogue standing in Stormwind: Woo Ping (here) first, then Ironforge
 # on the same continent, Darnassus (other continent) last; the map opens here.
@@ -269,7 +269,7 @@ C_Map = { GetBestMapForUnit = function() return 1453 end,
 """)
 L.globals().fire("TRAINER_SHOW")
 seen = L.eval("function(ns) local t = ns.Trainers.For('One-Handed Swords')[1] return t.x, t.y, t.seen ~= nil, #t.skills end")(ns)
-assert tuple(seen) == (0.6, 0.7, True, 2), tuple(seen)
+assert tuple(seen) == (0.6, 0.7, True, 6), tuple(seen)  # its 2 listed + the seed's other 4
 L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, UnitGUID, C_Map = nil, nil, nil, nil
 function UnitName() return "Tester" end; WorldMapFrame._shown = false; CreateFrame = REAL_CREATEFRAME""")
 L.eval("function(ns) ns.MapPins.Clear(); ns.db.trainers = nil end")(ns)
@@ -675,7 +675,10 @@ end
 """)
 load_addon("GearwrightProbe","GearwrightProbe.toc")
 L.globals().fire("ADDON_LOADED","GearwrightProbe"); L.globals().fire("PLAYER_LOGIN")
-L.globals().SlashCmdList.GEARWRIGHTPROBE("all")  # window closed: /gwp all opens it, reads it, closes it
+L.globals().SlashCmdList.GEARWRIGHTPROBE("all")  # window closed: /gwp all leaves it closed
+assert L.eval("function() return TOGGLES, SHEET_OPEN end")() == (0, False)
+assert any("character sheet not read" in str(x) for x in L.globals().printed.values())
+L.globals().SlashCmdList.GEARWRIGHTPROBE("sheet")  # /gwp sheet opens it, reads it, closes it
 assert L.eval("function() return TOGGLES, SHEET_OPEN end")() == (2, False)
 dbg = L.eval("""function() local d = GearwrightProbeDB.snapshots[1].sections.sheetDebug
   return d.how, d.hovered, d.stored, d.map[1], d.map[2] end""")()

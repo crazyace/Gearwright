@@ -1061,7 +1061,16 @@ local COMMANDS = {
   items = P.items, ej = P.ej, ah = P.ah,
   sheet = function() P.sheet() end,
   all = function()
-    P.env(); P.api(); P.talents(); P.gear(); P.stats(); P.sheet()
+    P.env(); P.api(); P.talents(); P.gear(); P.stats()
+    -- Never open the character sheet from here: read it only if it's already
+    -- open. It's recorded automatically whenever you open it yourself, and
+    -- /gwp sheet still opens it on purpose.
+    local frame = _G.PaperDollFrame
+    if frame and frame:IsVisible() then
+      P.sheet(true)
+    else
+      say("character sheet not read (open it any time and it's recorded, or /gwp sheet)")
+    end
     say("done. /reload to flush SavedVariables, or /gwp export to copy it out.")
   end,
   inspect = function()
