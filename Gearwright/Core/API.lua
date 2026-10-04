@@ -153,11 +153,40 @@ function API.DungeonJournalDB()
 end
 
 -- Ask the client to cache an item; GET_ITEM_INFO_RECEIVED follows.
+-- Ask the server for an item's data. Returns true while it's worth waiting
+-- for: an item the server says doesn't exist, or that still hasn't arrived
+-- after a few asks over 10 seconds, is given up on (some items in Gearwright's
+-- lists don't exist on Forever), so lists stop "reading more items" forever.
+local asked, gaveUp = {}, {}
+local function now() return GetTime and GetTime() or 0 end
+
 function API.RequestItem(itemID)
-  if itemID and C_Item and C_Item.RequestLoadItemDataByID then
+  if not itemID or gaveUp[itemID] then return false end
+  if C_Item and C_Item.DoesItemExistByID then
+    local ok, exists = pcall(C_Item.DoesItemExistByID, itemID)
+    if ok and exists == false then gaveUp[itemID] = true; return false end
+  end
+  local a = asked[itemID]
+  if not a then
+    a = { n = 0, since = now() }
+    asked[itemID] = a
+  end
+  a.n = a.n + 1
+  if a.n > 3 and now() - a.since > 10 then
+    gaveUp[itemID] = true
+    return false
+  end
+  if C_Item and C_Item.RequestLoadItemDataByID then
     pcall(C_Item.RequestLoadItemDataByID, itemID)
   end
+  return true
 end
+
+ns:On("GET_ITEM_INFO_RECEIVED", function(itemID, success)
+  itemID = API.clean(itemID)
+  if not itemID then return end
+  if success == false then gaveUp[itemID] = true else asked[itemID] = nil end
+end)
 
 -- Recipes -----------------------------------------------------------------------
 -- The player's professions as { [name] = skillLevel }, from GetProfessions
