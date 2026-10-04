@@ -313,7 +313,11 @@ Every gear item had data after the probe's retries. What it shows:
   (empty name in the key); the probe now merges them, and `tools/ah_report.py` merges
   older scans.
 
-`python tools/ah_report.py data/probe/2026-10-03-auction.json --level 20 --spec combat`
+Second scan, 2026-10-03 19:01 (`data/probe/2026-10-03-auction-2.json`, with the merge
+fix): 108,543 listings, 5,230 gear items, none split or missing data. 342 gear items
+weren't in the first scan; the two together cover 5,637.
+
+`python tools/ah_report.py data/probe/*auction*.json --level 20 --spec combat`
 ranks what's listed for a character, per slot, with prices.
 
 ## Still open
