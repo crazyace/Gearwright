@@ -240,11 +240,24 @@ L.eval("function(ns) ns.Trainers.Show('One-Handed Swords') end")(ns)
 pins = L.eval("function() local p = PINPOINTS[#PINPOINTS] return WorldMapFrame.mapID, p[1], p[2] end")()
 assert pins[0] == 1453 and abs(pins[1] - 572) < 1e-6 and abs(pins[2] + 345.6) < 1e-6, tuple(pins)
 assert "train One-Handed Swords with Woo Ping in Stormwind (Classic position" in L.globals().printed[1], L.globals().printed[1]
-L.execute("printed = {}")
+# An Alliance Rogue standing in Stormwind: Woo Ping (here) first, then Ironforge
+# on the same continent, Darnassus (other continent) last; the map opens here.
+L.execute("""printed = {}; WorldMapFrame.mapID = nil
+function UnitFactionGroup() return "Alliance" end
+local parents = { [1453] = 1429, [1429] = 1415, [1455] = 1426, [1426] = 1415, [1457] = 1414 }
+C_Map = { GetBestMapForUnit = function() return 1453 end,
+  GetPlayerMapPosition = function() return { GetXY = function() return 0.5, 0.5 end } end,
+  GetMapInfo = function(id) return { mapType = (id == 1415 or id == 1414) and 2 or 3, parentMapID = parents[id] } end }""")
 L.globals().SlashCmdList.GEARWRIGHT("train")
-out = "\n".join(L.globals().printed.values())
-assert "weapon skills you can still train:" in out and "One-Handed Maces  |cff999999Buliwyf Stonehand, Ironforge" in out, out
-assert "Daggers" not in out.split("weapon skills you can still train:")[1].split("train ")[0], out
+out = list(L.globals().printed.values())
+print("train:", out)
+assert out[1] == "  Woo Ping, Stormwind |cff40ff40(here)|r: Crossbows, One-Handed Swords", out
+# (axes too: the mock has Hack and Slash 5/5; only Daggers is trained)
+assert out[2] == "  Buliwyf Stonehand, Ironforge: Fist Weapons, Guns, One-Handed Axes, One-Handed Maces", out
+assert out[3] == "  Bixi Wobblebonk, Ironforge: Thrown", out
+assert out[4] == "  Ilyenia Moonfire, Darnassus |cff999999(other continent)|r: Bows", out
+assert L.eval("function() return WorldMapFrame.mapID end")() == 1453
+L.execute("UnitFactionGroup = nil; C_Map = nil")
 # Opening a weapon master saves where it really is, and that wins over Classic's.
 L.execute("""
 function GetNumTrainerServices() return 2 end

@@ -87,6 +87,19 @@ function API.PlayerMapPosition()
   return mapID, x, y
 end
 
+-- The continent a map belongs to (its uiMapID), walking up C_Map's parents.
+-- Classic IDs: Eastern Kingdoms 1415, Kalimdor 1414.
+function API.ContinentOf(mapID)
+  if not (mapID and C_Map and C_Map.GetMapInfo) then return nil end
+  for _ = 1, 8 do
+    local ok, info = pcall(C_Map.GetMapInfo, mapID)
+    if not ok or type(info) ~= "table" then return nil end
+    if info.mapType == 2 then return mapID end -- Enum.UIMapType.Continent
+    if not info.parentMapID or info.parentMapID == 0 then return nil end
+    mapID = info.parentMapID
+  end
+end
+
 -- True when the item binds on pickup (so an alt can't craft it for you),
 -- false when it doesn't, nil when not known yet.
 function API.BindsOnPickup(item)
