@@ -686,6 +686,13 @@ assert dung[0][2] == "quest The Restless Dead, Hall of Thanes (13-20)", dung
 assert dung[1][1] == 2 and dung[1][2] == "Faldrim Anvilmar, Hall of Thanes (13-20)", dung
 upg = L.eval("function(ns) local rows = ns.UI.BuildRows('upgrades') return #rows, rows[1].value, rows[2].sub end")(ns)
 assert upg[0] == 2 and upg[1].startswith("+") and "(+1 more)" in upg[2], upg
+# Gear tab: the head slot shows what you wear and its best known upgrade, the
+# quest reward 1005 (the cap with 40 Agility), with where it comes from.
+head = L.eval("""function(ns) local rows = ns.UI.BuildRows('gear')
+  return rows[1].title, rows[1].sub, rows[1].value, rows[1].link, rows[2].sub end""")(ns)
+print("gear head:", head)
+assert head[0] == "item:1001:0:0" and "Upgrade: item:1005" in head[1] and "quest The Restless Dead" in head[1], head
+assert head[2].startswith("+") and head[3] == "item:1005" and "no known upgrade" in head[4], head
 
 # Gearwright's own table (from probe loot logs) works without that addon.
 L.execute("ForeverDungeonJournal_NS = nil")

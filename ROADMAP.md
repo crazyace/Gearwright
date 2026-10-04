@@ -42,6 +42,7 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [x] Trainer spells below level 20 (checked on Wowhead: `data/verified/rogue-trainer-low-levels.json`)
 - [ ] Trainer costs (the probe records them at the next trainer visit)
 - [x] Training tab (class spells, weapon skills)
+- [x] Gear tab overview: each slot with its best known upgrade and where to get it
 - [x] Settings tab (tooltip, chat messages, spec, look-ahead, map pins, debug) + AddOns settings entry
 - [ ] Next-goal button (minimap / LibDataBroker) and a per-character wishlist
 - [ ] Engineering recipes (needs a probe scan from an engineer)

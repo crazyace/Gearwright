@@ -41,17 +41,27 @@ local TABS = {}
 TABS.gear = {
   label = "Gear", icon = "Interface\\Icons\\INV_Chest_Leather_09",
   build = function()
-    local gear = ns.Advisor.GearReport()
+    local gear, pending = ns.Advisor.GearOverview()
     local rows = {}
     for _, g in ipairs(gear or {}) do
-      rows[#rows + 1] = {
-        icon = g.link and ns.API.GetItemIcon(g.link) or EMPTY_ICON,
-        title = g.link or (Theme.Hex("muted") .. "empty|r"),
-        sub = g.name, link = g.link,
-        value = g.score and num(g.score), valueColor = "text",
-      }
+      local b = g.best
+      local current = g.link or (Theme.Hex("muted") .. "empty|r")
+      local r = { icon = g.link and ns.API.GetItemIcon(g.link) or EMPTY_ICON, title = current, link = g.link }
+      if b then
+        local sub = "Upgrade: " .. (b.link or b.name or "?") .. Theme.Hex("muted") .. "  " .. b.from .. "|r"
+        if b.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(b.reqLevel) end
+        if b.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(b.train) end
+        r.sub, r.value, r.valueColor = sub, plus(b.delta), "good"
+        r.link, r.train = b.link, b.train -- hover and shift-click show the upgrade
+        r.hint = { g.name .. ": you wear " .. (g.link or "nothing") .. (g.score and (" (" .. num(g.score) .. ")") or "") }
+      else
+        r.sub = g.name .. Theme.Hex("muted") .. "  no known upgrade|r"
+        r.value, r.valueColor = g.score and num(g.score), "text"
+      end
+      rows[#rows + 1] = r
     end
-    return rows
+    local message = pending and pending > 0 and ("Reading %d more items from the server..."):format(pending) or nil
+    return rows, message
   end,
 }
 
@@ -579,7 +589,8 @@ for _, event in ipairs(ns.API.TALENT_EVENTS) do ns:On(event, refreshIfShown) end
 -- Dungeon items arrive from the server a few at a time; redraw once they settle.
 local refreshQueued
 ns:On("GET_ITEM_INFO_RECEIVED", function()
-  if refreshQueued or (UI.tab ~= "upgrades" and UI.tab ~= "crafting") or not (UI.frame and UI.frame:IsShown()) then return end
+  local itemTab = UI.tab == "upgrades" or UI.tab == "crafting" or UI.tab == "gear"
+  if refreshQueued or not itemTab or not (UI.frame and UI.frame:IsShown()) then return end
   refreshQueued = true
   C_Timer.After(0.5, function() refreshQueued = false; refreshIfShown() end)
 end)

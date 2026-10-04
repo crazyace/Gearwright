@@ -508,3 +508,32 @@ function Advisor.DungeonReport()
   table.sort(rows, function(a, b) return a.delta > b.delta end)
   return rows, ctx, pending
 end
+
+-- Gear overview ---------------------------------------------------------------
+-- Every slot with what you wear and the best upgrade Gearwright knows for it,
+-- from any source (dungeon drops and quest rewards, crafted items):
+--   { { slot, name, link, score, best = { link, name, itemID, delta, reqLevel,
+--       kind = "dungeon" | "crafted", from = "Faldrim Anvilmar, Hall of Thanes (13-20)",
+--       train, lowSkill } }, ... }, pending
+function Advisor.GearOverview()
+  local gear, reason = Advisor.GearReport()
+  if not gear then return nil, reason end
+  local best, pending = {}, 0
+  local function offer(slot, cand)
+    if slot and (not best[slot] or cand.delta > best[slot].delta) then best[slot] = cand end
+  end
+  local dungeon, _, p1 = Advisor.DungeonReport()
+  pending = pending + (p1 or 0)
+  for _, r in ipairs(dungeon or {}) do
+    offer(r.slot, { link = r.link, name = r.name, itemID = r.itemID, delta = r.delta, reqLevel = r.reqLevel,
+      kind = "dungeon", from = ns.Sources.Describe(r.sources[1]), train = r.train, lowSkill = r.lowSkill })
+  end
+  local crafted, _, p2 = Advisor.CraftReport()
+  if type(p2) == "number" then pending = pending + p2 end
+  for _, r in ipairs(type(crafted) == "table" and crafted or {}) do
+    offer(r.slot, { link = r.link, name = r.name, itemID = r.itemID, delta = r.delta, reqLevel = r.reqLevel,
+      kind = "crafted", from = Advisor.CraftStatusText(r), train = r.train, lowSkill = r.lowSkill })
+  end
+  for _, g in ipairs(gear) do g.best = best[g.slot] end
+  return gear, pending
+end
