@@ -102,3 +102,8 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 | 2026-10-03 | Read Forever Dungeon Journal at runtime, don't copy it | It has no license file; its data stays its author's. Gearwright builds its own table from observed drops |
 | 2026-10-03 | Drop the Encounter Journal; log real drops | `LoadAddOn("Blizzard_EncounterJournal")` = WRONG_GAME_TYPE, no instance answers |
 | 2026-10-03 | Score enchants instead of listing them per spec | Recipe descriptions give exact amounts; one table serves every class and spec |
+
+## Battlewright
+
+Moved to its own repo, with its combat testing (BattlewrightProbe):
+https://github.com/crazyace/Battlewright

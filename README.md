@@ -110,6 +110,11 @@ python tests/smoke_test.py
 
 MIT - see [LICENSE](LICENSE).
 
+## Sibling addon
+
+[Battlewright](https://github.com/crazyace/Battlewright) shows what to press next in a
+fight. Its combat testing (BattlewrightProbe, `/bwp combat`) lives in that repo.
+
 ## Credits
 
 - **Exehn**, author of Forever Dungeon Journal: Gearwright's dungeon loot and dungeon

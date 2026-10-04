@@ -1021,35 +1021,6 @@ tr = L.eval("""function() local t = GearwrightProbeDB.scans["trainer:Fenthwick"]
 assert tuple(tr) == (3, 1, False, False), tuple(tr)  # all 3 read; "used" was off and is off again
 L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, GetTrainerServiceTypeFilter, SetTrainerServiceTypeFilter = nil, nil, nil, nil
 function UnitName() return "Tester" end""")
-# Combat readability: /gwp combat records, during the next fight, which calls a
-# rotation helper needs come back readable or secret. Here aura timers are secret.
-L.execute("""
-SECRET = setmetatable({}, { __tostring = function() return "secret" end })
-function issecretvalue(v) return v == SECRET end
-function UnitPower(_, t) return t == 4 and 3 or 80 end
-function UnitPowerMax() return 100 end
-function GetComboPoints() return 3 end
-function UnitHealth() return 500 end
-function UnitHealthMax() return 1000 end
-function UnitCanAttack() return true end
-function IsStealthed() return false end
-function GetTime() return 100 end
-C_UnitAuras = { GetAuraDataByIndex = function(unit, i) if i == 1 then return { name = "Slice and Dice", expirationTime = SECRET } end end }
-C_Spell.GetSpellInfo = function(name) if name == "Sinister Strike" then return { spellID = 1752 } end end
-C_Spell.GetSpellCooldown = function() return { startTime = 0, duration = 0 } end
-C_Spell.IsSpellUsable = function() return true, false end
-C_Spell.GetSpellPowerCost = function() return { { cost = 45 } } end
-printed = {}
-""")
-L.globals().SlashCmdList.GEARWRIGHTPROBE("combat")
-L.globals().fire("PLAYER_REGEN_DISABLED"); L.globals().fire("PLAYER_REGEN_ENABLED")
-cb = L.eval("""function() local c = GearwrightProbeDB.scans.combat
-  return c.samples, c["UnitPower(energy)"].readable, c["aura expirationTime"].secret, c.known["Sinister Strike"], c.buffs[1] end""")()
-assert tuple(cb) == (60, 60, 120, 1752, "Slice and Dice"), tuple(cb)  # player + target aura, 60 samples each
-out = "\n".join(L.globals().printed.values())
-assert "SECRET: aura expirationTime" in out, out
-L.execute("issecretvalue = nil; C_UnitAuras = nil; GetTime = nil")
-
 # Auction house full scan: gear gets its full record and lowest buyout; other
 # items only a unit price; a gear item whose data never loads is counted.
 L.execute("""
