@@ -597,6 +597,13 @@ asks = L.eval("""function(ns) local o = {}
   return o end""")(ns)
 assert list(asks.values()) == [True, True, True, True, False, False, True, False], list(asks.values())
 L.execute("GetTime = nil")
+# An item the client forgets after sending it keeps its details (no flicker).
+forgot = L.eval("""function(ns) local before = ns.API.GetItemDetails('item:1003:0:0')
+  ITEMS['item:1003:0:0'].uncached = true
+  local after = ns.API.GetItemDetails('item:1003:0:0')
+  ITEMS['item:1003:0:0'].uncached = nil
+  return before, after end""")(ns)
+assert tuple(forgot) == (40, 40), tuple(forgot)
 
 # Class trainer reminders ----------------------------------------------------------
 # Before any visit Gearwright only knows the spell list (Data/Rogue/Trainer.lua):
