@@ -29,25 +29,62 @@ local function num(v) return ("%.1f"):format(v) end
 local function plus(v) return (v >= 0 and "+" or "") .. num(v) end
 local function slotName(slot) return ns.Advisor.SLOT_NAMES[slot] or "?" end
 
+-- Wishlist: right-click any upgrade row to add it (or take it off again);
+-- wished items get a check mark.
+local WISHED = "|TInterface\\RaidFrame\\ReadyCheck-Ready:14|t "
+local function wishable(row, entry)
+  local has = ns.Wishlist.Has(entry.itemID)
+  if has then row.title = WISHED .. (row.title or "") end
+  local hint = row.hint
+  if type(hint) == "string" then hint = { hint } end
+  hint = hint or {}
+  hint[#hint + 1] = has and "Right-click: remove from your wishlist" or "Right-click: add to your wishlist"
+  row.hint = hint
+  local train = row.train
+  row.onClick = function(button)
+    if button == "RightButton" then
+      ns.Wishlist.Toggle(entry)
+    elseif train then
+      ns.Trainers.Show(train)
+    end
+  end
+  return row
+end
+
 -- Tabs ---------------------------------------------------------------------------
--- A row: { icon, title, sub, value, valueColor, link }. Returns rows, message.
+-- A tab's build() returns rows, message. A row:
+--   { icon, title, sub, value, valueColor, link, train,
+--     hint = "line" or { "line", ... }   -- hover text (after the item tooltip)
+--     onClick = function(button) end     -- left or right click (shift-click links)
+--     header = true }                    -- a section heading: just `title`
 
 local TABS = {}
 
 TABS.gear = {
   label = "Gear", icon = "Interface\\Icons\\INV_Chest_Leather_09",
   build = function()
-    local gear = ns.Advisor.GearReport()
+    local gear, pending = ns.Advisor.GearOverview()
     local rows = {}
     for _, g in ipairs(gear or {}) do
-      rows[#rows + 1] = {
-        icon = g.link and ns.API.GetItemIcon(g.link) or EMPTY_ICON,
-        title = g.link or (Theme.Hex("muted") .. "empty|r"),
-        sub = g.name, link = g.link,
-        value = g.score and num(g.score), valueColor = "text",
-      }
+      local b = g.best
+      local current = g.link or (Theme.Hex("muted") .. "empty|r")
+      local r = { icon = g.link and ns.API.GetItemIcon(g.link) or EMPTY_ICON, title = current, link = g.link }
+      if b then
+        local sub = "Upgrade: " .. (b.link or b.name or "?") .. Theme.Hex("muted") .. "  " .. b.from .. "|r"
+        if b.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(b.reqLevel) end
+        if b.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(b.train) end
+        r.sub, r.value, r.valueColor = sub, plus(b.delta), "good"
+        r.link, r.train = b.link, b.train -- hover and shift-click show the upgrade
+        r.hint = { g.name .. ": you wear " .. (g.link or "nothing") .. (g.score and (" (" .. num(g.score) .. ")") or "") }
+        if b.itemID then wishable(r, { itemID = b.itemID, link = b.link, name = b.name, from = b.from }) end
+      else
+        r.sub = g.name .. Theme.Hex("muted") .. "  no known upgrade|r"
+        r.value, r.valueColor = g.score and num(g.score), "text"
+      end
+      rows[#rows + 1] = r
     end
-    return rows
+    local message = pending and pending > 0 and ("Reading %d more items from the server..."):format(pending) or nil
+    return rows, message
   end,
 }
 
@@ -64,17 +101,17 @@ TABS.upgrades = {
       if r.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(r.reqLevel) end
       if r.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(r.train) end
       if r.lowSkill then sub = sub .. Theme.Hex("warn") .. (" - %s, level it|r"):format(r.lowSkill) end
-      rows[#rows + 1] = {
+      rows[#rows + 1] = wishable({
         icon = ns.API.GetItemIcon("item:" .. r.itemID) or EMPTY_ICON,
         title = r.link or r.name, sub = sub, link = r.link, train = r.train,
         value = plus(r.delta), valueColor = "good",
-      }
+      }, { itemID = r.itemID, link = r.link, name = r.name, from = ns.Sources.Describe(s) })
     end
     local message
     if pending and pending > 0 then
       message = ("Reading %d more items from the server..."):format(pending)
     elseif #rows == 0 then
-      message = "No dungeon upgrades for you up to " .. ns.Advisor.CRAFT_LOOKAHEAD .. " levels ahead."
+      message = "No dungeon upgrades for you up to " .. ns.Advisor.Lookahead() .. " levels ahead."
     end
     return rows, message
   end,
@@ -93,17 +130,17 @@ TABS.crafting = {
       if r.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(r.reqLevel) end
       if r.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(r.train) end
       if r.lowSkill then sub = sub .. Theme.Hex("warn") .. (" - %s, level it|r"):format(r.lowSkill) end
-      rows[#rows + 1] = {
+      rows[#rows + 1] = wishable({
         icon = ns.API.GetItemIcon("item:" .. r.itemID) or EMPTY_ICON,
         title = r.link or r.name, sub = sub, link = r.link, train = r.train,
         value = plus(r.delta), valueColor = "good",
-      }
+      }, { itemID = r.itemID, link = r.link, name = r.name, from = ns.Advisor.CraftStatusText(r) })
     end
     local message
     if pending and pending > 0 then
       message = ("Reading %d more items from the server..."):format(pending)
     elseif #rows == 0 then
-      message = "No crafted upgrades for you up to " .. ns.Advisor.CRAFT_LOOKAHEAD .. " levels ahead."
+      message = "No crafted upgrades for you up to " .. ns.Advisor.Lookahead() .. " levels ahead."
     end
     return rows, message
   end,
@@ -150,7 +187,207 @@ TABS.talents = {
   end,
 }
 
-UI.TAB_ORDER = { "gear", "upgrades", "crafting", "enchants", "talents" }
+local SKILL_ICONS = {
+  [15] = "Interface\\Icons\\INV_Weapon_ShortBlade_01", [7] = "Interface\\Icons\\INV_Sword_04",
+  [4] = "Interface\\Icons\\INV_Mace_01", [0] = "Interface\\Icons\\INV_Axe_01",
+  [13] = "Interface\\Icons\\INV_Gauntlets_04", [2] = "Interface\\Icons\\INV_Weapon_Bow_01",
+  [3] = "Interface\\Icons\\INV_Weapon_Rifle_01", [18] = "Interface\\Icons\\INV_Weapon_Crossbow_01",
+  [16] = "Interface\\Icons\\INV_ThrowingKnife_02",
+}
+local SPELL_ICON = "Interface\\Icons\\INV_Misc_Book_11"
+
+local function money(copper)
+  if GetCoinTextureString then return GetCoinTextureString(copper) end
+  return ("%dg %ds %dc"):format(math.floor(copper / 10000), math.floor(copper / 100) % 100, copper % 100)
+end
+
+local function spellIcon(name)
+  if C_Spell and C_Spell.GetSpellTexture then
+    local ok, tex = pcall(C_Spell.GetSpellTexture, name)
+    if ok and tex then return tex end
+  end
+  return SPELL_ICON
+end
+
+local function spellRow(s, value, color)
+  local cost = s.cost and (" - " .. money(s.cost)) or ""
+  return { icon = spellIcon(s.name), title = ns.ClassTrainer.Label(s), sub = "Level " .. s.level .. cost,
+    value = value, valueColor = color }
+end
+
+TABS.training = {
+  label = "Training", icon = "Interface\\Icons\\INV_Misc_Book_11",
+  build = function()
+    local rows = {}
+    local level = ns.API.clean(UnitLevel("player")) or 1
+    local trainers = {}
+    for i, t in ipairs(ns.ClassTrainer.Trainers()) do
+      if i > 2 then break end
+      trainers[#trainers + 1] = t.name .. (t.city and (", " .. t.city) or "")
+    end
+    local where = #trainers > 0 and table.concat(trainers, " or ") or "your class trainer"
+
+    -- Class spells: what to train now, then the next levels.
+    local now, visited = ns.ClassTrainer.ToTrain(level)
+    local cost = ns.ClassTrainer.Cost(now)
+    rows[#rows + 1] = { header = true, title = "Train now" .. (cost and #now > 0 and (" - " .. money(cost)) or "") }
+    if not visited then
+      rows[#rows + 1] = { icon = SPELL_ICON, title = "Visit your class trainer once",
+        sub = "Then Gearwright knows which spells you've learned. " .. where, valueColor = "muted" }
+    elseif #now == 0 then
+      rows[#rows + 1] = { icon = SPELL_ICON, title = "Nothing to train", sub = "Everything up to level " .. level .. " is learned" }
+    else
+      for _, sp in ipairs(now) do
+        local r = spellRow(sp, "train", "good")
+        r.hint = "Train at " .. where
+        rows[#rows + 1] = r
+      end
+    end
+    local shown = 0
+    for l = level + 1, level + 10 do
+      local new = ns.ClassTrainer.NewAt(l)
+      if #new > 0 then
+        if shown == 0 then rows[#rows + 1] = { header = true, title = "Coming up" } end
+        for _, sp in ipairs(new) do rows[#rows + 1] = spellRow(sp, "level " .. l, "muted") end
+        shown = shown + 1
+        if shown == 2 then break end
+      end
+    end
+
+    -- Weapon skills: trained or not, how far levelled, who teaches the rest.
+    local skills = ns.Advisor.WeaponSkillReport()
+    if skills then
+      rows[#rows + 1] = { header = true, title = "Weapon skills" }
+      for _, w in ipairs(skills) do
+        local r = { icon = SKILL_ICONS[w.sub] or SPELL_ICON, title = w.name }
+        if w.known == false then
+          r.sub = "Not trained" .. (w.where and (" - " .. w.where) or "")
+          r.value, r.valueColor = "train", "warn"
+          r.hint = "Click: show the weapon master on the map"
+          local name = w.name
+          r.onClick = function() ns.Trainers.Show(name) end
+        elseif w.current then
+          local low = w.current + ns.WeaponSkills.WARN_BELOW < w.max
+          r.sub = low and "Fight with this weapon type to level it" or "Trained"
+          if w.old then r.sub = r.sub .. " (level seen at an earlier character level)" end
+          r.value, r.valueColor = w.current .. "/" .. w.max, low and "warn" or "good"
+        else
+          r.sub = "Trained - hover Main Hand on your character sheet with one equipped to read its level"
+          r.value, r.valueColor = "?", "muted"
+        end
+        rows[#rows + 1] = r
+      end
+    end
+    return rows
+  end,
+}
+
+TABS.wishlist = {
+  label = "Wishlist", icon = "Interface\\Icons\\INV_Misc_Note_02",
+  build = function()
+    local rows = {}
+    local goal = ns.Wishlist.NextGoal()
+    rows[#rows + 1] = { header = true, title = "Next goal" }
+    if goal then
+      rows[#rows + 1] = { icon = goal.link and ns.API.GetItemIcon(goal.link) or EMPTY_ICON,
+        title = goal.link or goal.name, link = goal.link,
+        sub = ns.Wishlist.When(goal.levelsAway) .. Theme.Hex("muted") .. "  " .. (goal.from or "") .. "|r"
+          .. (goal.wished and "" or (Theme.Hex("muted") .. "  (best known upgrade)|r")),
+        value = plus(goal.delta), valueColor = "good" }
+    else
+      rows[#rows + 1] = { icon = EMPTY_ICON, title = "No upgrade known yet", sub = "Gearwright looks in dungeon loot and crafted items" }
+    end
+    local report = ns.Wishlist.Report()
+    rows[#rows + 1] = { header = true, title = "Wishlist" }
+    if #report == 0 then
+      rows[#rows + 1] = { icon = EMPTY_ICON, title = "Empty",
+        sub = "Right-click an upgrade in Gear, Dungeons or Crafting to add it here" }
+    end
+    for _, w in ipairs(report) do
+      local e = w.entry
+      local status, value, color
+      if w.equipped then
+        status, value, color = "wearing it", "done", "good"
+      elseif not w.delta then
+        status, value, color = "can't score it right now", "?", "muted"
+      elseif w.delta <= 0.05 then
+        status, value, color = "no longer an upgrade", plus(w.delta), "muted"
+      else
+        status, value, color = ns.Wishlist.When(w.levelsAway), plus(w.delta), "good"
+      end
+      local sub = status .. (w.slot and ("  -  " .. slotName(w.slot)) or "") .. Theme.Hex("muted") .. "  " .. (e.from or "") .. "|r"
+      local id = e.itemID
+      rows[#rows + 1] = { icon = ns.API.GetItemIcon("item:" .. id) or EMPTY_ICON, title = w.link or e.name,
+        link = w.link, sub = sub, value = value, valueColor = color, hint = "Right-click: remove from your wishlist",
+        onClick = function(button) if button == "RightButton" then ns.Wishlist.Remove(id) end end }
+    end
+    return rows
+  end,
+}
+
+-- Settings: every row is a control. Left-click toggles or picks; on the
+-- look-ahead row, left-click adds a level and right-click takes one away.
+local function onOff(v) return v and "On" or "Off", v and "good" or "muted" end
+
+local function toggleRow(title, sub, key, after)
+  local value, color = onOff(ns.db[key])
+  return { icon = "Interface\\Icons\\INV_Misc_Note_01", title = title, sub = sub, value = value,
+    valueColor = color, hint = "Click to turn " .. (ns.db[key] and "off" or "on"),
+    onClick = function() ns.db[key] = not ns.db[key]; if after then after() end end }
+end
+
+TABS.settings = {
+  label = "Settings", icon = "Interface\\Icons\\Trade_Engineering",
+  build = function()
+    if not ns.db then return {}, "Settings aren't loaded yet." end
+    local rows = {}
+    rows[#rows + 1] = { header = true, title = "Display" }
+    rows[#rows + 1] = toggleRow("Tooltip line", "Gearwright's score on item tooltips", "showTooltip")
+    rows[#rows + 1] = toggleRow("Chat messages", "Quest rewards, loot, rolls, training reminders", "notices")
+    if ns.MinimapButton then
+      rows[#rows + 1] = toggleRow("Minimap button", "Your next goal; click it to open this window", "minimap",
+        ns.MinimapButton.Update)
+    end
+
+    rows[#rows + 1] = { header = true, title = "Spec" }
+    local classData = ns.Spec.ClassData()
+    local choices = { { key = false, label = "Automatic", sub = "From your talents (Combat before level 10)" } }
+    for _, key in ipairs({ "assassination", "combat", "subtlety" }) do
+      local spec = classData and classData.specs[key]
+      if spec then choices[#choices + 1] = { key = key, label = spec.label, sub = spec.summary } end
+    end
+    for _, c in ipairs(choices) do
+      local on = (ns.db.specOverride or false) == c.key
+      rows[#rows + 1] = { icon = "Interface\\Icons\\Ability_Stealth", title = c.label, sub = c.sub,
+        value = on and "selected" or "", valueColor = "good", hint = on and nil or "Click to score gear for this",
+        onClick = function() ns.db.specOverride = c.key end }
+    end
+
+    rows[#rows + 1] = { header = true, title = "Upgrade lists" }
+    local n = ns.Advisor.Lookahead()
+    rows[#rows + 1] = { icon = "Interface\\Icons\\INV_Misc_Spyglass_02", title = "Look ahead",
+      sub = "Dungeons and Crafting also list items up to this many levels above you",
+      value = n .. (n == 1 and " level" or " levels"), valueColor = "title",
+      hint = { "Left-click: one more level", "Right-click: one less" },
+      onClick = function(button)
+        local d = button == "RightButton" and -1 or 1
+        ns.db.lookahead = math.max(0, math.min(15, n + d))
+      end }
+
+    rows[#rows + 1] = { header = true, title = "Map" }
+    local pins = ns.db.pins and #ns.db.pins or 0
+    rows[#rows + 1] = { icon = "Interface\\Icons\\INV_Misc_Map_01", title = "Clear map pins",
+      sub = "Weapon masters Gearwright pinned on the world map", value = pins .. " pinned",
+      valueColor = pins > 0 and "title" or "muted", hint = pins > 0 and "Click to remove them all" or nil,
+      onClick = pins > 0 and function() ns.MapPins.Clear() end or nil }
+
+    rows[#rows + 1] = { header = true, title = "Troubleshooting" }
+    rows[#rows + 1] = toggleRow("Debug messages", "Extra chat output when something can't be read", "debug")
+    return rows
+  end,
+}
+
+UI.TAB_ORDER = { "gear", "wishlist", "upgrades", "crafting", "enchants", "talents", "training", "settings" }
 UI.TABS = TABS
 
 function UI.BuildRows(tab)
@@ -201,22 +438,33 @@ local function makeRow(parent)
   row.sub:SetJustifyH("LEFT")
   Theme.Color(row.sub, "muted")
 
+  if row.RegisterForClicks then row:RegisterForClicks("LeftButtonUp", "RightButtonUp") end
   row:SetScript("OnEnter", function(self)
+    if self.isHeader then return end
     self:SetBackdropColor(unpack(Theme.rowHover))
-    if self.link and GameTooltip then
-      GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-      GameTooltip:SetHyperlink(self.link)
-      if self.train then GameTooltip:AddLine("Click: show where to train " .. self.train, 1, 0.6, 0) end
-      GameTooltip:Show()
+    if not GameTooltip or not (self.link or self.hint or self.train) then return end
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    if self.link then GameTooltip:SetHyperlink(self.link) end
+    if self.train then GameTooltip:AddLine("Click: show where to train " .. self.train, 1, 0.6, 0) end
+    local hint = self.hint
+    if type(hint) == "string" then hint = { hint } end
+    for i, line in ipairs(hint or {}) do
+      if i == 1 and not self.link then GameTooltip:SetText(line, 1, 0.82, 0.4) else GameTooltip:AddLine(line, 0.8, 0.8, 0.8, true) end
     end
+    GameTooltip:Show()
   end)
   row:SetScript("OnLeave", function(self)
+    if self.isHeader then return end
     self:SetBackdropColor(unpack(Theme.row))
     if GameTooltip then GameTooltip:Hide() end
   end)
-  row:SetScript("OnClick", function(self)
+  row:SetScript("OnClick", function(self, button)
+    if self.isHeader then return end
     if self.link and IsModifiedClick and IsModifiedClick("CHATLINK") and ChatEdit_InsertLink then
       ChatEdit_InsertLink(self.link)
+    elseif self.onClick then
+      self.onClick(button)
+      UI.Refresh()
     elseif self.train then
       ns.Trainers.Show(self.train) -- where to train the weapon skill this item needs
     end
@@ -316,24 +564,51 @@ function UI.Create()
   return f
 end
 
+local HEADER_HEIGHT = 26
+
 local function drawRows(f, rows, message)
+  local y = 0
   for i, r in ipairs(rows) do
     local row = f.rows[i] or makeRow(f.list)
     f.rows[i] = row
     row:ClearAllPoints()
-    row:SetPoint("TOPLEFT", 0, -(i - 1) * ROW_HEIGHT)
+    row:SetPoint("TOPLEFT", 0, -y)
     row:SetPoint("RIGHT", f.list, "RIGHT", 0, 0)
-    row.icon:SetTexture(r.icon or EMPTY_ICON)
+    row.isHeader = r.header
+    if r.header then
+      row:SetHeight(HEADER_HEIGHT - 4)
+      row:SetBackdropColor(unpack(Theme.nav))
+      row.icon:Hide()
+      row.title:ClearAllPoints()
+      row.title:SetPoint("LEFT", 10, 0)
+      row.title:SetPoint("RIGHT", -10, 0)
+      row.title:SetFontObject("GameFontNormalLarge")
+      Theme.Color(row.title, "title")
+      y = y + HEADER_HEIGHT
+    else
+      row:SetHeight(ROW_HEIGHT - 4)
+      row:SetBackdropColor(unpack(Theme.row))
+      row.icon:Show()
+      row.icon:SetTexture(r.icon or EMPTY_ICON)
+      row.title:ClearAllPoints()
+      row.title:SetPoint("TOPLEFT", row.icon, "TOPRIGHT", 10, -1)
+      row.title:SetPoint("RIGHT", row.value, "LEFT", -8, 0)
+      row.title:SetFontObject("GameFontNormal")
+      Theme.Color(row.title, "title")
+      y = y + ROW_HEIGHT
+    end
     row.title:SetText(r.title or "")
-    row.sub:SetText(r.sub or "")
-    row.value:SetText(r.value or "")
+    row.sub:SetText(r.header and "" or (r.sub or ""))
+    row.value:SetText(r.header and "" or (r.value or ""))
     Theme.Color(row.value, r.valueColor or "text")
     row.link = r.link
     row.train = r.train
+    row.hint = r.hint
+    row.onClick = r.onClick
     row:Show()
   end
   for i = #rows + 1, #f.rows do f.rows[i]:Hide() end
-  f.list:SetHeight(math.max(#rows * ROW_HEIGHT, 1))
+  f.list:SetHeight(math.max(y, 1))
   f.message:SetText(message or "")
   f.message:SetShown(message ~= nil)
   f.scroll:ClearAllPoints()
@@ -381,7 +656,8 @@ for _, event in ipairs(ns.API.TALENT_EVENTS) do ns:On(event, refreshIfShown) end
 -- Dungeon items arrive from the server a few at a time; redraw once they settle.
 local refreshQueued
 ns:On("GET_ITEM_INFO_RECEIVED", function()
-  if refreshQueued or (UI.tab ~= "upgrades" and UI.tab ~= "crafting") or not (UI.frame and UI.frame:IsShown()) then return end
+  local itemTab = UI.tab == "upgrades" or UI.tab == "crafting" or UI.tab == "gear"
+  if refreshQueued or not itemTab or not (UI.frame and UI.frame:IsShown()) then return end
   refreshQueued = true
   C_Timer.After(0.5, function() refreshQueued = false; refreshIfShown() end)
 end)

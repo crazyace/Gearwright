@@ -22,6 +22,7 @@ Data\WeaponMasters.lua
 Data\Rogue\Specs.lua
 Data\Rogue\Weights.lua
 Data\Rogue\Talents.lua
+Data\Rogue\Trainer.lua
 
 Engine\Spec.lua
 Engine\Weights.lua
@@ -30,12 +31,16 @@ Engine\Sources.lua
 Engine\Professions.lua
 Engine\Trainers.lua
 Engine\WeaponSkills.lua
+Engine\ClassTrainer.lua
 Engine\Advisor.lua
+Engine\Wishlist.lua
 
 UI\Theme.lua
 UI\MapPins.lua
 UI\Tooltip.lua
 UI\MainFrame.lua
 UI\Notices.lua
+UI\Options.lua
+UI\MinimapButton.lua
 
 Core\Commands.lua

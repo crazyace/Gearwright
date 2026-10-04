@@ -153,6 +153,111 @@ function Notices.Train()
   return missing
 end
 
+-- Class trainer -------------------------------------------------------------------
+-- Reminders of what to learn: on level-up (what's new, plus anything still
+-- untrained), once at login, and /gearwright spells.
+
+local function spellList(list, max)
+  local names = {}
+  for i = 1, math.min(#list, max or #list) do names[i] = ns.ClassTrainer.Label(list[i]) end
+  local more = max and #list > max and (" and %d more"):format(#list - max) or ""
+  return table.concat(names, ", ") .. more
+end
+
+local function trainerText()
+  local names = {}
+  for i, t in ipairs(ns.ClassTrainer.Trainers()) do
+    if i > 2 then break end
+    names[#names + 1] = t.name .. (t.city and (", " .. t.city) or "")
+  end
+  return #names > 0 and table.concat(names, " or ") or "your class trainer"
+end
+
+local function costText(list)
+  local c = ns.ClassTrainer.Cost(list)
+  return c and (" (" .. money(c) .. ")") or ""
+end
+
+function Notices.LevelUp(level)
+  if not enabled() then return end
+  local new = ns.ClassTrainer.NewAt(level)
+  local all = ns.ClassTrainer.ToTrain(level)
+  local older = {}
+  for _, s in ipairs(all) do if s.level < level then older[#older + 1] = s end end
+  if #new == 0 and #older == 0 then return end
+  if #new > 0 then
+    ns.util.print("level %d: new at the trainer: %s%s", level, spellList(new), costText(new))
+  end
+  if #older > 0 then
+    ns.util.print("still to train from earlier levels: %s", spellList(older, 6))
+  end
+  ns.util.print("train at %s", trainerText())
+  return new, older
+end
+
+-- Wishlist items that just became wearable.
+function Notices.WishlistLevelUp(level)
+  if not enabled() then return end
+  local ready = {}
+  for _, w in ipairs(ns.Wishlist.Report()) do
+    if not w.equipped and w.reqLevel == level and w.delta and w.delta > 0.05 then
+      ready[#ready + 1] = ("%s (|cff40ff40+%.1f|r)"):format(w.link or w.entry.name or "?", w.delta)
+    end
+  end
+  if #ready > 0 then ns.util.print("wishlist: you can wear %s now", table.concat(ready, ", ")) end
+  return ready
+end
+
+ns:On("PLAYER_LEVEL_UP", function(level)
+  level = ns.API.clean(level)
+  Notices.LevelUp(level)
+  -- Required levels are checked against UnitLevel, which may lag the event.
+  if C_Timer then C_Timer.After(1, function() Notices.WishlistLevelUp(level) end) end
+end)
+
+function Notices.SpellsAtLogin()
+  if not enabled() then return end
+  local list = ns.ClassTrainer.ToTrain()
+  if #list == 0 then return end
+  ns.util.print("you can train %d spell%s: %s  (/gearwright spells)", #list, #list == 1 and "" or "s", spellList(list, 5))
+  return list
+end
+
+ns:On("PLAYER_LOGIN", function()
+  if C_Timer then C_Timer.After(6, Notices.SpellsAtLogin) end
+end)
+
+-- /gearwright spells: what to train now, and what's coming up.
+function Notices.Spells()
+  local level = ns.API.clean(UnitLevel("player")) or 1
+  local list, visited = ns.ClassTrainer.ToTrain(level)
+  if not visited then
+    ns.util.print("visit your class trainer once so Gearwright knows what you've learned")
+  elseif #list == 0 then
+    ns.util.print("you've trained everything up to level %d", level)
+  else
+    ns.util.print("to train now%s:", costText(list))
+    local byLevel, order = {}, {}
+    for _, s in ipairs(list) do
+      if not byLevel[s.level] then byLevel[s.level] = {}; order[#order + 1] = s.level end
+      table.insert(byLevel[s.level], s)
+    end
+    for _, l in ipairs(order) do print(("  %d: %s"):format(l, spellList(byLevel[l]))) end
+  end
+  local shown = 0
+  for l = level + 1, level + 6 do
+    local new = ns.ClassTrainer.NewAt(l)
+    if #new > 0 then
+      if shown == 0 then ns.util.print("coming up:") end
+      print(("  %d: %s%s"):format(l, spellList(new), costText(new)))
+      shown = shown + 1
+      if shown == 3 then break end
+    end
+  end
+  ns.util.print("train at %s", trainerText())
+  return list
+end
+
 -- Crafting ---------------------------------------------------------------------
 -- /gearwright craft: crafted upgrades from every profession, with whether you
 -- can make it yourself, need to learn the recipe, or should have it crafted.
@@ -175,7 +280,7 @@ function Notices.Craft(retried)
   end
   if #rows == 0 then
     ns.util.print("no crafted upgrades for you up to level %d",
-      (ns.API.clean(UnitLevel("player")) or 0) + ns.Advisor.CRAFT_LOOKAHEAD)
+      (ns.API.clean(UnitLevel("player")) or 0) + ns.Advisor.Lookahead())
   else
     ns.util.print("crafted upgrades:")
     for i = 1, math.min(#rows, CRAFT_SHOWN) do

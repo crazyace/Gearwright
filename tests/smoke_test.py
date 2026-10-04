@@ -587,6 +587,79 @@ assert "no recipes known yet" in L.globals().printed[1], L.globals().printed[1]
 L.eval("function(ns) ns.Data.CRAFTED = SAVED_CRAFTED end")(ns)
 L.execute("C_TradeSkillUI = nil")
 
+# Class trainer reminders ----------------------------------------------------------
+# Before any visit Gearwright only knows the spell list (Data/Rogue/Trainer.lua):
+# a level-up names the new spells; /gearwright spells asks for a visit.
+L.execute("printed = {}")
+new = L.eval("function(ns) local n = ns.Notices.LevelUp(30) local o = {} for i, s in ipairs(n) do o[i] = ns.ClassTrainer.Label(s) end return table.concat(o, ', ') end")(ns)
+assert new == "Deadly Poison 1, Disarm Trap, Garrote 3, Kidney Shot 1, Sinister Strike 5", new
+out = "\n".join(L.globals().printed.values())
+assert "level 30: new at the trainer: Deadly Poison 1, Disarm Trap, Garrote 3, Kidney Shot 1, Sinister Strike 5" in out, out
+assert "train at Fenthwick, Ironforge or Lord Tony Romano, Stormwind" in out, out
+L.execute("printed = {}")
+L.globals().SlashCmdList.GEARWRIGHT("spells")
+out = "\n".join(L.globals().printed.values())
+assert "visit your class trainer once" in out and "  32: Eviscerate 5, Gouge 3, Wound Poison 1" in out, out
+# A visit at level 30: the window lists what's left to learn (Rupture 2, Kidney
+# Shot) and what's coming; everything else up to 30 isn't listed, so it's learned.
+L.execute("""
+SERVICES = {
+  { "Rupture", "available", 1, 28, "Rank 2", "", 1500 },
+  { "Kidney Shot", "available", 1, 30, "Rank 1", "", 2000 },
+  { "Eviscerate", "unavailable", 1, 32, "Rank 5", "", 2500 },
+}
+function GetNumTrainerServices() return #SERVICES end
+function GetTrainerServiceInfo(i) local s = SERVICES[i] return s[1], s[2], s[3], s[4], s[5], s[6] end
+function GetTrainerServiceCost(i) return SERVICES[i][7] end
+function UnitGUID() return "Creature-0-1-0-1-5167-0001" end
+function UnitName(u) return u == "npc" and "Fenthwick" or "Tester" end
+""")
+L.globals().fire("TRAINER_SHOW")
+L.execute("printed = {}")
+todo = L.eval("function(ns) local t = ns.ClassTrainer.ToTrain(30) local o = {} for i, s in ipairs(t) do o[i] = ns.ClassTrainer.Label(s) end return table.concat(o, ', ') end")(ns)
+assert todo == "Rupture 2, Kidney Shot 1", todo
+L.globals().SlashCmdList.GEARWRIGHT("spells")
+out = "\n".join(L.globals().printed.values())
+assert "to train now (0g 35s 0c):" in out and "  28: Rupture 2" in out and "  30: Kidney Shot 1" in out, out
+# The Training tab: spells to train now (with the cost), what's next, and every
+# weapon skill (here only Daggers is known: the rest say where to train them).
+L.execute("function IsPlayerSpell(id) return id == 1180 end")
+rows = L.eval("function(ns) return (ns.UI.BuildRows('training')) end")(ns)
+rows = [dict(r.items()) for r in rows.values()]
+print("training tab:", [(r.get("title"), r.get("value")) for r in rows])
+titles = [r.get("title") for r in rows]
+assert titles[0] == "Train now - 0g 35s 0c" and titles[1:3] == ["Rupture 2", "Kidney Shot 1"], titles
+assert "Coming up" in titles and "Eviscerate 5" in titles and "Weapon skills" in titles, titles
+swords = next(r for r in rows if r.get("title") == "One-Handed Swords")
+assert swords["value"] == "train" and "Woo Ping, Stormwind" in swords["sub"], swords
+assert next(r for r in rows if r.get("title") == "Daggers")["value"] == "?"
+L.execute("IsPlayerSpell = nil")
+# Settings tab: rows are controls. Turning the tooltip line off, picking a
+# spec, and changing the look-ahead all go through the rows' click handlers.
+def settings_rows():
+    rows = L.eval("function(ns) return (ns.UI.BuildRows('settings')) end")(ns)
+    return {r["title"]: r for r in rows.values()}
+L.eval("function(ns) ns.UI.Create() end")(ns)
+st = settings_rows()
+assert st["Tooltip line"]["value"] == "On" and st["Automatic"]["value"] == "selected" and st["Look ahead"]["value"] == "5 levels"
+st["Tooltip line"]["onClick"]("LeftButton"); st["Subtlety"]["onClick"]("LeftButton")
+st["Look ahead"]["onClick"]("LeftButton"); settings_rows()["Look ahead"]["onClick"]("LeftButton")
+settings_rows()["Look ahead"]["onClick"]("RightButton")
+st = settings_rows()
+assert st["Tooltip line"]["value"] == "Off" and st["Subtlety"]["value"] == "selected" and st["Look ahead"]["value"] == "6 levels", \
+    (st["Tooltip line"]["value"], st["Subtlety"]["value"], st["Look ahead"]["value"])
+assert L.eval("function(ns) return ns.Spec.Detect() end")(ns) == ("subtlety", "override")
+L.eval("function(ns) ns.db.showTooltip = true; ns.db.specOverride = false; ns.db.lookahead = nil end")(ns)
+# Reaching 32: the new spells, plus the two still untrained.
+L.execute("printed = {}")
+L.eval("function(ns) ns.Notices.LevelUp(32) end")(ns)
+out = "\n".join(L.globals().printed.values())
+assert "level 32: new at the trainer: Eviscerate 5, Gouge 3, Wound Poison 1" in out, out
+assert "still to train from earlier levels: Rupture 2, Kidney Shot 1" in out, out
+L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, GetTrainerServiceCost, UnitGUID = nil, nil, nil, nil
+function UnitName() return "Tester" end; printed = {}""")
+L.eval("function(ns) ns.db.trained = nil; ns.db.classSpells = nil; ns.db.classTrainers = nil end")(ns)
+
 # Dungeons ------------------------------------------------------------------------
 # Forever Dungeon Journal's table, in its own shape: boss loot {id, name, slot,
 # quality}, quest rewards {id, name, quality}. Gearwright only reads it.
@@ -613,6 +686,32 @@ assert dung[0][2] == "quest The Restless Dead, Hall of Thanes (13-20)", dung
 assert dung[1][1] == 2 and dung[1][2] == "Faldrim Anvilmar, Hall of Thanes (13-20)", dung
 upg = L.eval("function(ns) local rows = ns.UI.BuildRows('upgrades') return #rows, rows[1].value, rows[2].sub end")(ns)
 assert upg[0] == 2 and upg[1].startswith("+") and "(+1 more)" in upg[2], upg
+# Gear tab: the head slot shows what you wear and its best known upgrade, the
+# quest reward 1005 (the cap with 40 Agility), with where it comes from.
+head = L.eval("""function(ns) local rows = ns.UI.BuildRows('gear')
+  return rows[1].title, rows[1].sub, rows[1].value, rows[1].link, rows[2].sub end""")(ns)
+print("gear head:", head)
+assert head[0] == "item:1001:0:0" and "Upgrade: item:1005" in head[1] and "quest The Restless Dead" in head[1], head
+assert head[2].startswith("+") and head[3] == "item:1005" and "no known upgrade" in head[4], head
+# Wishlist: with nothing wished, the next goal is the best known upgrade.
+# Right-clicking a dungeon row wishes it (check mark); the Wishlist tab lists
+# it, and right-clicking it there takes it off again.
+goal = L.eval("function(ns) local g = ns.Wishlist.NextGoal() return g.link, g.wished, ns.MinimapButton.ShortText() end")(ns)
+assert goal[0] == "item:1005" and not goal[1], goal
+L.eval("function(ns) local rows = ns.UI.BuildRows('upgrades') rows[2].onClick('RightButton') end")(ns)  # 1002
+wl = L.eval("""function(ns) local up = ns.UI.BuildRows('upgrades') local w = ns.UI.BuildRows('wishlist')
+  return up[2].title, w[2].title, w[4].title, w[4].value, w[4].sub, #w end""")(ns)
+print("wishlist:", wl)
+assert wl[0].startswith("|TInterface") and wl[1] == "item:1002" and wl[2] == "item:1002", wl  # next goal = the wished one
+assert wl[3].startswith("+") and "available now" in wl[4] and "Faldrim Anvilmar" in wl[4] and wl[5] == 4, wl
+L.eval("function(ns) local w = ns.UI.BuildRows('wishlist') w[4].onClick('RightButton') end")(ns)
+assert L.eval("function(ns) return #ns.Wishlist.Items(), ns.UI.BuildRows('wishlist')[4].title end")(ns) == (0, "Empty")
+# The minimap button builds on the minimap and follows the setting.
+L.execute("Minimap = CreateFrame('Frame'); function GetCursorPosition() return 0, 0 end")
+mb = L.eval("""function(ns) ns.MinimapButton.Update() local shown = ns.MinimapButton.frame:IsShown()
+  ns.db.minimap = false ns.MinimapButton.Update() local hidden = not ns.MinimapButton.frame:IsShown()
+  ns.db.minimap = true return shown, hidden end""")(ns)
+assert tuple(mb) == (True, True), tuple(mb)
 
 # Gearwright's own table (from probe loot logs) works without that addon.
 L.execute("ForeverDungeonJournal_NS = nil")
@@ -877,6 +976,13 @@ assert (OUT / "check.lua").read_text() == (R / "Gearwright" / "Data" / "DungeonL
 assert subprocess.run([sys.executable, str(R / "tools" / "crafted_from_probe.py"), *map(str, sorted((R / "data" / "probe").glob("*.json"))),
                        "-o", str(OUT / "crafted.lua")], check=True, capture_output=True).returncode == 0
 assert (OUT / "crafted.lua").read_text() == (R / "Gearwright" / "Data" / "Crafted.lua").read_text(), "rerun tools/crafted_from_probe.py"
+# Data/Rogue/Trainer.lua is current with the saved trainer captures.
+assert subprocess.run([sys.executable, str(R / "tools" / "trainer_from_probe.py"), "--class", "ROGUE",
+                       "--trainer", "Fenthwick", "--trainer", "Lord Tony Romano", "--city", "Lord Tony Romano=Stormwind",
+                       "--verified", str(R / "data" / "verified" / "rogue-trainer-low-levels.json"),
+                       *map(str, sorted((R / "data" / "probe").glob("*.json"))), "-o", str(OUT / "trainer.lua")],
+                      check=True, capture_output=True).returncode == 0
+assert (OUT / "trainer.lua").read_text() == (R / "Gearwright" / "Data" / "Rogue" / "Trainer.lua").read_text(), "rerun tools/trainer_from_probe.py"
 # also write a SavedVariables-style Lua file
 L.execute(r"""
 local function ser(v, ind)

@@ -38,7 +38,13 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [x] Weapon skill levels: warn while a trained skill is low (read from the sheet's weapon tooltips)
 - [ ] Score low-skill weapons lower (Classic miss chance from skill vs. target defense)
 - [ ] Check the weapon masters' positions on Forever (Gearwright saves them when you visit one)
-- [ ] Next-goal button (minimap / LibDataBroker) and a per-character wishlist
+- [x] Train reminder: new class spells on level-up, untrained ones at login, /gearwright spells
+- [x] Trainer spells below level 20 (checked on Wowhead: `data/verified/rogue-trainer-low-levels.json`)
+- [ ] Trainer costs (the probe records them at the next trainer visit)
+- [x] Training tab (class spells, weapon skills)
+- [x] Gear tab overview: each slot with its best known upgrade and where to get it
+- [x] Settings tab (tooltip, chat messages, spec, look-ahead, map pins, debug) + AddOns settings entry
+- [x] Next-goal button (minimap / LibDataBroker) and a per-character wishlist
 - [ ] Engineering recipes (needs a probe scan from an engineer)
 - [x] Probe: auction house full scan (`/gwp ah`) for gear stats and prices in bulk
 - [ ] Auction house upgrades in Gearwright itself: gear on the AH that beats yours, with prices

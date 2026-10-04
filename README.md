@@ -5,11 +5,17 @@ Gear, talent and enchant advice for your build in **World of Warcraft: Forever**
 Gearwright reads your talents to work out your spec, scores items with spec-specific
 stat weights, and tells you:
 
-- **Gear** - is this item an upgrade, and by how much? (tooltip line + gear summary)
+- **Gear** - is this item an upgrade, and by how much? (tooltip line), and for every slot the best
+  known upgrade and where to get it
+- **Wishlist and next goal** - right-click any upgrade to wishlist it; the minimap button (or your
+  info bar, via LibDataBroker) shows the next one you can wear
+- **Settings** - in the window's Settings tab (also reachable from the game's AddOns settings)
 - **Quest rewards and loot** - which reward to take, and which drops or rolls are upgrades
   (chat messages; `/gearwright notices` turns them off)
 - **Talents** - where does your build differ from the recommended one?
 - **Enchants** - the best stat enchant for each slot, and what it adds over the one you have
+- **Training** - class spells to train now (and their cost) and coming up, and every weapon
+  skill: trained, its level, or who teaches it (click to pin them on the map)
 - **Crafting** - crafted upgrades from every profession, yours or not: whether you can craft
   it, one of your other characters can (same realm and faction, not bind-on-pickup), you
   need to learn the recipe, or should have someone craft it (`/gearwright` -> Crafting,
@@ -49,6 +55,7 @@ tools/                 probe_to_json.py - turns probe output into JSON + a summa
                        loot_from_probe.py - builds Data/DungeonLoot.lua from probe loot logs
                        crafted_from_probe.py - builds Data/Crafted.lua from profession scans
                        ah_report.py - ranks auction house gear with Gearwright's scoring
+                       trainer_from_probe.py - builds Data/<Class>/Trainer.lua from trainer captures
 tests/                 smoke_test.py - runs both addons against a mocked WoW API
 docs/                  Architecture, beta checklist
 data/probe/            Probe captures you commit (raw research data)
@@ -86,6 +93,7 @@ python tests/smoke_test.py
 | `/gearwright spec <assassination\|combat\|subtlety\|auto>` | Force or auto-detect spec |
 | `/gearwright tooltip` | Toggle the tooltip upgrade line |
 | `/gearwright notices` | Toggle quest reward / loot upgrade messages |
+| `/gearwright spells` | Class spells to train now (and their cost), and what's coming up |
 | `/gearwright train` | Weapon skills you can still train, who teaches them, pinned on the world map |
 | `/gearwright craft` | Crafted upgrades up to 5 levels ahead, and who can make them |
 | `/gwp all` | Probe: dump env, APIs, talents, gear, stats |

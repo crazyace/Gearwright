@@ -84,6 +84,12 @@ Bixi 62.1, 89.5, Ironforge, both in the Timberline Arms weapon shop
 (`data/probe/2026-10-03-ironforge-weapon-masters.json`).
 (The probe saved unknown skills as "error" in this capture; fixed.)
 
+Cross-check (2026-10-04): the TrainerSpells addon (D4KiR, all rights reserved,
+nothing copied) ships Forever weapon master data with the same eight trainers as
+`Data/WeaponMasters.lua`, and Woo Ping, Buliwyf and Bixi where the probe found them.
+It also prices one-handed weapon skills at 10s and polearms at 1g; the probe now
+records trainer costs (`GetTrainerServiceCost`) to confirm.
+
 Weapon masters (`Data/WeaponMasters.lua`) are seeded from Classic. Checked so far:
 **Woo Ping, Stormwind, at 63.9, 69.0, inside the Just Maces shop** (probe at his
 window, 19:26; the seed had 57.2, 57.6, so expect the other seeded positions to be off
@@ -282,6 +288,26 @@ The trainer window's filter (available / unavailable / already known) decides wh
 `GetTrainerServiceInfo` lists. Fenthwick (Rogue trainer, Ironforge 51.6, 15.0) was read
 at 19:43 with the default filter: 85 services, all "unavailable", nothing already
 known. The probe now turns every filter on before reading and restores yours after.
+
+Read again at 19:47 with all filters on: **107 services, 22 known + 85 to come**
+(`data/probe/2026-10-03-rogue-trainer.json`). Known at level 19: Ambush 1, Backstab 1-2,
+Evasion, Eviscerate 2-3, Expose Armor 1, Feint 1, Garrote 1, Gouge 1-2, Kick 1,
+Pick Pocket, Sap 1, Sinister Strike 2-3, Slice and Dice 1, Sprint 1, Stealth 1,
+Dual Wield (10), Parry (12), Pick Lock (16). Learned spells report level 0, except
+the passives and Pick Lock. Next up: level 20 Backstab 3, Crippling Poison, Rupture,
+Stealth 2; 22 Distract, Garrote 2, Sinister Strike 4, Vanish; 24 Detect Traps,
+Eviscerate 4, Mind-numbing Poison; 26 Ambush 2, Cheap Shot, Expose Armor 2, Kick 2;
+28 Backstab 4, Feint 2, Instant Poison II, Rupture 2, Sap 2; 30 Deadly Poison,
+Disarm Trap, Garrote 3, Kidney Shot, Sinister Strike 5. Mutilate ranks 2-4 at
+40/50/60. No Instant Poison rank 1 at the trainer.
+
+Levels 1-18 (2026-10-04): the TrainerSpells addon's Forever Rogue list (all rights
+reserved, used only as a checklist) agreed with this capture on all 88 spells it
+dates, and Jeff checked its 19 earlier ones on Wowhead's Forever database: Stealth 1
+(1), Backstab 1 and Pick Pocket (4), Sinister Strike 2 and Gouge 1 (6), Evasion and
+Eviscerate 2 (8), Sprint 1, Slice and Dice 1, Sap 1 (10), Kick 1 and Backstab 2 (12),
+Garrote 1, Sinister Strike 3, Expose Armor 1 (14), Feint 1 and Eviscerate 3 (16),
+Gouge 2 and Ambush 1 (18). Saved as `data/verified/rogue-trainer-low-levels.json`.
 
 The trainer window lists every service with its level, rank and category (`GetTrainerServiceInfo`
 returns name, availability, icon, level, rank, category). A level 19 Rogue saw 85 class
