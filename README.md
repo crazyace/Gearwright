@@ -11,7 +11,8 @@ stat weights, and tells you:
 - **Talents** - where does your build differ from the recommended one?
 - **Enchants** - the best stat enchant for each slot, and what it adds over the one you have
 - **Crafting** - crafted upgrades from every profession, yours or not: whether you can craft
-  it, need to learn the recipe, or should have someone craft it (`/gearwright` -> Crafting,
+  it, one of your other characters can (same realm and faction, not bind-on-pickup), you
+  need to learn the recipe, or should have someone craft it (`/gearwright` -> Crafting,
   `/gearwright craft`)
 - **Dungeons** - the boss drops and dungeon quest rewards that would be upgrades for you, and
   where they drop (window tab + tooltip line)
@@ -46,6 +47,8 @@ GearwrightProbe/       Dev-only addon: dumps what the Forever client exposes
 tools/                 probe_to_json.py - turns probe output into JSON + a summary
                        enchants_from_probe.py - builds Data/Enchants.lua from a recipe scan
                        loot_from_probe.py - builds Data/DungeonLoot.lua from probe loot logs
+                       crafted_from_probe.py - builds Data/Crafted.lua from profession scans
+                       ah_report.py - ranks auction house gear with Gearwright's scoring
 tests/                 smoke_test.py - runs both addons against a mocked WoW API
 docs/                  Architecture, beta checklist
 data/probe/            Probe captures you commit (raw research data)

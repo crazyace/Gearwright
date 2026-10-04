@@ -67,7 +67,7 @@ local function item(l) return ITEMS[l] or {} end
 C_Item = { GetItemStats = function(l) return ITEMS[l] and ITEMS[l].stats end,
            GetItemInfoInstant = function(l) local i = item(l) return 1, "Armor", "Cloth", i.equip, 0, i.class, i.sub end,
            GetItemInfo = function(l) local i = ITEMS[l] if not i or i.uncached then return nil end
-             return "name", l, 2, 20, i.req or 1, "Armor", "Leather", 1, i.equip, 0, i.sell or 0 end }
+             return "name", l, 2, 20, i.req or 1, "Armor", "Leather", 1, i.equip, 0, i.sell or 0, 4, 2, i.bind end }
 -- Main hand 34 damage every 1.7 s: 20 DPS, so 1% of damage = 2.8 AP.
 function UnitDamage() return 34, 34, 17, 17, 0, 0, 1 end
 function UnitAttackSpeed() return 1.7, 1.7 end
@@ -200,6 +200,19 @@ assert compare("item:2003:0:0")[1] == 16  # 22-DPS dagger: main hand only, not t
 L.execute("function IsPlayerSpell(id) return id == 674 end")
 assert compare("item:2006:0:0")[1] == 17  # Dual Wield already known
 L.execute("IsPlayerSpell = nil; UnitLevel = function() return 30 end")
+# Tooltip: best slot first, the other hand after it, and what isn't scored.
+L.execute("""
+ITEMS['item:2007:0:0'] = { equip='INVTYPE_WEAPON', class=2, sub=15, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30, ITEM_MOD_INTELLECT_SHORT=2},
+  tip={"Claw", "Chance on hit: Sends a shadowy bolt at the enemy causing 35 Shadow damage."} }
+INV[17] = '|cnIQ2:|Hitem:2003::::|h[Pearl-handled Dagger]|h|r'
+ITEMS[INV[17]] = ITEMS['item:2003:0:0']
+""")
+tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:2007:0:0', ns.Advisor.CompareSlots('item:2007:0:0')) end""")(ns).values())
+print("tooltip:", tip)
+assert "+140.0|r in Main Hand over equipped" in tip[0] and "(Combat)" in tip[0], tip
+assert tip[1].startswith("|cffaaaaaaOff Hand:|r") and "+56.0|r" in tip[1] and "over Pearl-handled Dagger" in tip[1], tip
+assert tip[2] == "|cffaaaaaaNot counted: Intellect, chance on hit effect|r", tip
+L.execute("INV[17] = nil")
 # Items above your level still score, and say when you can wear them.
 d = compare("item:1003:0:0")
 assert d[0] > 0 and d[4] == 40, d
@@ -452,11 +465,36 @@ C_TradeSkillUI.GetBaseProfessionInfo = function() return { professionName = "Bla
 L.globals().fire("TRADE_SKILL_SHOW")
 L.execute("RECIPES = {}; printed = {}")
 assert sword()[0] == "learn", sword()
+# An alt on this realm who knows the recipe can make it for you; one on another
+# realm can't mail it, and a bind-on-pickup item can't be passed on at all.
+L.eval("""function(ns)
+  ns.db.recipes["Smithy-Realm"] = { Blacksmithing = { recipes = { { recipeID = 6, itemID = 2002, learned = true } } } }
+  ns.db.characters["Smithy-Realm"] = { name = "Smithy", realm = "Realm" }
+  ns.db.recipes["Faraway-Other"] = { Blacksmithing = { recipes = { { recipeID = 6, itemID = 2002, learned = true } } } }
+  ns.db.characters["Faraway-Other"] = { name = "Faraway", realm = "Other" } end""")(ns)
+assert sword() == ("alt", "Smithy can craft it (Blacksmithing)"), sword()
+L.eval("function(ns) ns.db.recipes['Smithy-Realm'].Blacksmithing.recipes[1].learned = false end")(ns)
+assert sword() == ("learn", "learn the recipe (Blacksmithing)"), sword()  # learning it yourself comes first
+L.eval("function(ns) ns.db.recipes['Smithy-Realm'].Blacksmithing.recipes[1].learned = true end")(ns)
+L.execute('ITEMS["item:2002"].bind = 1')
+assert sword()[0] == "learn", sword()
+L.execute('ITEMS["item:2002"].bind = nil')
+L.eval("function(ns) ns.db.recipes['Smithy-Realm'] = nil; ns.db.recipes['Faraway-Other'] = nil end")(ns)
+# Another player's linked profession: its recipes join the catalog of what
+# Tailoring makes, but it isn't yours and its learned flags aren't yours.
+L.execute("""CRAFT_OUTPUT[7] = 1003; RECIPES = { 7 }
+C_TradeSkillUI.GetBaseProfessionInfo = function() return { professionName = "Tailoring" } end
+C_TradeSkillUI.IsTradeSkillLinked = function() return true, "Bob" end""")
+L.globals().fire("TRADE_SKILL_SHOW")
+linked = L.eval("""function(ns) local me = ns.db.recipes[ns.Professions.CharKey()]
+  return me.Tailoring == nil, ns.db.catalog.Tailoring[1003] ~= nil, me.Blacksmithing ~= nil end""")(ns)
+assert tuple(linked) == (True, True, True), tuple(linked)
+L.execute("C_TradeSkillUI.IsTradeSkillLinked = nil; RECIPES = {}")
 L.globals().SlashCmdList.GEARWRIGHT("craft")
 out = "\n".join(L.globals().printed.values())
 assert "learn the recipe (Blacksmithing)" in out and "learn the recipe (Leatherworking)" in out, out
 L.execute("GetProfessions, GetProfessionInfo = nil, nil; printed = {}")
-L.eval("function(ns) ns.db.recipes = nil; ns.Data.CRAFTED = nil end")(ns)
+L.eval("function(ns) ns.db.recipes = nil; ns.db.catalog = nil; ns.Data.CRAFTED = nil end")(ns)
 L.globals().SlashCmdList.GEARWRIGHT("craft")
 assert "no recipes known yet" in L.globals().printed[1], L.globals().printed[1]
 L.eval("function(ns) ns.Data.CRAFTED = SAVED_CRAFTED end")(ns)
@@ -679,7 +717,7 @@ ITEMS[2002] = ITEMS["item:2002:0:0"]
 ITEMS[7777] = { equip="INVTYPE_HEAD", class=4, sub=2 }
 ITEMS["item:7777"] = { equip="INVTYPE_HEAD", class=4, sub=2, uncached=true }
 AH_ROWS = {
-  { "Sword", 1, 5000, 2002, "item:2002:0:0" }, { "Sword", 1, 4000, 2002, "item:2002:0:0" },
+  { "Sword", 1, 5000, 2002, "item:2002:0:0" }, { "", 1, 4000, 2002, "item:2002:0:0" },
   { "Linen Cloth", 20, 2000, 2589, "item:2589" }, { "Linen Cloth", 5, 1000, 2589, "item:2589" },
   { "Odd Cap", 1, 900, 7777, "item:7777" },
 }
@@ -696,7 +734,9 @@ L.globals().SlashCmdList.GEARWRIGHTPROBE("ah")
 assert "open the auction house first" in L.globals().printed[1], L.globals().printed[1]
 L.globals().fire("AUCTION_HOUSE_SHOW")
 L.globals().SlashCmdList.GEARWRIGHTPROBE("ah")
-ahs = L.eval("""function() local a = GearwrightProbeDB.scans.auction local g = a.gear["2002:Sword"]
+ahs = L.eval("""function() local a = GearwrightProbeDB.scans.auction local g, n = nil, 0
+  for _, v in pairs(a.gear) do n = n + 1; if v.id == 2002 then g = v end end
+  assert(n == 1, "listings with and without a name merge into one record")
   return a.listings, g.minBuyout, g.listings, g.stats.ITEM_MOD_DAMAGE_PER_SECOND_SHORT, g.equip, a.prices["2589"], a.missing,
     a.gear["7777:Odd Cap"] == nil end""")()
 assert tuple(ahs) == (5, 4000, 2, 25, "INVTYPE_WEAPON", 100, 1, True), tuple(ahs)
@@ -752,4 +792,7 @@ for f in ("export.json", "GearwrightProbe.lua"):
         assert want in r.stdout, (want, r.stdout)
     if f == "GearwrightProbe.lua":  # the SavedVariables file has the auction scan too
         assert "auction house scan 2026-10-03 16:00:00: 5 listings, 1 gear items, 1 other items priced" in r.stdout, r.stdout
+        r = subprocess.run([sys.executable, str(R/"tools"/"ah_report.py"), str(OUT/f), "--level", "30"],
+                           capture_output=True, text=True)
+        assert r.returncode == 0 and "One-hand\n" in r.stdout and "(level 1, 40s, 2 listed)" in r.stdout, r.stdout + r.stderr
 print("\nALL SMOKE TESTS PASSED")

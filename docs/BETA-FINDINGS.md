@@ -179,7 +179,7 @@ not as ground truth.
   Dungeon loot has to come from real drops instead: the probe now logs every loot
   window with the NPC (from its GUID) and the instance or zone it dropped in.
 
-## Enchanting (skill 225/225)
+## Enchanting (another player's window, skill 225/225)
 
 The Enchanting window listed 270 recipes (`C_TradeSkillUI`), many new for Forever
 (recipe IDs over 1,200,000). Agility enchants, the ones a Rogue cares about:
@@ -212,6 +212,13 @@ Forever-specific amounts worth knowing:
 
 ## Professions (2026-10-03, saved in `data/probe/2026-10-03-professions.json`)
 
+**These windows were found in game, not opened on Jeff's characters**: the skill
+levels and "learned" counts below belong to whoever's profession it was. The recipe
+lists (what each profession makes) are what's useful. How they were opened (a
+player's link, a crafting station...) isn't recorded; the probe now records
+`IsTradeSkillLinked` / `IsTradeSkillGuild` / `IsNPCCrafting` and your own
+`GetProfessions` with each scan to tell.
+
 | Profession | Skill | Recipes | Learned | Make an item |
 |---|---|---|---|---|
 | Tailoring | 225/225 | 471 | 97 | 471 |
@@ -224,6 +231,9 @@ Forever-specific amounts worth knowing:
 
 - Forever allows **two primary professions**. The API only lists the open profession's
   recipes, so Gearwright saves them per character whenever a profession window opens.
+- Gearwright only treats a window as yours when it isn't linked, a guild list or NPC
+  crafting, and (if `GetProfessions` answers) the profession is one of yours. Any window,
+  yours or not, adds to an account-wide catalog of what each profession makes.
 - Crafted gear from other professions comes from the probe scans (`Data/Crafted.lua`):
   Blacksmithing, Enchanting, Leatherworking and Tailoring so far; no Engineering scan yet.
   Which professions you have comes from `GetProfessions`/`GetProfessionInfo`, if the
@@ -284,7 +294,27 @@ Auctionator 340 runs on Forever with its **modern** auction house code
 `GetNumReplicateItems` / `GetReplicateItemInfo(i)` / `GetReplicateItemLink(i)` (0-based)
 read it. Some listings come without item data and need `RequestLoadItemDataByID` first.
 Auctionator is "All Rights Reserved"; none of its code is used, only the API it shows.
-`/gwp ah` does that scan (not yet run on the beta).
+First scan, 2026-10-03 18:34 (`data/probe/2026-10-03-auction.json`, tooltips trimmed to
+effect lines): **109,889 listings, 5,295 distinct gear items, 1,177 other items priced.**
+Every gear item had data after the probe's retries. What it shows:
+
+- Mostly levels 10-29 (beta cap 30): required level 0-9: 1,309, 10-19: 2,823,
+  20-29: 2,049, 30+: 89. Quality: 5,224 green, 505 white, 346 grey, 195 blue.
+- Stat tokens seen: the six base stats, `ATTACK_POWER`, `RANGED_ATTACK_POWER`,
+  `ATTACK_POWER_VS_BEAST/HUMANOID/MECHANICAL`, spell power and per-school damage,
+  healing, defense, resistances, mana and health regen, fishing; `HIT_RATING` on 3
+  items (3 -> 0.3%), `CRIT_RATING` and `PARRY_RATING` on Fletcher's Gloves
+  (14 -> 1% crit, -15 -> "Decreases your chance to Parry by 1.0%"). No haste or
+  expertise gear listed yet.
+- Zircon Band of Eluding's "+1% dodge" exists only as a tooltip line, with no stat token.
+- Gearwright's reader (`Data/Stats.lua`) gets hit, crit and AP right on every item:
+  each counted once, each matching its tooltip.
+- An item listed both with and without its data loaded was split in two in this scan
+  (empty name in the key); the probe now merges them, and `tools/ah_report.py` merges
+  older scans.
+
+`python tools/ah_report.py data/probe/2026-10-03-auction.json --level 20 --spec combat`
+ranks what's listed for a character, per slot, with prices.
 
 ## Still open
 

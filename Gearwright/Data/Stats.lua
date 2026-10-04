@@ -74,7 +74,8 @@ end
 -- (e.g. "+20 Attack Power" as ITEM_MOD_ATTACK_POWER_SHORT = 20), so a stat
 -- already present in `stats` is not added again from the tooltip.
 -- Confirmed on the Forever beta: Catacomb Cloak reports ITEM_MOD_ATTACK_POWER_SHORT = 3
--- AND "Equip: +3 Attack Power." Still unverified for hit/crit "Equip:" lines.
+-- AND "Equip: +3 Attack Power." Hit and crit too: across the 5,295 gear items of
+-- the 2026-10-03 auction house scan, every one is counted once and matches its tooltip.
 function Stats.AddTooltipEffects(stats, lines)
   local fromRaw = {}
   for key in pairs(stats) do fromRaw[key] = true end
@@ -109,6 +110,41 @@ function Stats.FromEnchantLine(lines)
 end
 
 -- Normalized stats for an item link, or nil if unreadable.
+-- What an item has that the score leaves out, as short labels: stats your
+-- spec doesn't value (e.g. Intellect for a Rogue) and on-hit / on-use effects.
+-- Armor is left out of the list: every piece has it.
+local UNSCORED_SKIP = { RESISTANCE0_NAME = true }
+function Stats.Unscored(raw, lines, weights)
+  local out, seen = {}, {}
+  local function add(label)
+    if not seen[label] then seen[label] = true; out[#out + 1] = label end
+  end
+  local tokens = {}
+  for token in pairs(raw or {}) do tokens[#tokens + 1] = token end
+  table.sort(tokens)
+  for _, token in ipairs(tokens) do
+    local key = Stats.TOKEN_TO_KEY[token]
+    local w = key and (key == "dps" or ns.Weights.For(weights, key))
+    if not UNSCORED_SKIP[token] and not (w and w ~= 0) then
+      add(key and Stats.LABELS[key] or Stats.TokenLabel(token))
+    end
+  end
+  for _, line in ipairs(lines or {}) do
+    if type(line) == "string" then
+      if line:find("^Chance on hit:") then add("chance on hit effect") end
+      if line:find("^Use:") then add("use effect") end
+    end
+  end
+  return out
+end
+
+-- "ITEM_MOD_SPELL_POWER_SHORT" -> "Spell Power", "RESISTANCE4_NAME" -> "resistance"
+function Stats.TokenLabel(token)
+  if token:find("^RESISTANCE") then return "Resistance" end
+  local words = token:gsub("^ITEM_MOD_", ""):gsub("_SHORT$", ""):lower():gsub("_", " ")
+  return (words:gsub("^%l", string.upper))
+end
+
 function Stats.FromLink(link)
   local raw = ns.API.GetItemStats(link)
   if not raw then return nil end

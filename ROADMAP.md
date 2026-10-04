@@ -33,6 +33,8 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [x] Quest reward pick and loot/roll upgrade messages
 - [x] Crafted upgrades from every scanned profession, yours or not: craft it, learn it, or have it
       crafted (`Data/Crafted.lua` from `tools/crafted_from_probe.py`; Crafting tab)
+- [x] Crafting knows your other characters' recipes ("Smithy can craft it")
+- [ ] Next-goal button (minimap / LibDataBroker) and a per-character wishlist
 - [ ] Engineering recipes (needs a probe scan from an engineer)
 - [x] Probe: auction house full scan (`/gwp ah`) for gear stats and prices in bulk
 - [ ] Auction house upgrades in Gearwright itself: gear on the AH that beats yours, with prices

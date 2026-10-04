@@ -491,6 +491,19 @@ local function scanTradeSkill()
   local out = { at = now(), recipes = {} }
   if C_TradeSkillUI and C_TradeSkillUI.GetAllRecipeIDs then
     out.profession = capture("C_TradeSkillUI.GetBaseProfessionInfo")
+    -- Whose window is this? Yours, another player's link, a guild list, an NPC...
+    out.owner = {
+      linked = capture("C_TradeSkillUI.IsTradeSkillLinked"),
+      guild = capture("C_TradeSkillUI.IsTradeSkillGuild"),
+      npc = capture("C_TradeSkillUI.IsNPCCrafting"),
+      ready = capture("C_TradeSkillUI.IsTradeSkillReady"),
+      mine = capture("GetProfessions"),
+    }
+    local mine = out.owner.mine.values or {}
+    out.owner.mineInfo = {}
+    for i = 1, 6 do
+      if type(mine[i]) == "number" then out.owner.mineInfo[#out.owner.mineInfo + 1] = capture("GetProfessionInfo", mine[i]) end
+    end
     local ids = capture("C_TradeSkillUI.GetAllRecipeIDs")
     for _, id in ipairs((ids.values and ids.values[1]) or {}) do
       local info = capture("C_TradeSkillUI.GetRecipeInfo", id)
@@ -522,7 +535,9 @@ local function scanTradeSkill()
     name = tostring(n + 1)
   end
   db().scans["tradeskill:" .. name] = out
-  say("recorded %d recipes (%s)", #out.recipes, tostring(out.api))
+  local linked = out.owner and out.owner.linked.values or {}
+  say("recorded %d recipes (%s)%s", #out.recipes, tostring(out.api),
+    linked[1] == true and (" from " .. tostring(linked[2]) .. "'s linked profession") or "")
 end
 
 local function scanTrainer()
@@ -760,11 +775,21 @@ local function ahRetry(scan, todo, try)
   if not ah.open then return ahFinish(scan, #todo) end
   local left = {}
   for _, t in ipairs(todo) do
-    local rec = not scan.gear[t.key] and readGear(t.index, t.id)
+    local rec = not t.done and readGear(t.index, t.id)
     if rec then
-      rec.minBuyout, rec.listings = t.buyout, t.listings
-      scan.gear[t.key] = rec
-    elseif not scan.gear[t.key] then
+      -- The listing's name is empty until its data loads, so key by the real
+      -- name now and merge listings that were split by that.
+      t.done = true
+      local key = t.id .. ":" .. tostring(rec.name)
+      local prev = scan.gear[key]
+      if prev then
+        prev.listings = prev.listings + t.listings
+        if t.buyout and (not prev.minBuyout or t.buyout < prev.minBuyout) then prev.minBuyout = t.buyout end
+      else
+        rec.minBuyout, rec.listings = t.buyout, t.listings
+        scan.gear[key] = rec
+      end
+    elseif not t.done then
       left[#left + 1] = t
       if C_Item.RequestLoadItemDataByID then pcall(C_Item.RequestLoadItemDataByID, t.id) end
     end
@@ -792,7 +817,8 @@ local function ahProcess()
           and math.floor(buyout / count) or nil
         local key = tostring(itemID)
         if isGear(itemID) then
-          -- Random-suffix items share an ID: tell them apart by name.
+          -- Random-suffix items share an ID: tell them apart by name (empty
+          -- until the item's data loads; ahRetry re-keys by the real name).
           key = key .. ":" .. tostring(sanitize(info[1]))
           local t = byKey[key]
           if not t then
