@@ -212,6 +212,15 @@ print("tooltip:", tip)
 assert "+140.0|r in Main Hand over equipped" in tip[0] and "(Combat)" in tip[0], tip
 assert tip[1].startswith("|cffaaaaaaOff Hand:|r") and "+56.0|r" in tip[1] and "over Pearl-handled Dagger" in tip[1], tip
 assert tip[2] == "|cffaaaaaaNot counted: Intellect, chance on hit effect|r", tip
+# Weapon skills: with only Daggers trained, a sword still scores but says to
+# train One-Handed Swords first; a dagger doesn't.
+L.execute("function IsPlayerSpell(id) return id == 1180 end")
+train = L.eval("""function(ns) return ns.Advisor.CompareToEquipped('item:2002:0:0') ~= nil,
+  ns.Advisor.TrainingNeeded('item:2002:0:0'), ns.Advisor.TrainingNeeded('item:2003:0:0') end""")(ns)
+assert tuple(train) == (True, "One-Handed Swords"), tuple(train)  # dagger: nil
+tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:2002:0:0', ns.Advisor.CompareSlots('item:2002:0:0')) end""")(ns).values())
+assert any("Train One-Handed Swords at a weapon master" in t for t in tip), tip
+L.execute("IsPlayerSpell = nil")
 L.execute("INV[17] = nil")
 # Items above your level still score, and say when you can wear them.
 d = compare("item:1003:0:0")

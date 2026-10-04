@@ -33,6 +33,8 @@ end
 local function describe(row)
   local s = ("%s |cff40ff40+%.1f|r vs %s"):format(row.link, row.delta, ns.Advisor.SLOT_NAMES[row.slot] or "equipped")
   if row.reqLevel then s = s .. (" |cffff9900(at level %d)|r"):format(row.reqLevel) end
+  local train = row.train or (row.link and ns.Advisor.TrainingNeeded(row.link))
+  if train then s = s .. (" |cffff9900(train %s first)|r"):format(train) end
   return s
 end
 

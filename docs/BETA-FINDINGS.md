@@ -64,6 +64,17 @@ here. Gearwright allows them once Hack and Slash has a point or the One-Handed
 Axes skill (spell 196) is known. The probe now records which weapon skills are
 known, to confirm.
 
+## Weapon skills (19:04 capture)
+
+`IsPlayerSpell` answers for weapon skill spells. Level 19 Rogue: **Daggers (1180),
+Thrown (2567) and Dual Wield (674) known; One-Handed Swords (201), One-Handed Maces
+(198), Fist Weapons (15590), One-Handed Axes (196) not.** As in Classic, a Rogue
+starts with daggers and trains the other weapon types at a weapon master.
+Gearwright still scores those weapons but says to train the skill first. Unknown
+yet: whether Forever has Classic's weapon skill *levels* (a freshly trained skill
+at 1/100 misses a lot), and whether Hack and Slash lets Rogues train axes.
+(The probe saved unknown skills as "error" in this capture; fixed.)
+
 ## Items and stats
 
 - `C_Item.GetItemStats` works and returns `ITEM_MOD_*_SHORT` tokens. Seen so far:
@@ -212,12 +223,14 @@ Forever-specific amounts worth knowing:
 
 ## Professions (2026-10-03, saved in `data/probe/2026-10-03-professions.json`)
 
-**These windows were found in game, not opened on Jeff's characters**: the skill
-levels and "learned" counts below belong to whoever's profession it was. The recipe
-lists (what each profession makes) are what's useful. How they were opened (a
-player's link, a crafting station...) isn't recorded; the probe now records
-`IsTradeSkillLinked` / `IsTradeSkillGuild` / `IsNPCCrafting` and your own
-`GetProfessions` with each scan to tell.
+**Not all of these are Jeff's.** Sassy (level 19 Rogue) has Leatherworking 85,
+Skinning 133, First Aid 83 and Cooking 15 (`GetProfessions` + `GetProfessionInfo`,
+19:05 capture, `data/probe/2026-10-03-weaponskills-professions.json`). Tailoring,
+Enchanting and Blacksmithing were other players' windows: Enchanting was
+**Xania Vei's linked profession** (`C_TradeSkillUI.IsTradeSkillLinked()` returns
+`true, "Xania Vei"`). So their skill levels and learned counts are those players';
+their recipe lists (what each profession makes) are what's useful.
+`IsTradeSkillGuild` and `IsNPCCrafting` exist and answer false.
 
 | Profession | Skill | Recipes | Learned | Make an item |
 |---|---|---|---|---|

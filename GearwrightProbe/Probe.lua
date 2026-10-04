@@ -213,7 +213,7 @@ local function weaponSkills()
   local known = IsPlayerSpell or (C_SpellBook and C_SpellBook.IsSpellKnown) or IsSpellKnown
   for id, name in pairs(WEAPON_SKILL_SPELLS) do
     local ok, v = pcall(known or function() return nil end, id)
-    out.spells[name] = ok and sanitize(v) or "error"
+    if ok then out.spells[name] = sanitize(v) == true else out.spells[name] = "error" end
   end
   if GetNumSkillLines and GetSkillLineInfo then
     out.skillLines = {}

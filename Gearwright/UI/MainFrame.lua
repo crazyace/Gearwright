@@ -62,6 +62,7 @@ TABS.upgrades = {
       local sub = slotName(r.slot) .. "  -  " .. ns.Sources.Describe(s)
       if #r.sources > 1 then sub = sub .. (" (+%d more)"):format(#r.sources - 1) end
       if r.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(r.reqLevel) end
+      if r.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(r.train) end
       rows[#rows + 1] = {
         icon = ns.API.GetItemIcon("item:" .. r.itemID) or EMPTY_ICON,
         title = r.link or r.name, sub = sub, link = r.link,
@@ -89,6 +90,7 @@ TABS.crafting = {
     for _, r in ipairs(list) do
       local sub = slotName(r.slot) .. "  -  " .. Theme.Hex(CRAFT_COLOR[r.status]) .. ns.Advisor.CraftStatusText(r) .. "|r"
       if r.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(r.reqLevel) end
+      if r.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(r.train) end
       rows[#rows + 1] = {
         icon = ns.API.GetItemIcon("item:" .. r.itemID) or EMPTY_ICON,
         title = r.link or r.name, sub = sub, link = r.link,

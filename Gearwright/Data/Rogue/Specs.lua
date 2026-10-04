@@ -25,6 +25,23 @@ R.proficiency = {
   [4] = { [0] = true, [1] = true, [2] = true }, -- armor: misc (rings, necks, trinkets), cloth, leather
 }
 
+-- Weapon skills, by weapon subclass. As in Classic, a Rogue starts with Daggers
+-- (and Thrown) and trains the others at a weapon master: on the 2026-10-03 beta
+-- a level 19 Rogue knew Daggers, Thrown and Dual Wield but not Swords, Maces or
+-- Fist Weapons (IsPlayerSpell). A weapon whose skill isn't trained yet is still
+-- scored, with a note to train it.
+R.weaponSkills = {
+  [15] = { spell = 1180, name = "Daggers" },
+  [7] = { spell = 201, name = "One-Handed Swords" },
+  [4] = { spell = 198, name = "One-Handed Maces" },
+  [13] = { spell = 15590, name = "Fist Weapons" },
+  [0] = { spell = 196, name = "One-Handed Axes" },
+  [2] = { spell = 264, name = "Bows" },
+  [3] = { spell = 266, name = "Guns" },
+  [18] = { spell = 5011, name = "Crossbows" },
+  [16] = { spell = 2567, name = "Thrown" },
+}
+
 -- Weapon types a Rogue only gets later. Forever's Combat talent Hack and Slash
 -- has an Axe/Sword bonus, so taking it should let Rogues use one-handed axes.
 -- Unlocked when the talent has a point in it, or when the player knows the
