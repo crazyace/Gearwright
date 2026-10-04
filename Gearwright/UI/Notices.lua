@@ -137,11 +137,16 @@ function Notices.Train()
   end
   table.sort(missing)
   if #missing == 0 then return ns.util.print("you know every weapon skill your class can use") end
-  ns.util.print("weapon skills you can still train:")
-  for _, skill in ipairs(missing) do
-    print("  " .. skill .. "  |cff999999" .. (ns.Trainers.Where(skill) or "no trainer known") .. "|r")
+  local plan, unknown = ns.Trainers.Plan(missing)
+  local WHERE = { [0] = " |cff40ff40(here)|r", [1] = "", [2] = " |cff999999(other continent)|r" }
+  ns.util.print("weapon skills you can still train, nearest trainer first:")
+  for _, g in ipairs(plan) do
+    local t = g.trainer
+    print(("  %s%s%s: %s"):format(t.name, t.city and (", " .. t.city) or "", WHERE[g.distance] or "",
+      table.concat(g.skills, ", ")))
   end
-  for i = #missing, 1, -1 do ns.Trainers.Show(missing[i]) end
+  if #unknown > 0 then print("  no trainer known: " .. table.concat(unknown, ", ")) end
+  ns.Trainers.ShowPlan(plan)
   return missing
 end
 
