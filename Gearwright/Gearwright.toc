@@ -5,6 +5,7 @@
 ## Version: 0.1.0-dev
 ## SavedVariables: GearwrightDB
 ## OptionalDeps: ForeverDungeonJournal
+## X-Credits: Dungeon loot and quest rewards from Forever Dungeon Journal by Exehn, used with permission
 ## IconTexture: Interface\Icons\INV_Misc_Gear_01
 
 # Interface 16001 confirmed on the Forever beta (client 1.60.1, build 70205)
@@ -17,6 +18,7 @@ Core\API.lua
 Data\Stats.lua
 Data\Enchants.lua
 Data\DungeonLoot.lua
+Data\DungeonJournal.lua
 Data\Crafted.lua
 Data\WeaponMasters.lua
 Data\Rogue\Specs.lua

@@ -65,7 +65,8 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [ ] Weapon logic: daggers for Mutilate/Hemorrhage, main-hand vs off-hand speed
 - [x] Dungeon upgrades: own loot table from the probe's loot log, plus Forever Dungeon Journal's
       tables when installed (read at runtime, optional dependency)
-- [ ] Ask Exehn (Forever Dungeon Journal) about sharing data both ways
+- [x] Ask Exehn (Forever Dungeon Journal) about using his data: yes, with credit (2026-10-04)
+- [ ] Offer Exehn Gearwright's probe findings (loot logs, quest rewards) for his addon
 - [ ] Raid and quest-hub sources
 - [ ] Raid gear + enchants for Barrow Deeps, Hyjal Summit, Onyxia's Lair (Dec 9)
 - [ ] Multiple builds per spec (raid, dungeon, PvP)

@@ -124,7 +124,7 @@ end
 txt = L.globals().SCREEN(ns)
 print("---- main window ----"); print(txt)
 for want in ("Spec:|r Subtlety", "(override)", "Stat weights are provisional", "Head", "item:1001:0:0",
-             "No recommended build for this spec yet.", "Best: Superior Striking", "No dungeon loot known yet"):
+             "No recommended build for this spec yet.", "Best: Superior Striking", "No dungeon upgrades for you"):
     assert want in txt, want
 L.globals().SlashCmdList.GEARWRIGHT("spec auto")  # refreshes the open window
 txt = L.globals().SCREEN(ns)
@@ -737,8 +737,13 @@ L.execute('ns_own = { { itemID = 1002, name = "Better Cap", dungeon = "The Deadm
 own = L.eval("""function(ns) ns.Data.DUNGEON_LOOT = ns_own; ns.Sources.Reset()
   local rows = ns.Advisor.DungeonReport() local s = ns.Sources.For(1002)[1]
   ns.Data.DUNGEON_LOOT = {}; ns.Sources.Reset()
-  return #rows, ns.Sources.Describe(s), ns.Sources.All() end""")(ns)
-assert own[0] == 1 and own[1] == "Rhahk'Zor, The Deadmines" and own[2] is None, own
+  return #rows, ns.Sources.Describe(s) end""")(ns)
+assert own[0] == 1 and own[1] == "Rhahk'Zor, The Deadmines", own
+# Without the addon, Gearwright's copy of Forever Dungeon Journal's data (by
+# Exehn, used with permission) is used: Catacomb Cloak is a Hall of Thanes quest reward.
+bundled = L.eval("""function(ns) ns.Sources.Reset() local s = ns.Sources.For(279899)
+  return ns.Sources.Describe(s[1]), ns.Data.DUNGEON_JOURNAL.source end""")(ns)
+assert bundled[0] == "quest An Ancient Grudge, Hall of Thanes (13-20)" and "Exehn" in bundled[1], bundled
 
 # Probe
 # Character sheet + stats, shaped like the Forever beta: no GetCritChanceFromAgility,
@@ -934,6 +939,35 @@ tr = L.eval("""function() local t = GearwrightProbeDB.scans["trainer:Fenthwick"]
 assert tuple(tr) == (3, 1, False, False), tuple(tr)  # all 3 read; "used" was off and is off again
 L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, GetTrainerServiceTypeFilter, SetTrainerServiceTypeFilter = nil, nil, nil, nil
 function UnitName() return "Tester" end""")
+# Combat readability: /gwp combat records, during the next fight, which calls a
+# rotation helper needs come back readable or secret. Here aura timers are secret.
+L.execute("""
+SECRET = setmetatable({}, { __tostring = function() return "secret" end })
+function issecretvalue(v) return v == SECRET end
+function UnitPower(_, t) return t == 4 and 3 or 80 end
+function UnitPowerMax() return 100 end
+function GetComboPoints() return 3 end
+function UnitHealth() return 500 end
+function UnitHealthMax() return 1000 end
+function UnitCanAttack() return true end
+function IsStealthed() return false end
+function GetTime() return 100 end
+C_UnitAuras = { GetAuraDataByIndex = function(unit, i) if i == 1 then return { name = "Slice and Dice", expirationTime = SECRET } end end }
+C_Spell.GetSpellInfo = function(name) if name == "Sinister Strike" then return { spellID = 1752 } end end
+C_Spell.GetSpellCooldown = function() return { startTime = 0, duration = 0 } end
+C_Spell.IsSpellUsable = function() return true, false end
+C_Spell.GetSpellPowerCost = function() return { { cost = 45 } } end
+printed = {}
+""")
+L.globals().SlashCmdList.GEARWRIGHTPROBE("combat")
+L.globals().fire("PLAYER_REGEN_DISABLED"); L.globals().fire("PLAYER_REGEN_ENABLED")
+cb = L.eval("""function() local c = GearwrightProbeDB.scans.combat
+  return c.samples, c["UnitPower(energy)"].readable, c["aura expirationTime"].secret, c.known["Sinister Strike"], c.buffs[1] end""")()
+assert tuple(cb) == (60, 60, 120, 1752, "Slice and Dice"), tuple(cb)  # player + target aura, 60 samples each
+out = "\n".join(L.globals().printed.values())
+assert "SECRET: aura expirationTime" in out, out
+L.execute("issecretvalue = nil; C_UnitAuras = nil; GetTime = nil")
+
 # Auction house full scan: gear gets its full record and lowest buyout; other
 # items only a unit price; a gear item whose data never loads is counted.
 L.execute("""

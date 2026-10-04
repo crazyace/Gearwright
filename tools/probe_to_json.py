@@ -295,6 +295,16 @@ def summarize(db):
                     lines.append(f"   {item_id} {rec.get('name')}: {e.get('count')}x from "
                                  f"{e.get('name') or src} in {e.get('where')}")
             continue
+        if key == "combat":
+            lines.append(f"combat readability {scan.get('at')}: {scan.get('samples')} samples")
+            for name, rec in sorted(scan.items()):
+                if isinstance(rec, dict) and "calls" in rec:
+                    state = ("SECRET" if rec.get("secret") else "readable" if rec.get("readable") else
+                             "missing" if rec.get("missing") else "error")
+                    lines.append(f"   {name}: {state} ({rec.get('readable', 0)} readable, {rec.get('secret', 0)} secret, "
+                                 f"{rec.get('missing', 0)} missing, {rec.get('errors', 0)} errors)")
+            lines.append(f"   known spells: {', '.join(sorted((scan.get('known') or {}).keys()))}")
+            continue
         if key == "auction":
             gear = scan.get("gear") or {}
             lines.append(f"auction house scan {scan.get('at')}: {scan.get('listings')} listings, "
