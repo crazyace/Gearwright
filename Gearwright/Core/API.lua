@@ -72,6 +72,21 @@ function API.TradeSkillOwner(profession)
   return "mine"
 end
 
+-- Where the player stands: mapID, x, y (0-1), or nil.
+function API.PlayerMapPosition()
+  if not (C_Map and C_Map.GetBestMapForUnit and C_Map.GetPlayerMapPosition) then return nil end
+  local okM, mapID = pcall(C_Map.GetBestMapForUnit, "player")
+  mapID = okM and API.clean(mapID)
+  if not mapID then return nil end
+  local okP, pos = pcall(C_Map.GetPlayerMapPosition, mapID, "player")
+  if not okP or not pos then return nil end
+  local x, y
+  if pos.GetXY then x, y = pos:GetXY() else x, y = pos.x, pos.y end
+  x, y = API.clean(x), API.clean(y)
+  if type(x) ~= "number" or type(y) ~= "number" then return nil end
+  return mapID, x, y
+end
+
 -- True when the item binds on pickup (so an alt can't craft it for you),
 -- false when it doesn't, nil when not known yet.
 function API.BindsOnPickup(item)

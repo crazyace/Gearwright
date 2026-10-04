@@ -219,7 +219,47 @@ train = L.eval("""function(ns) return ns.Advisor.CompareToEquipped('item:2002:0:
   ns.Advisor.TrainingNeeded('item:2002:0:0'), ns.Advisor.TrainingNeeded('item:2003:0:0') end""")(ns)
 assert tuple(train) == (True, "One-Handed Swords"), tuple(train)  # dagger: nil
 tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:2002:0:0', ns.Advisor.CompareSlots('item:2002:0:0')) end""")(ns).values())
-assert any("Train One-Handed Swords at a weapon master" in t for t in tip), tip
+assert "|cffff9900Train One-Handed Swords first: Woo Ping, Stormwind|r" in tip, tip
+# ...and where: the weapon master gets a pin on the world map, drawn when the
+# map shows Stormwind. /gearwright train lists every skill still to train.
+L.execute("""
+local canvas = CreateFrame("Frame"); canvas.GetWidth = function() return 1000 end; canvas.GetHeight = function() return 600 end
+WorldMapFrame = CreateFrame("Frame"); WorldMapFrame._shown = true
+WorldMapFrame.GetCanvas = function() return canvas end
+WorldMapFrame.GetMapID = function(self) return self.mapID end
+WorldMapFrame.SetMapID = function(self, id) self.mapID = id end
+PINPOINTS = {}
+REAL_CREATEFRAME = CreateFrame
+local cf = CreateFrame
+CreateFrame = function(kind, name, parent, ...) local f = cf(kind, name, parent, ...)
+  f.SetPoint = function(self, a, rel, b, x, y) PINPOINTS[#PINPOINTS + 1] = { x, y } end
+  return f end
+printed = {}
+""")
+L.eval("function(ns) ns.Trainers.Show('One-Handed Swords') end")(ns)
+pins = L.eval("function() local p = PINPOINTS[#PINPOINTS] return WorldMapFrame.mapID, p[1], p[2] end")()
+assert pins[0] == 1453 and abs(pins[1] - 572) < 1e-6 and abs(pins[2] + 345.6) < 1e-6, tuple(pins)
+assert "train One-Handed Swords with Woo Ping in Stormwind (Classic position" in L.globals().printed[1], L.globals().printed[1]
+L.execute("printed = {}")
+L.globals().SlashCmdList.GEARWRIGHT("train")
+out = "\n".join(L.globals().printed.values())
+assert "weapon skills you can still train:" in out and "One-Handed Maces  |cff999999Buliwyf Stonehand, Ironforge" in out, out
+assert "Daggers" not in out.split("weapon skills you can still train:")[1].split("train ")[0], out
+# Opening a weapon master saves where it really is, and that wins over Classic's.
+L.execute("""
+function GetNumTrainerServices() return 2 end
+function GetTrainerServiceInfo(i) return ({ "One-Handed Swords", "Staves" })[i], "", "available" end
+function UnitGUID() return "Creature-0-1-0-1-11867-0001" end
+function UnitName(u) return u == "npc" and "Woo Ping" or "Tester" end
+C_Map = { GetBestMapForUnit = function() return 1453 end,
+  GetPlayerMapPosition = function() return { GetXY = function() return 0.6, 0.7 end } end }
+""")
+L.globals().fire("TRAINER_SHOW")
+seen = L.eval("function(ns) local t = ns.Trainers.For('One-Handed Swords')[1] return t.x, t.y, t.seen ~= nil, #t.skills end")(ns)
+assert tuple(seen) == (0.6, 0.7, True, 2), tuple(seen)
+L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, UnitGUID, C_Map = nil, nil, nil, nil
+function UnitName() return "Tester" end; WorldMapFrame._shown = false; CreateFrame = REAL_CREATEFRAME""")
+L.eval("function(ns) ns.MapPins.Clear(); ns.db.trainers = nil end")(ns)
 L.execute("IsPlayerSpell = nil")
 L.execute("INV[17] = nil")
 # Items above your level still score, and say when you can wear them.

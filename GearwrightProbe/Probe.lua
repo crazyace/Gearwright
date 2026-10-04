@@ -541,7 +541,15 @@ local function scanTradeSkill()
 end
 
 local function scanTrainer()
-  local out = { at = now(), services = {} }
+  local out = { at = now(), services = {}, npc = sanitize(UnitGUID and UnitGUID("npc")) }
+  out.map = capture("C_Map.GetBestMapForUnit", "player")
+  local mapID = out.map.values and out.map.values[1]
+  if type(mapID) == "number" and C_Map and C_Map.GetPlayerMapPosition then
+    local ok, pos = pcall(C_Map.GetPlayerMapPosition, mapID, "player")
+    if ok and pos and pos.GetXY then out.x, out.y = pos:GetXY() end
+    out.x, out.y = sanitize(out.x), sanitize(out.y)
+  end
+  out.zone = sanitize(GetRealZoneText and GetRealZoneText())
   for i = 1, (GetNumTrainerServices and GetNumTrainerServices() or 0) do
     out.services[i] = capture("GetTrainerServiceInfo", i)
   end

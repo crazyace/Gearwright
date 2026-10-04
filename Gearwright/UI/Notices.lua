@@ -121,6 +121,30 @@ end
 ns:On("LOOT_OPENED", function() Notices.Loot() end)
 ns:On("START_LOOT_ROLL", function(rollID) Notices.Roll(rollID) end)
 
+-- Weapon skills -------------------------------------------------------------------
+-- /gearwright train: the weapon skills your class can use but you haven't
+-- trained, who teaches them, and pins on the map.
+function Notices.Train()
+  local ctx, reason = ns.Advisor.Context()
+  if not ctx then return ns.util.print("train: %s", tostring(reason)) end
+  if not ctx.weaponSkills then
+    return ns.util.print("train: this client doesn't say which weapon skills you know")
+  end
+  local missing = {}
+  local prof = ctx.proficiency or ctx.class.proficiency
+  for sub, skill in pairs(ctx.class.weaponSkills or {}) do
+    if not ctx.weaponSkills[sub] and prof[2] and prof[2][sub] then missing[#missing + 1] = skill.name end
+  end
+  table.sort(missing)
+  if #missing == 0 then return ns.util.print("you know every weapon skill your class can use") end
+  ns.util.print("weapon skills you can still train:")
+  for _, skill in ipairs(missing) do
+    print("  " .. skill .. "  |cff999999" .. (ns.Trainers.Where(skill) or "no trainer known") .. "|r")
+  end
+  for i = #missing, 1, -1 do ns.Trainers.Show(missing[i]) end
+  return missing
+end
+
 -- Crafting ---------------------------------------------------------------------
 -- /gearwright craft: crafted upgrades from every profession, with whether you
 -- can make it yourself, need to learn the recipe, or should have it crafted.

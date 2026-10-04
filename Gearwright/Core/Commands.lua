@@ -8,6 +8,8 @@ local function help()
   print("  /gearwright tooltip    toggle the tooltip line")
   print("  /gearwright notices    toggle quest reward / loot upgrade messages")
   print("  /gearwright craft      upgrades you can craft (open each profession once first)")
+  print("  /gearwright train      weapon skills you can still train, pinned on the map")
+  print("  /gearwright pins clear remove Gearwright's map pins")
   print("  /gearwright debug      toggle debug output")
 end
 
@@ -38,6 +40,11 @@ SlashCmdList.GEARWRIGHT = function(msg)
     ns.util.print("upgrade messages %s", ns.db.notices and "on" or "off")
   elseif cmd == "craft" then
     ns.Notices.Craft()
+  elseif cmd == "train" then
+    ns.Notices.Train()
+  elseif cmd == "pins" and arg == "clear" then
+    ns.MapPins.Clear()
+    ns.util.print("map pins cleared")
   elseif cmd == "debug" then
     ns.db.debug = not ns.db.debug
     ns.util.print("debug %s", ns.db.debug and "on" or "off")
