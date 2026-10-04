@@ -14,6 +14,9 @@ stat weights, and tells you:
   (chat messages; `/gearwright notices` turns them off)
 - **Talents** - where does your build differ from the recommended one?
 - **Enchants** - the best stat enchant for each slot, and what it adds over the one you have
+- **Consumables** - the best weapon buff for each hand (sharpening stone, weightstone, wizard or
+  mana oil, Rogue poison) and whether one is on, the elixirs worth drinking, and which healing
+  and mana potions to carry, all for your level and spec
 - **Training** - class spells to train now (and their cost) and coming up, and every weapon
   skill: trained, its level, or who teaches it (click to pin them on the map)
 - **Crafting** - crafted upgrades from every profession, yours or not: whether you can craft
@@ -24,7 +27,7 @@ stat weights, and tells you:
   where they drop (window tab + tooltip line)
 
 The window (`/gearwright`) has a tab per advisor: Gear, Wishlist, Dungeons, Crafting,
-Enchants, Talents, Training and Settings. Hover a row for the item tooltip; Shift-click
+Enchants, Consumables, Talents, Training and Settings. Hover a row for the item tooltip; Shift-click
 links it in chat; right-click an upgrade to add it to your wishlist.
 
 ### Dungeon loot

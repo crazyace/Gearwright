@@ -17,6 +17,7 @@ Core\API.lua
 
 Data\Stats.lua
 Data\Enchants.lua
+Data\Consumables.lua
 Data\DungeonLoot.lua
 Data\DungeonJournal.lua
 Data\Crafted.lua
@@ -37,6 +38,7 @@ Engine\Professions.lua
 Engine\Trainers.lua
 Engine\WeaponSkills.lua
 Engine\ClassTrainer.lua
+Engine\Consumables.lua
 Engine\Advisor.lua
 Engine\Wishlist.lua
 

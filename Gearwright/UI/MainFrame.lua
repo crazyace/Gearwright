@@ -14,6 +14,7 @@ local REASONS = {
   ["no-build-data"] = "No recommended build for this spec yet.",
   ["no-enchant-data"] = "No enchant data loaded.",
   ["nothing-to-enchant"] = "Nothing equipped that takes an enchant.",
+  ["no-consumable-data"] = "No consumable data loaded.",
   ["no-talent-points"] = "Spend some talent points so Gearwright can detect your spec.",
   ["no-talent-config"] = "Talents aren't loaded yet; try again in a moment.",
   ["no-trait-tab-map"] = "No talent tree layout for this class yet.",
@@ -168,6 +169,90 @@ TABS.enchants = {
         link = r.link, value = value, valueColor = color }
     end
     return rows
+  end,
+}
+
+-- "+4 Weapon Damage, +2% Crit"
+local PERCENT = { crit = true, hit = true, haste = true, spellCrit = true, spellHit = true }
+local function effectText(stats)
+  local keys = {}
+  for k in pairs(stats or {}) do keys[#keys + 1] = k end
+  table.sort(keys)
+  local parts = {}
+  for _, k in ipairs(keys) do
+    parts[#parts + 1] = ("+%s%s %s"):format(stats[k], PERCENT[k] and "%" or "", ns.Stats.LABELS[k] or k)
+  end
+  return table.concat(parts, ", ")
+end
+
+local function itemLink(id)
+  local link = ns.API.GetItemLink(id)
+  if not link then ns.API.RequestItem(id) end
+  return link or ("item:" .. id)
+end
+
+local function consumableRow(title, c, nxt, sub)
+  local item = (c or nxt).item
+  local row = { icon = ns.API.GetItemIcon(item.id) or EMPTY_ICON, link = itemLink(item.id) }
+  if c then
+    row.title, row.value, row.valueColor = title .. item.name, plus(c.score), "good"
+  else
+    row.title, row.value, row.valueColor = title .. Theme.Hex("muted") .. item.name .. "|r", "level " .. item.level, "muted"
+  end
+  if c and nxt then sub = sub .. Theme.Hex("muted") .. ("  -  level %d: %s|r"):format(nxt.item.level, nxt.item.name) end
+  row.sub = sub
+  return row
+end
+
+local function weaponBuffSub(c, r)
+  local item = c.item
+  local sub
+  if c.poison then
+    sub = ("~%.1f damage per second  -  you make it (Poisons)"):format(c.dps)
+  else
+    sub = effectText(item.stats) .. "  -  " .. item.source
+  end
+  if r.active then
+    sub = Theme.Hex("good") .. ("applied, %d min left|r  -  "):format(r.active) .. sub
+  elseif r.active == false then
+    sub = Theme.Hex("warn") .. "nothing applied|r  -  " .. sub
+  end
+  return sub
+end
+
+TABS.consumables = {
+  label = "Consumables", icon = "Interface\\Icons\\INV_Potion_93",
+  build = function()
+    local report, reason = ns.Advisor.ConsumableReport()
+    if not report then return {}, why(reason) end
+    local rows = {}
+    if #report.weapon > 0 then
+      rows[#rows + 1] = { header = true, title = "Weapon buffs" }
+      for _, r in ipairs(report.weapon) do
+        local c = r.best or r.next
+        rows[#rows + 1] = consumableRow(slotName(r.slot) .. ": ", r.best, r.next, weaponBuffSub(c, r))
+      end
+    end
+    if #report.elixirs > 0 then
+      rows[#rows + 1] = { header = true, title = "Elixirs" }
+      for _, r in ipairs(report.elixirs) do
+        local item = (r.best or r.next).item
+        rows[#rows + 1] = consumableRow("", r.best, r.next, effectText(item.stats) .. "  -  " .. (item.source or "Alchemy"))
+      end
+    end
+    if #report.potions > 0 then
+      rows[#rows + 1] = { header = true, title = "Potions" }
+      for _, r in ipairs(report.potions) do
+        local item = (r.best or r.next).item
+        local row = consumableRow("", r.best, r.next,
+          ("Restores ~%d %s  -  %s"):format(item.amount, item.restores, item.source or "Alchemy"))
+        if r.best then row.value, row.valueColor = "use", "good" end
+        rows[#rows + 1] = row
+      end
+    end
+    local message = "Effects are Classic's until checked on Forever."
+    if #rows == 0 then message = "Nothing worth using at your level yet." end
+    return rows, message
   end,
 }
 
@@ -394,7 +479,7 @@ TABS.settings = {
   end,
 }
 
-UI.TAB_ORDER = { "gear", "wishlist", "upgrades", "crafting", "enchants", "talents", "training", "settings" }
+UI.TAB_ORDER = { "gear", "wishlist", "upgrades", "crafting", "enchants", "consumables", "talents", "training", "settings" }
 UI.TABS = TABS
 
 function UI.BuildRows(tab)
