@@ -15,13 +15,12 @@ ns.Data.WEAPON_MASTERS = {
   { npcID = 11867, name = "Woo Ping", faction = "Alliance", mapID = 1453, x = 0.639, y = 0.690, checked = true,
     city = "Stormwind", continent = 1415, detail = "inside the Just Maces shop",
     skills = { "Daggers", "One-Handed Swords", "Two-Handed Swords", "Polearms", "Staves", "Crossbows" } },
-  -- Buliwyf and Bixi: an Ironforge guard says both are "over at the Timberline Arms
-  -- weapon shop" and teach "axes to... uh... zweihanders" (2026-10-04). Positions
-  -- are still Classic's.
-  { npcID = 11865, name = "Buliwyf Stonehand", faction = "Alliance", mapID = 1455, x = 0.612, y = 0.895,
+  -- Buliwyf and Bixi: in the Timberline Arms weapon shop, per an Ironforge guard;
+  -- positions from the probe at their windows (2026-10-03, 61.3, 89.4 and 62.1, 89.5).
+  { npcID = 11865, name = "Buliwyf Stonehand", faction = "Alliance", mapID = 1455, x = 0.613, y = 0.894, checked = true,
     city = "Ironforge", continent = 1415, detail = "in the Timberline Arms weapon shop",
     skills = { "Fist Weapons", "Guns", "One-Handed Axes", "Two-Handed Axes", "One-Handed Maces", "Two-Handed Maces" } },
-  { npcID = 13084, name = "Bixi Wobblebonk", faction = "Alliance", mapID = 1455, x = 0.622, y = 0.888,
+  { npcID = 13084, name = "Bixi Wobblebonk", faction = "Alliance", mapID = 1455, x = 0.621, y = 0.895, checked = true,
     city = "Ironforge", continent = 1415, detail = "in the Timberline Arms weapon shop",
     skills = { "Daggers", "Crossbows", "Thrown" } },
   { npcID = 11866, name = "Ilyenia Moonfire", faction = "Alliance", mapID = 1457, x = 0.576, y = 0.466,

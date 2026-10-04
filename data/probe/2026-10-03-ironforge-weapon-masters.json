@@ -1,0 +1,4217 @@
+{
+ "scans": {
+  "trainer:Bixi Wobblebonk": {
+   "at": "2026-10-03 19:39:05",
+   "map": {
+    "status": "ok",
+    "values": [
+     1455
+    ]
+   },
+   "npc": "Creature-0-6783-0-145-13084-000040715A",
+   "services": {},
+   "x": 0.6210726499557495,
+   "y": 0.8952656984329224,
+   "zone": "Ironforge"
+  },
+  "trainer:Buliwyf Stonehand": {
+   "at": "2026-10-03 19:38:52",
+   "map": {
+    "status": "ok",
+    "values": [
+     1455
+    ]
+   },
+   "npc": "Creature-0-6783-0-145-11865-000040715A",
+   "services": [
+    {
+     "status": "ok",
+     "values": [
+      "Fist Weapons",
+      "available",
+      132938,
+      0,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Guns",
+      "available",
+      135610,
+      0,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "One-Handed Axes",
+      "available",
+      132392,
+      0,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "One-Handed Maces",
+      "available",
+      133476,
+      0,
+      "",
+      ""
+     ]
+    }
+   ],
+   "x": 0.6132471561431885,
+   "y": 0.8941985964775085,
+   "zone": "Ironforge"
+  }
+ },
+ "snapshots": [
+  {
+   "at": "2026-10-03 19:39:23",
+   "character": "Sassy-Ry",
+   "class": "ROGUE",
+   "level": 19,
+   "sections": {
+    "api": {
+     "C_AddOns.LoadAddOn": "function",
+     "C_AuctionHouse.GetNumReplicateItems": "function",
+     "C_AuctionHouse.GetReplicateItemInfo": "function",
+     "C_AuctionHouse.GetReplicateItemLink": "function",
+     "C_AuctionHouse.ReplicateItems": "function",
+     "C_AuctionHouse.SendBrowseQuery": "function",
+     "C_ClassTalents.GetActiveConfigID": "function",
+     "C_EncounterJournal.GetLootInfoByIndex": "function",
+     "C_Item.GetItemInfo": "function",
+     "C_Item.GetItemInfoInstant": "function",
+     "C_Item.GetItemStats": "function",
+     "C_Item.RequestLoadItemDataByID": "function",
+     "C_PaperDollInfo.GetInspectItemLevel": "function",
+     "C_SpecializationInfo.GetSpecialization": "function",
+     "C_Spell.GetSpellDescription": "function",
+     "C_SpellBook.IsSpellKnown": "function",
+     "C_TooltipInfo.GetHyperlink": "function",
+     "C_TooltipInfo.GetInventoryItem": "function",
+     "C_TooltipInfo.GetItemByID": "function",
+     "C_TradeSkillUI.GetAllRecipeIDs": "function",
+     "C_TradeSkillUI.GetBaseProfessionInfo": "function",
+     "C_TradeSkillUI.GetRecipeInfo": "function",
+     "C_TradeSkillUI.GetRecipeSchematic": "function",
+     "C_Traits.GetConfigInfo": "function",
+     "C_Traits.GetDefinitionInfo": "function",
+     "C_Traits.GetEntryInfo": "function",
+     "C_Traits.GetNodeInfo": "function",
+     "C_Traits.GetTreeNodes": "function",
+     "CanInspect": "function",
+     "EJ_GetEncounterInfoByIndex": "function",
+     "EJ_GetInstanceByIndex": "function",
+     "EJ_GetInstanceInfo": "function",
+     "EJ_GetLootFilter": "function",
+     "EJ_GetLootInfoByIndex": "nil",
+     "EJ_GetNumLoot": "function",
+     "EJ_GetNumTiers": "function",
+     "EJ_SelectInstance": "function",
+     "EJ_SelectTier": "function",
+     "GetArmorPenetration": "function",
+     "GetCombatRating": "function",
+     "GetCombatRatingBonus": "function",
+     "GetCritChance": "function",
+     "GetDodgeChance": "function",
+     "GetExpertise": "function",
+     "GetHaste": "function",
+     "GetHitModifier": "function",
+     "GetInspectSpecialization": "function",
+     "GetInventoryItemLink": "function",
+     "GetItemInfo": "nil",
+     "GetItemInfoInstant": "nil",
+     "GetItemStats": "nil",
+     "GetLootRollItemLink": "function",
+     "GetLootSlotLink": "function",
+     "GetMeleeHaste": "function",
+     "GetNumLootItems": "function",
+     "GetNumQuestChoices": "function",
+     "GetNumSkillLines": "nil",
+     "GetNumTalentTabs": "nil",
+     "GetNumTalents": "nil",
+     "GetNumTradeSkills": "nil",
+     "GetNumTrainerServices": "function",
+     "GetParryChance": "function",
+     "GetProfessionInfo": "function",
+     "GetProfessions": "function",
+     "GetQuestItemLink": "function",
+     "GetSkillLineInfo": "nil",
+     "GetSpecialization": "nil",
+     "GetSpellHitModifier": "function",
+     "GetTalentInfo": "nil",
+     "GetTalentTabInfo": "nil",
+     "GetTradeSkillInfo": "nil",
+     "GetTrainerServiceInfo": "function",
+     "IsPlayerSpell": "function",
+     "IsSpellKnown": "function",
+     "NotifyInspect": "function",
+     "TooltipDataProcessor.AddTooltipPostCall": "function",
+     "UnitAttackPower": "function",
+     "UnitAttackSpeed": "function",
+     "UnitDamage": "function",
+     "UnitStat": "function",
+     "canaccessvalue": "function",
+     "issecretvalue": "function"
+    },
+    "env": {
+     "build": {
+      "status": "ok",
+      "values": [
+       "1.60.1",
+       "70205",
+       "Oct  2 2026",
+       16001,
+       "",
+       " "
+      ]
+     },
+     "locale": "enUS",
+     "project": 18,
+     "race": {
+      "status": "ok",
+      "values": [
+       "Gnome",
+       "Gnome",
+       7
+      ]
+     }
+    },
+    "gear": [
+     null,
+     null,
+     null,
+     {
+      "enchantID": 0,
+      "itemID": 49,
+      "link": "|cnIQ1:|Hitem:49::::::::19:1488::75:::::::|h[Footpad's Shirt]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {}
+       ]
+      },
+      "tooltip": [
+       "Footpad's Shirt",
+       "Shirt",
+       ""
+      ]
+     },
+     {
+      "enchantID": 15,
+      "itemID": 5957,
+      "link": "|cnIQ2:|Hitem:5957:15:::::::19:1488::::::::Player-4618-010E9DA1:|h[Handstitched Leather Vest]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {
+         "ITEM_MOD_AGILITY_SHORT": 1,
+         "RESISTANCE0_NAME": 55
+        }
+       ]
+      },
+      "tooltip": [
+       "Handstitched Leather Vest",
+       "Binds when equipped",
+       "Chest",
+       "55 Armor",
+       "+1 Agility",
+       "Enchanted: Stamina +1 and Armor +8",
+       "Requires Level 3",
+       "|cff00ff00<Made by Sassy Ry>|r",
+       ""
+      ]
+     },
+     {
+      "enchantID": 0,
+      "itemID": 279897,
+      "link": "|cnIQ2:|Hitem:279897::::::::19:1488::11:::::::|h[Dusty Belt]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {
+         "ITEM_MOD_AGILITY_SHORT": 2,
+         "ITEM_MOD_SPIRIT_SHORT": 2,
+         "RESISTANCE0_NAME": 41
+        }
+       ]
+      },
+      "tooltip": [
+       "Dusty Belt",
+       "Binds when picked up",
+       "Waist",
+       "41 Armor",
+       "+2 Agility",
+       "+2 Spirit",
+       ""
+      ]
+     },
+     {
+      "enchantID": 8481,
+      "itemID": 270260,
+      "link": "|cnIQ3:|Hitem:270260:8481:::::::19:1488::1::1:28:7000:::::|h[Direhammer Leggings]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {
+         "ITEM_MOD_AGILITY_SHORT": 4,
+         "ITEM_MOD_STAMINA_SHORT": 7,
+         "RESISTANCE0_NAME": 72
+        }
+       ]
+      },
+      "tooltip": [
+       "Direhammer Leggings",
+       "Binds when picked up",
+       "Legs",
+       "72 Armor",
+       "+4 Agility",
+       "+7 Stamina",
+       "Enchanted: Stamina +2 and Armor +16",
+       "Requires Level 13",
+       ""
+      ]
+     },
+     {
+      "enchantID": 8481,
+      "itemID": 252425,
+      "link": "|cnIQ3:|Hitem:252425:8481:::::::19:1488::::::::Player-4618-010E9DA1:|h[Dark Leather Boots]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {
+         "ITEM_MOD_AGILITY_SHORT": 4,
+         "ITEM_MOD_STAMINA_SHORT": 4,
+         "RESISTANCE0_NAME": 53
+        }
+       ]
+      },
+      "tooltip": [
+       "Dark Leather Boots",
+       "Binds when picked up",
+       "Feet",
+       "53 Armor",
+       "+4 Agility",
+       "+4 Stamina",
+       "Enchanted: Stamina +2 and Armor +16",
+       "Requires Level 10",
+       "|cff00ff00<Made by Sassy Ry>|r",
+       ""
+      ]
+     },
+     {
+      "enchantID": 0,
+      "itemID": 7281,
+      "link": "|cnIQ2:|Hitem:7281::::::::19:1488::::::::Player-4618-010E9DA1:|h[Light Leather Bracers]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {
+         "ITEM_MOD_AGILITY_SHORT": 1,
+         "ITEM_MOD_STRENGTH_SHORT": 1,
+         "RESISTANCE0_NAME": 30
+        }
+       ]
+      },
+      "tooltip": [
+       "Light Leather Bracers",
+       "Binds when equipped",
+       "Wrist",
+       "30 Armor",
+       "+1 Strength",
+       "+1 Agility",
+       "Requires Level 9",
+       "|cff00ff00<Made by Sassy Ry>|r",
+       ""
+      ]
+     },
+     {
+      "enchantID": 15,
+      "itemID": 4239,
+      "link": "|cnIQ2:|Hitem:4239:15:::::::19:1488::::::::Player-4618-010E9DA1:|h[Embossed Leather Gloves]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {
+         "ITEM_MOD_AGILITY_SHORT": 1,
+         "ITEM_MOD_STAMINA_SHORT": 1,
+         "RESISTANCE0_NAME": 41
+        }
+       ]
+      },
+      "tooltip": [
+       "Embossed Leather Gloves",
+       "Binds when equipped",
+       "Hands",
+       "41 Armor",
+       "+1 Agility",
+       "+1 Stamina",
+       "Enchanted: Stamina +1 and Armor +8",
+       "Requires Level 8",
+       "|cff00ff00<Made by Sassy Ry>|r",
+       ""
+      ]
+     },
+     {
+      "enchantID": 0,
+      "itemID": 286737,
+      "link": "|cnIQ1:|Hitem:286737::::::::19:1488::11:::::::|h[Avala's Binding]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {
+         "ITEM_MOD_FROST_RESISTANCE_SHORT": 1,
+         "RESISTANCE4_NAME": 1
+        }
+       ]
+      },
+      "tooltip": [
+       "Avala's Binding",
+       "Binds when picked up",
+       "Finger",
+       "+1 Frost Resistance",
+       ""
+      ]
+     },
+     null,
+     null,
+     null,
+     {
+      "enchantID": 0,
+      "itemID": 279899,
+      "link": "|cnIQ2:|Hitem:279899::::::::19:1488::11:::::::|h[Catacomb Cloak]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {
+         "ITEM_MOD_ATTACK_POWER_SHORT": 3,
+         "ITEM_MOD_ATTACK_POWER_VS_HUMANOID_SHORT": 4,
+         "ITEM_MOD_STAMINA_SHORT": 2,
+         "RESISTANCE0_NAME": 15
+        }
+       ]
+      },
+      "tooltip": [
+       "Catacomb Cloak",
+       "Binds when picked up",
+       "Back",
+       "15 Armor",
+       "+2 Stamina",
+       "Equip: +3 Attack Power.",
+       "Equip: +4 Attack Power against Humanoids.",
+       ""
+      ]
+     },
+     {
+      "enchantID": 0,
+      "itemID": 5540,
+      "link": "|cnIQ2:|Hitem:5540::::::::19:1488::::::::Player-4618-006B618B:|h[Pearl-handled Dagger]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {
+         "ITEM_MOD_AGILITY_SHORT": 2,
+         "ITEM_MOD_DAMAGE_PER_SECOND_SHORT": 11.47058868408203,
+         "ITEM_MOD_STAMINA_SHORT": 2
+        }
+       ]
+      },
+      "tooltip": [
+       "Pearl-handled Dagger",
+       "Binds when equipped",
+       "One-Hand",
+       "13 - 26 Damage",
+       "(11.5 damage per second)",
+       "+2 Agility",
+       "+2 Stamina",
+       "Requires Level 18",
+       "|cff00ff00<Made by Baker Zb>|r",
+       ""
+      ]
+     },
+     {
+      "enchantID": 0,
+      "itemID": 5540,
+      "link": "|cnIQ2:|Hitem:5540::::::::19:1488::::::::Player-4618-006B618B:|h[Pearl-handled Dagger]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {
+         "ITEM_MOD_AGILITY_SHORT": 2,
+         "ITEM_MOD_DAMAGE_PER_SECOND_SHORT": 11.47058868408203,
+         "ITEM_MOD_STAMINA_SHORT": 2
+        }
+       ]
+      },
+      "tooltip": [
+       "Pearl-handled Dagger",
+       "Binds when equipped",
+       "One-Hand",
+       "13 - 26 Damage",
+       "(11.5 damage per second)",
+       "+2 Agility",
+       "+2 Stamina",
+       "Requires Level 18",
+       "|cff00ff00<Made by Baker Zb>|r",
+       ""
+      ]
+     },
+     {
+      "enchantID": 0,
+      "itemID": 3107,
+      "link": "|cnIQ1:|Hitem:3107::::::::19:1488::14:::::::|h[Keen Throwing Knife]|h|r",
+      "stats": {
+       "status": "ok",
+       "values": [
+        {
+         "ITEM_MOD_DAMAGE_PER_SECOND_SHORT": 6.315789699554443
+        }
+       ]
+      },
+      "tooltip": [
+       "Keen Throwing Knife",
+       "Thrown",
+       "8 - 16 Damage",
+       "(6.3 damage per second)",
+       "Requires Level 11"
+      ]
+     }
+    ],
+    "sheet": [
+     {
+      "hover": [
+       "|cffffffffHealth 601|r",
+       "Used for |cFFFFFFFFTaking Damage|r\nResults in death when reduced to 0\n\nMaximum increased by |cFFFFFFFFStamina|r\nRegeneration increased by |cFFFFFFFFSpirit|r\n\n|cFFBCBCBCReplenishes automatically while out of combat\n\nEvery 1 Stamina adds 10 Health|r"
+      ],
+      "label": "Health:",
+      "tooltip": "|cffffffffHealth 601|r",
+      "tooltip2": "Used for |cFFFFFFFFTaking Damage|r\nResults in death when reduced to 0\n\nMaximum increased by |cFFFFFFFFStamina|r\nRegeneration increased by |cFFFFFFFFSpirit|r\n\n|cFFBCBCBCReplenishes automatically while out of combat\n\nEvery 1 Stamina adds 10 Health|r",
+      "value": "601"
+     },
+     {
+      "hover": [
+       "|cffffffffEnergy 105|r",
+       "Resource used to perform |cFFFFFFFFAbilities|r\n\nReplenishes automatically over time\n\n|cFFBCBCBCRegenerates 1 Energy per 0.1 sec\n(10 Energy per 1 sec)|r"
+      ],
+      "label": "Energy:",
+      "tooltip": "|cffffffffEnergy 105|r",
+      "tooltip2": "Resource used to perform |cFFFFFFFFAbilities|r\n\nReplenishes automatically over time\n\n|cFFBCBCBCRegenerates 1 Energy per 0.1 sec\n(10 Energy per 1 sec)|r",
+      "value": "105"
+     },
+     {
+      "hover": [
+       "|cffffffffMovement Speed 100%|r",
+       "Run Speed: 100%",
+       "Swim Speed: 67%",
+       " ",
+       "|cFFBCBCBCBase Speeds (In Yards Per Second):\n7.0 yd/s Running\n4.7 yd/s Swimming\n4.5 yd/s Backpedaling\n2.5 yd/s Walking|r"
+      ],
+      "label": "Movement Speed:",
+      "value": "100%"
+     },
+     {
+      "hover": [
+       "|cffffffffStrength 33 (32|r|r|cff19ff19+1|r|cffffffff)|r",
+       "Increases |cFFFFFFFFAttack Power|r by 33"
+      ],
+      "label": "Strength:",
+      "tooltip": "|cffffffffStrength 33 (32|r|r|cff19ff19+1|r|cffffffff)|r",
+      "tooltip2": "Increases |cFFFFFFFFAttack Power|r by 33",
+      "value": "33"
+     },
+     {
+      "hover": [
+       "|cffffffffAgility 66 (49|r|r|cff19ff19+17|r|cffffffff)|r",
+       "Increases |cFFFFFFFFCritical Strike|r chance by 8.7%\nIncreases |cFFFFFFFFAttack Power|r by 66\nIncreases |cFFFFFFFFRanged Attack Power|r by 132\nIncreases |cFFFFFFFFArmor|r by 132\nIncreases |cFFFFFFFFDodge|r chance by 17.4%"
+      ],
+      "label": "Agility:",
+      "tooltip": "|cffffffffAgility 66 (49|r|r|cff19ff19+17|r|cffffffff)|r",
+      "tooltip2": "Increases |cFFFFFFFFCritical Strike|r chance by 8.7%\nIncreases |cFFFFFFFFAttack Power|r by 66\nIncreases |cFFFFFFFFRanged Attack Power|r by 132\nIncreases |cFFFFFFFFArmor|r by 132\nIncreases |cFFFFFFFFDodge|r chance by 17.4%",
+      "value": "66"
+     },
+     {
+      "hover": [
+       "|cffffffffStamina 56 (32|r|r|cff19ff19+24|r|cffffffff)|r",
+       "Increases |cFFFFFFFFHealth|r by 380"
+      ],
+      "label": "Stamina:",
+      "tooltip": "|cffffffffStamina 56 (32|r|r|cff19ff19+24|r|cffffffff)|r",
+      "tooltip2": "Increases |cFFFFFFFFHealth|r by 380",
+      "value": "56"
+     },
+     {
+      "hover": [
+       "|cffffffffIntellect 26|r",
+       "Increases |cFFFFFFFFWeapon Skill|r improvement rate"
+      ],
+      "label": "Intellect:",
+      "tooltip": "|cffffffffIntellect 26|r",
+      "tooltip2": "Increases |cFFFFFFFFWeapon Skill|r improvement rate",
+      "value": "26"
+     },
+     {
+      "hover": [
+       "|cffffffffSpirit 29 (27|r|r|cff19ff19+2|r|cffffffff)|r",
+       "Increases |cFFFFFFFFHealth Regeneration|r by 35 per 5 sec while not in combat\n\n|cffBCBCBCHealth Regeneration is increased by 33% while sitting or reclining|r"
+      ],
+      "label": "Spirit:",
+      "tooltip": "|cffffffffSpirit 29 (27|r|r|cff19ff19+2|r|cffffffff)|r",
+      "tooltip2": "Increases |cFFFFFFFFHealth Regeneration|r by 35 per 5 sec while not in combat\n\n|cffBCBCBCHealth Regeneration is increased by 33% while sitting or reclining|r",
+      "value": "29"
+     },
+     {
+      "hover": [
+       "Main Hand",
+       "Attack Speed (seconds):  1.70",
+       "Damage:  29 - 43",
+       "DPS:  21.2",
+       "Daggers:  95/95"
+      ],
+      "label": "Main Hand:",
+      "value": "29 - 43"
+     },
+     {
+      "hover": [
+       "Off Hand",
+       "Attack Speed (seconds):  1.70",
+       "Damage:  14 - 22",
+       "DPS:  10.6",
+       "Daggers:  95/95"
+      ],
+      "label": "Off Hand:",
+      "value": "14 - 22"
+     },
+     {
+      "label": "Armor:",
+      "tooltip": "|cffffffffArmor 487|r",
+      "tooltip2": "Reduces |cFFFFFFFFPhysical Damage|r taken by 19.46%\n\nIncreased by |cFFFFFFFFAgility|r",
+      "value": "487"
+     }
+    ],
+    "sheetDebug": {
+     "hovered": 10,
+     "how": "opened by probe",
+     "map": [
+      "1 ?: Sassy Ry",
+      "4 ?: General",
+      "4 ?: 601 | Health:",
+      "4 ?: 105 | Energy:",
+      "4 ?: 100% | Movement Speed:",
+      "4 ?: Primary Attributes",
+      "4 ?: 33 | Strength:",
+      "4 ?: 66 | Agility:",
+      "4 ?: 56 | Stamina:",
+      "4 ?: 26 | Intellect:",
+      "4 ?: 29 | Spirit:",
+      "4 ?: Weapons",
+      "4 ?: 29 - 43 | Main Hand:",
+      "4 ?: 14 - 22 | Off Hand:",
+      "2 PaperDollLevelInfo: Level 19 |cfffff468Rogue|r",
+      "3 ?: +2 Stam / +3 AP | +1 Agi | Stamina +1 and Armor +8 | +1 Str / +1 Agi | +1 Agi / +1 Stam | Stamina +1 and Armor +8 | +2 Agi / +2 Spi | +4 Agi / +7 Stam | Stamina +2 and Armor +16 | +4 Agi / +4 Stam | Stamina +2 and Armor +16 | +1 Frost Res | +2 Agi / +2 Stam | 11.5 Dps | +2 Agi / +2 Stam | 11.5 Dps | 6.3 Dps"
+     ],
+     "root": "CharacterFrame",
+     "scanned": 503,
+     "stored": 13,
+     "toggleCharacter": true,
+     "visible": 117,
+     "windowVisible": true
+    },
+    "stats": {
+     "GetArmorPenetration": {
+      "status": "ok",
+      "values": [
+       0
+      ]
+     },
+     "GetBlockChance": {
+      "status": "ok",
+      "values": [
+       0
+      ]
+     },
+     "GetCritChance": {
+      "status": "ok",
+      "values": [
+       13.6855993270874
+      ]
+     },
+     "GetCritChanceFromAgility:player": {
+      "status": "missing"
+     },
+     "GetDodgeChance": {
+      "status": "ok",
+      "values": [
+       17.29120063781738
+      ]
+     },
+     "GetExpertise": {
+      "status": "ok",
+      "values": [
+       0,
+       0,
+       0
+      ]
+     },
+     "GetHaste": {
+      "status": "ok",
+      "values": [
+       0
+      ]
+     },
+     "GetHitModifier": {
+      "status": "ok",
+      "values": [
+       0
+      ]
+     },
+     "GetManaRegen": {
+      "status": "ok",
+      "values": [
+       0,
+       0
+      ]
+     },
+     "GetMeleeHaste": {
+      "status": "ok",
+      "values": [
+       0
+      ]
+     },
+     "GetParryChance": {
+      "status": "ok",
+      "values": [
+       4.920000076293945
+      ]
+     },
+     "GetPowerRegen": {
+      "status": "ok",
+      "values": [
+       10.00100040435791,
+       10.00100040435791
+      ]
+     },
+     "GetRangedCritChance": {
+      "status": "ok",
+      "values": [
+       13.52559947967529
+      ]
+     },
+     "GetRangedHaste": {
+      "status": "ok",
+      "values": [
+       0,
+       0
+      ]
+     },
+     "GetShieldBlock": {
+      "status": "ok",
+      "values": [
+       1
+      ]
+     },
+     "GetSpellBonusDamage:2": {
+      "status": "ok",
+      "values": [
+       0
+      ]
+     },
+     "GetSpellBonusHealing": {
+      "status": "ok",
+      "values": [
+       0
+      ]
+     },
+     "GetSpellCritChance:2": {
+      "status": "ok",
+      "values": [
+       4.999999523162842
+      ]
+     },
+     "GetSpellCritChanceFromIntellect:player": {
+      "status": "missing"
+     },
+     "GetSpellHitModifier": {
+      "status": "ok",
+      "values": [
+       0
+      ]
+     },
+     "UnitArmor:player": {
+      "status": "ok",
+      "values": [
+       48,
+       487,
+       487,
+       439
+      ]
+     },
+     "UnitAttackBothHands:player": {
+      "status": "missing"
+     },
+     "UnitAttackPower:player": {
+      "status": "ok",
+      "values": [
+       117,
+       17,
+       0
+      ]
+     },
+     "UnitAttackSpeed:player": {
+      "status": "ok",
+      "values": [
+       1.700000047683716,
+       1.700000047683716,
+       1.900000095367432
+      ]
+     },
+     "UnitDamage:player": {
+      "status": "ok",
+      "values": [
+       29.27142906188965,
+       42.27143096923828,
+       14.63571453094482,
+       21.13571548461914,
+       0,
+       0,
+       1
+      ]
+     },
+     "UnitDefense:player": {
+      "status": "missing"
+     },
+     "UnitHealthMax:player": {
+      "status": "ok",
+      "values": [
+       601
+      ]
+     },
+     "UnitPowerMax:player": {
+      "status": "ok",
+      "values": [
+       105
+      ]
+     },
+     "UnitRangedAttackPower:player": {
+      "status": "ok",
+      "values": [
+       131,
+       3,
+       0
+      ]
+     },
+     "UnitRangedDamage:player": {
+      "status": "ok",
+      "values": [
+       1.900000095367432,
+       26.18571662902832,
+       34.18571472167969,
+       0,
+       0,
+       1
+      ]
+     },
+     "UnitResistance:player:1": {
+      "status": "ok",
+      "values": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "UnitResistance:player:2": {
+      "status": "ok",
+      "values": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "UnitResistance:player:3": {
+      "status": "ok",
+      "values": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "UnitResistance:player:4": {
+      "status": "ok",
+      "values": [
+       1,
+       1,
+       1,
+       0
+      ]
+     },
+     "UnitResistance:player:5": {
+      "status": "ok",
+      "values": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "UnitResistance:player:6": {
+      "status": "ok",
+      "values": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "UnitSpellHaste:player": {
+      "status": "ok",
+      "values": [
+       0
+      ]
+     },
+     "UnitStat:player:1": {
+      "status": "ok",
+      "values": [
+       33,
+       33,
+       1,
+       0
+      ]
+     },
+     "UnitStat:player:2": {
+      "status": "ok",
+      "values": [
+       66,
+       66,
+       17,
+       0
+      ]
+     },
+     "UnitStat:player:3": {
+      "status": "ok",
+      "values": [
+       56,
+       56,
+       24,
+       0
+      ]
+     },
+     "UnitStat:player:4": {
+      "status": "ok",
+      "values": [
+       26,
+       26,
+       0,
+       0
+      ]
+     },
+     "UnitStat:player:5": {
+      "status": "ok",
+      "values": [
+       29,
+       29,
+       2,
+       0
+      ]
+     },
+     "rating:CR_ARMOR_PENETRATION": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 25,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_AVOIDANCE": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 21,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_BLOCK": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 5,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_CORRUPTION": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 12,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_CORRUPTION_RESISTANCE": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 13,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_CRIT_MELEE": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 9,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_CRIT_RANGED": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 10,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_CRIT_SPELL": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 11,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_DEFENSE_SKILL": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 2,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_DODGE": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 3,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_EXPERTISE": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 24,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_HASTE_MELEE": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 18,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_HASTE_RANGED": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 19,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_HASTE_SPELL": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 20,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_HIT_MELEE": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 6,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_HIT_RANGED": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 7,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_HIT_SPELL": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 8,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_LIFESTEAL": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 17,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_MASTERY": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 26,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_PARRY": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 4,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_SPEED": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 14,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_UNUSED_1": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 1,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_UNUSED_2": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 22,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_UNUSED_3": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 27,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_UNUSED_4": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 28,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_VERSATILITY_DAMAGE_DONE": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 29,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_VERSATILITY_DAMAGE_TAKEN": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 31,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     },
+     "rating:CR_WEAPON_SKILL_RANGED": {
+      "bonus": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      },
+      "id": 23,
+      "rating": {
+       "status": "ok",
+       "values": [
+        0
+       ]
+      }
+     }
+    },
+    "talents": {
+     "traits": {
+      "config": {
+       "status": "ok",
+       "values": [
+        {
+         "ID": 9917893,
+         "name": "Rogue",
+         "treeIDs": [
+          1111
+         ],
+         "type": 4,
+         "usesSharedActionBars": false
+        }
+       ]
+      },
+      "configID": {
+       "status": "ok",
+       "values": [
+        9917893
+       ]
+      },
+      "trees": [
+       {
+        "nodeCount": 53,
+        "nodes": [
+         {
+          "node": {
+           "ID": 105708,
+           "activeEntry": {
+            "entryID": 130437,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": {},
+           "currentRank": 0,
+           "entryIDs": [
+            130437
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            12780,
+            12781,
+            12782,
+            12783,
+            12784,
+            11573
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130437,
+            "rank": 1
+           },
+           "posX": 5020,
+           "posY": 2130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105708,
+          "spellID": 14162,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Improved Eviscerate"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105709,
+           "activeEntry": {
+            "entryID": 130438,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43441
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130438
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11576,
+            12775,
+            11580
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130438,
+            "rank": 1
+           },
+           "posX": 1620,
+           "posY": 4530,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": [
+            {
+             "isActive": false,
+             "targetNode": 105712,
+             "type": 2,
+             "visualStyle": 1
+            }
+           ]
+          },
+          "nodeID": 105709,
+          "spellID": 1310707,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Mutilate"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105710,
+           "activeEntry": {
+            "entryID": 130439,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43440
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130439
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11575,
+            11580
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 5,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130439,
+            "rank": 1
+           },
+           "posX": 2220,
+           "posY": 5130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 5,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105710,
+          "spellID": 14186,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Seal Fate"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105711,
+           "activeEntry": {
+            "entryID": 130440,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43441
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130440
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11576,
+            11580,
+            12775
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130440,
+            "rank": 1
+           },
+           "posX": 2220,
+           "posY": 4530,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105711,
+          "spellID": 14174,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Improved Kidney Shot"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105712,
+           "activeEntry": {
+            "entryID": 130441,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            50984,
+            43439
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130441
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11574,
+            11580
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": false,
+           "nextEntry": {
+            "entryID": 130441,
+            "rank": 1
+           },
+           "posX": 1620,
+           "posY": 5730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105712,
+          "spellID": 1310703,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Venom"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105713,
+           "activeEntry": {
+            "entryID": 130442,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43442
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130442
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11577,
+            11580,
+            12775,
+            12776
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 5,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130442,
+            "rank": 1
+           },
+           "posX": 2220,
+           "posY": 3930,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 5,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105713,
+          "spellID": 14113,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Improved Poisons"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105714,
+           "activeEntry": {
+            "entryID": 130443,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43442
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130443
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11577,
+            12775,
+            12776,
+            11580
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 5,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130443,
+            "rank": 1
+           },
+           "posX": 1020,
+           "posY": 3930,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 5,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105714,
+          "spellID": 16513,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Vile Poisons"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105715,
+           "activeEntry": {
+            "entryID": 130444,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43442
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130444
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11577,
+            11580,
+            12775,
+            12776
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130444,
+            "rank": 1
+           },
+           "posX": 1620,
+           "posY": 3930,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105715,
+          "spellID": 14177,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Cold Blood"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105716,
+           "activeEntry": {
+            "entryID": 130445,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43443
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130445
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11578,
+            11580,
+            12775,
+            12776,
+            12777
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 5,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130445,
+            "rank": 1
+           },
+           "posX": 2220,
+           "posY": 3330,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 5,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105716,
+          "spellID": 14128,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Lethality"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105717,
+           "activeEntry": {
+            "entryID": 130446,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43443
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130446
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11578,
+            11580,
+            12775,
+            12776,
+            12777
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130446,
+            "rank": 1
+           },
+           "posX": 1620,
+           "posY": 3330,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105717,
+          "spellID": 14168,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Improved Expose Armor"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105718,
+           "activeEntry": {
+            "entryID": 130447,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43441
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130447
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11576,
+            12775,
+            11580
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130447,
+            "rank": 1
+           },
+           "posX": 1020,
+           "posY": 4530,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105718,
+          "spellID": 14983,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Vigor"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105719,
+           "activeEntry": {
+            "entryID": 130448,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43450
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130448
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11571,
+            11573,
+            12780,
+            12781,
+            12782,
+            12783
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130448,
+            "rank": 1
+           },
+           "posX": 5020,
+           "posY": 2730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105719,
+          "spellID": 1224716,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Puncturing Wounds"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105720,
+           "activeEntry": {
+            "entryID": 130449,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43444
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130449
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11579,
+            11580,
+            12775,
+            12776,
+            12777,
+            12778
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130449,
+            "rank": 1
+           },
+           "posX": 1620,
+           "posY": 2730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105720,
+          "spellID": 14158,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Murder"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105721,
+           "activeEntry": {
+            "entryID": 130450,
+            "rank": 3
+           },
+           "activeRank": 3,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43444
+           ],
+           "currentRank": 3,
+           "entryIDs": [
+            130450
+           ],
+           "entryIDsWithCommittedRanks": [
+            130450
+           ],
+           "flags": 0,
+           "groupIDs": [
+            11579,
+            11580,
+            12775,
+            12776,
+            12777,
+            12778
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "posX": 1020,
+           "posY": 2730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 3,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105721,
+          "spellID": 14156,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Ruthlessness"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105722,
+           "activeEntry": {
+            "entryID": 130451,
+            "rank": 5
+           },
+           "activeRank": 5,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": {},
+           "currentRank": 5,
+           "entryIDs": [
+            130451
+           ],
+           "entryIDsWithCommittedRanks": [
+            130451
+           ],
+           "flags": 0,
+           "groupIDs": [
+            11580,
+            12775,
+            12776,
+            12777,
+            12778,
+            12779
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 5,
+           "meetsEdgeRequirements": true,
+           "posX": 2220,
+           "posY": 2130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 5,
+           "totalMaxRanks": 5,
+           "type": 0,
+           "visibleEdges": [
+            {
+             "isActive": true,
+             "targetNode": 105716,
+             "type": 2,
+             "visualStyle": 1
+            }
+           ]
+          },
+          "nodeID": 105722,
+          "spellID": 14138,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Malice"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105723,
+           "activeEntry": {
+            "entryID": 130452,
+            "rank": 2
+           },
+           "activeRank": 2,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": {},
+           "currentRank": 2,
+           "entryIDs": [
+            130452
+           ],
+           "entryIDsWithCommittedRanks": [
+            130452
+           ],
+           "flags": 0,
+           "groupIDs": [
+            11580,
+            12775,
+            12776,
+            12777,
+            12778,
+            12779
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "posX": 1620,
+           "posY": 2130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 2,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105723,
+          "spellID": 14144,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Remorseless Attacks"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105724,
+           "activeEntry": {
+            "entryID": 130453,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43445
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130453
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11566,
+            11573
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130453,
+            "rank": 1
+           },
+           "posX": 5620,
+           "posY": 5730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105724,
+          "spellID": 13750,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Adrenaline Rush"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105726,
+           "activeEntry": {
+            "entryID": 130455,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43446
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130455
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11567,
+            11573
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": false,
+           "nextEntry": {
+            "entryID": 130455,
+            "rank": 1
+           },
+           "posX": 5620,
+           "posY": 5130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105726,
+          "spellID": 30919,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Weapon Expertise"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105727,
+           "activeEntry": {
+            "entryID": 130456,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43447
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130456
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11568,
+            12780,
+            11573
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 5,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130456,
+            "rank": 1
+           },
+           "posX": 6220,
+           "posY": 4530,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 5,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105727,
+          "spellID": 13960,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Hack and Slash"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105728,
+           "activeEntry": {
+            "entryID": 130457,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43447
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130457
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11568,
+            12780,
+            11573
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130457,
+            "rank": 1
+           },
+           "posX": 5620,
+           "posY": 4530,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": [
+            {
+             "isActive": false,
+             "targetNode": 105726,
+             "type": 2,
+             "visualStyle": 1
+            }
+           ]
+          },
+          "nodeID": 105728,
+          "spellID": 13877,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Blade Flurry"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105730,
+           "activeEntry": {
+            "entryID": 130459,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43446
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130459
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11567,
+            11573
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130459,
+            "rank": 1
+           },
+           "posX": 6220,
+           "posY": 5130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105730,
+          "spellID": 18427,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Aggression"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105732,
+           "activeEntry": {
+            "entryID": 130461,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43449
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130461
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11570,
+            12780,
+            12781,
+            12782,
+            11573
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130461,
+            "rank": 1
+           },
+           "posX": 6820,
+           "posY": 3330,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105732,
+          "spellID": 13743,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Improved Sprint"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105733,
+           "activeEntry": {
+            "entryID": 130462,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            46500
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130462
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11569,
+            12780,
+            12781,
+            11573
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130462,
+            "rank": 1
+           },
+           "posX": 5020,
+           "posY": 3930,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105733,
+          "spellID": 13754,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Improved Kick"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105735,
+           "activeEntry": {
+            "entryID": 130464,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43449
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130464
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11570,
+            11573,
+            12780,
+            12781,
+            12782
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": false,
+           "nextEntry": {
+            "entryID": 130464,
+            "rank": 1
+           },
+           "posX": 5620,
+           "posY": 3330,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105735,
+          "spellID": 14251,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Riposte"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105736,
+           "activeEntry": {
+            "entryID": 130465,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43449
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130465
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11570,
+            11573,
+            12780,
+            12781,
+            12782
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130465,
+            "rank": 1
+           },
+           "posX": 5020,
+           "posY": 3330,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105736,
+          "spellID": 13742,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Endurance"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105737,
+           "activeEntry": {
+            "entryID": 130466,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43450
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130466
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11571,
+            11573,
+            12780,
+            12781,
+            12782,
+            12783
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130466,
+            "rank": 1
+           },
+           "posX": 6220,
+           "posY": 2730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": [
+            {
+             "isActive": false,
+             "targetNode": 105740,
+             "type": 2,
+             "visualStyle": 1
+            }
+           ]
+          },
+          "nodeID": 105737,
+          "spellID": 13705,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Precision"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105738,
+           "activeEntry": {
+            "entryID": 130467,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43450
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130467
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11571,
+            11573,
+            12780,
+            12781,
+            12782,
+            12783
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130467,
+            "rank": 1
+           },
+           "posX": 5620,
+           "posY": 2730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": [
+            {
+             "isActive": false,
+             "targetNode": 105735,
+             "type": 2,
+             "visualStyle": 1
+            }
+           ]
+          },
+          "nodeID": 105738,
+          "spellID": 13713,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Deflection"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105739,
+           "activeEntry": {
+            "entryID": 130468,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43444
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130468
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11579,
+            11580,
+            12775,
+            12776,
+            12777,
+            12778
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130468,
+            "rank": 1
+           },
+           "posX": 2820,
+           "posY": 2730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105739,
+          "spellID": 14165,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Improved Slice and Dice"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105740,
+           "activeEntry": {
+            "entryID": 130469,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            46500
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130469
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11573,
+            11569,
+            12780,
+            12781
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 5,
+           "meetsEdgeRequirements": false,
+           "nextEntry": {
+            "entryID": 130469,
+            "rank": 1
+           },
+           "posX": 6220,
+           "posY": 3930,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 5,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105740,
+          "spellID": 13715,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Dual Wield Specialization"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105741,
+           "activeEntry": {
+            "entryID": 130470,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": {},
+           "currentRank": 0,
+           "entryIDs": [
+            130470
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11573,
+            12780,
+            12781,
+            12782,
+            12783,
+            12784
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130470,
+            "rank": 1
+           },
+           "posX": 5620,
+           "posY": 2130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105741,
+          "spellID": 13732,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Improved Sinister Strike"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105742,
+           "activeEntry": {
+            "entryID": 130471,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": {},
+           "currentRank": 0,
+           "entryIDs": [
+            130471
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            12775,
+            12776,
+            12777,
+            12778,
+            12779,
+            11580
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130471,
+            "rank": 1
+           },
+           "posX": 1020,
+           "posY": 2130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105742,
+          "spellID": 13741,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Improved Gouge"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105743,
+           "activeEntry": {
+            "entryID": 130472,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43454
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130472
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11563,
+            12785,
+            12786,
+            11572
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130472,
+            "rank": 1
+           },
+           "posX": 9680,
+           "posY": 3930,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105743,
+          "spellID": 14183,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Premeditation"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105745,
+           "activeEntry": {
+            "entryID": 130474,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43453
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130474
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11562,
+            12785,
+            11572
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130474,
+            "rank": 1
+           },
+           "posX": 9080,
+           "posY": 4530,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": [
+            {
+             "isActive": false,
+             "targetNode": 110867,
+             "type": 2,
+             "visualStyle": 1
+            }
+           ]
+          },
+          "nodeID": 105745,
+          "spellID": 14082,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Dirty Deeds"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105746,
+           "activeEntry": {
+            "entryID": 130475,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43453
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130475
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11562,
+            12785,
+            11572
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130475,
+            "rank": 1
+           },
+           "posX": 9680,
+           "posY": 4530,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": [
+            {
+             "isActive": false,
+             "targetNode": 110866,
+             "type": 2,
+             "visualStyle": 1
+            }
+           ]
+          },
+          "nodeID": 105746,
+          "spellID": 14185,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Preparation"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105747,
+           "activeEntry": {
+            "entryID": 130476,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43454
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130476
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11563,
+            12785,
+            12786,
+            11572
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130476,
+            "rank": 1
+           },
+           "posX": 9080,
+           "posY": 3930,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105747,
+          "spellID": 30894,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Heightened Senses"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105748,
+           "activeEntry": {
+            "entryID": 130477,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43453
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130477
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11562,
+            11572,
+            12785
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": false,
+           "nextEntry": {
+            "entryID": 130477,
+            "rank": 1
+           },
+           "posX": 10280,
+           "posY": 4530,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105748,
+          "spellID": 16511,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Hemorrhage"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105749,
+           "activeEntry": {
+            "entryID": 130478,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43456
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130478
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11565,
+            12785,
+            12786,
+            12787,
+            12788,
+            11572
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130478,
+            "rank": 1
+           },
+           "posX": 10880,
+           "posY": 2730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105749,
+          "spellID": 14079,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Improved Ambush"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105750,
+           "activeEntry": {
+            "entryID": 130479,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43452
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130479
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11561,
+            11572
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 5,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130479,
+            "rank": 1
+           },
+           "posX": 10280,
+           "posY": 5130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 5,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105750,
+          "spellID": 462708,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Cutthroat"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105751,
+           "activeEntry": {
+            "entryID": 130480,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43456
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130480
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            12785,
+            12786,
+            12787,
+            12788,
+            11565,
+            11572
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130480,
+            "rank": 1
+           },
+           "posX": 9080,
+           "posY": 2730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105751,
+          "spellID": 13983,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Setup"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105752,
+           "activeEntry": {
+            "entryID": 130481,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43454
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130481
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11563,
+            11572,
+            12785,
+            12786
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130481,
+            "rank": 1
+           },
+           "posX": 10280,
+           "posY": 3930,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": [
+            {
+             "isActive": false,
+             "targetNode": 105748,
+             "type": 2,
+             "visualStyle": 1
+            }
+           ]
+          },
+          "nodeID": 105752,
+          "spellID": 14171,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Serrated Blades"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105753,
+           "activeEntry": {
+            "entryID": 130482,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43456
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130482
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11565,
+            12785,
+            12786,
+            12787,
+            12788,
+            11572
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130482,
+            "rank": 1
+           },
+           "posX": 9680,
+           "posY": 2730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105753,
+          "spellID": 13981,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Elusiveness"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105754,
+           "activeEntry": {
+            "entryID": 130483,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43455
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130483
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11564,
+            11572,
+            12785,
+            12786,
+            12787
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130483,
+            "rank": 1
+           },
+           "posX": 9680,
+           "posY": 3330,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105754,
+          "spellID": 14278,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Ghostly Strike"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105755,
+           "activeEntry": {
+            "entryID": 130484,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43455
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130484
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11564,
+            11572,
+            12785,
+            12786,
+            12787
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130484,
+            "rank": 1
+           },
+           "posX": 9080,
+           "posY": 3330,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105755,
+          "spellID": 13976,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Initiative"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105756,
+           "activeEntry": {
+            "entryID": 130485,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": {},
+           "currentRank": 0,
+           "entryIDs": [
+            130485
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            12785,
+            12786,
+            12787,
+            12788,
+            12789,
+            11572
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 5,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130485,
+            "rank": 1
+           },
+           "posX": 9080,
+           "posY": 2130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 5,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105756,
+          "spellID": 13975,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Camouflage"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105757,
+           "activeEntry": {
+            "entryID": 130486,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43456
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130486
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11565,
+            11572,
+            12785,
+            12786,
+            12787,
+            12788
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130486,
+            "rank": 1
+           },
+           "posX": 10280,
+           "posY": 2730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105757,
+          "spellID": 1224782,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Dirty Tricks"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105759,
+           "activeEntry": {
+            "entryID": 130488,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43443
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            130488
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11578,
+            12775,
+            12776,
+            12777,
+            11580
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130488,
+            "rank": 1
+           },
+           "posX": 1020,
+           "posY": 3330,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105759,
+          "spellID": 14179,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Relentless Strikes"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105760,
+           "activeEntry": {
+            "entryID": 130489,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": {},
+           "currentRank": 0,
+           "entryIDs": [
+            130489
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11572,
+            12785,
+            12786,
+            12787,
+            12788,
+            12789
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130489,
+            "rank": 1
+           },
+           "posX": 10280,
+           "posY": 2130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105760,
+          "spellID": 14057,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Opportunity"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 105761,
+           "activeEntry": {
+            "entryID": 130490,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": {},
+           "currentRank": 0,
+           "entryIDs": [
+            130490
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11572,
+            12785,
+            12786,
+            12787,
+            12788,
+            12789
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 3,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 130490,
+            "rank": 1
+           },
+           "posX": 9680,
+           "posY": 2130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 3,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 105761,
+          "spellID": 13958,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Master of Deception"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 108100,
+           "activeEntry": {
+            "entryID": 133482,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            46500
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            133482
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11569,
+            12780,
+            12781,
+            11573
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 133482,
+            "rank": 1
+           },
+           "posX": 5620,
+           "posY": 3930,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 108100,
+          "spellID": 1310711,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Flawless Execution"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 110866,
+           "activeEntry": {
+            "entryID": 137864,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43451
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            137864
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11560,
+            11572
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 1,
+           "meetsEdgeRequirements": false,
+           "nextEntry": {
+            "entryID": 137864,
+            "rank": 1
+           },
+           "posX": 9680,
+           "posY": 5730,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 1,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 110866,
+          "spellID": 1310721,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Thousand Cuts"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 110867,
+           "activeEntry": {
+            "entryID": 137865,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43452
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            137865
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11561,
+            11572
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 5,
+           "meetsEdgeRequirements": false,
+           "nextEntry": {
+            "entryID": 137865,
+            "rank": 1
+           },
+           "posX": 9080,
+           "posY": 5130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 5,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 110867,
+          "spellID": 1310728,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Quietus"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 110868,
+           "activeEntry": {
+            "entryID": 137866,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": false,
+           "canRefundRank": false,
+           "conditionIDs": [
+            43455
+           ],
+           "currentRank": 0,
+           "entryIDs": [
+            137866
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            11564,
+            12785,
+            12786,
+            12787,
+            11572
+           ],
+           "isAvailable": false,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 2,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 137866,
+            "rank": 1
+           },
+           "posX": 10280,
+           "posY": 3330,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 2,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 110868,
+          "spellID": 14084,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Improved Distract"
+           ]
+          }
+         },
+         {
+          "node": {
+           "ID": 113398,
+           "activeEntry": {
+            "entryID": 140697,
+            "rank": 0
+           },
+           "activeRank": 0,
+           "canPurchaseRank": true,
+           "canRefundRank": false,
+           "conditionIDs": {},
+           "currentRank": 0,
+           "entryIDs": [
+            140697
+           ],
+           "entryIDsWithCommittedRanks": {},
+           "flags": 0,
+           "groupIDs": [
+            12780,
+            12781,
+            12782,
+            12783,
+            12784,
+            11573
+           ],
+           "isAvailable": true,
+           "isCascadeRepurchasable": false,
+           "isDisplayError": false,
+           "isVisible": true,
+           "maxRanks": 5,
+           "meetsEdgeRequirements": true,
+           "nextEntry": {
+            "entryID": 140697,
+            "rank": 1
+           },
+           "posX": 6220,
+           "posY": 2130,
+           "ranksIncreased": 0,
+           "ranksPurchased": 0,
+           "totalMaxRanks": 5,
+           "type": 0,
+           "visibleEdges": {}
+          },
+          "nodeID": 113398,
+          "spellID": 13712,
+          "spellName": {
+           "status": "ok",
+           "values": [
+            "Lightning Reflexes"
+           ]
+          }
+         }
+        ],
+        "treeID": 1111
+       }
+      ]
+     },
+     "weaponSkills": {
+      "spells": {
+       "Bows": false,
+       "Crossbows": true,
+       "Daggers": true,
+       "Dual Wield": true,
+       "Fist Weapons": true,
+       "Guns": true,
+       "One-Handed Axes": true,
+       "One-Handed Maces": true,
+       "One-Handed Swords": true,
+       "Polearms": false,
+       "Staves": false,
+       "Thrown": true,
+       "Two-Handed Axes": false,
+       "Two-Handed Maces": false,
+       "Two-Handed Swords": false,
+       "Wands": false
+      }
+     }
+    }
+   }
+  }
+ ]
+}

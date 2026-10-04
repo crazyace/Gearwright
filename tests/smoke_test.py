@@ -179,17 +179,26 @@ L.execute("ITEMS['item:2004:0:0'] = { equip='INVTYPE_WEAPONMAINHAND', class=2, s
 assert compare("item:2004:0:0")[:2] == [None, "wrong-weapon-type"]
 L.eval("function(ns) ns.db.specOverride = false end")(ns)
 L.execute("INV[17] = nil")
-# One-handed axes: unlocked by Hack and Slash (5/5 in the mock), or by
-# knowing the One-Handed Axes skill; otherwise a Rogue can't use them.
+# One-handed axes: any Rogue can train them on Forever, talents or not.
 L.execute("ITEMS['item:2005:0:0'] = { equip='INVTYPE_WEAPON', class=2, sub=0, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")
-assert compare("item:2005:0:0")[0] > 0
 L.execute("TABS[2][2][1][2] = 0")
 L.globals().fire("CHARACTER_POINTS_CHANGED")
-assert compare("item:2005:0:0")[:2] == [None, "not-usable"]
-L.execute("function IsPlayerSpell(id) return id == 196 end")
 assert compare("item:2005:0:0")[0] > 0
+# The unlock mechanism (a weapon type a talent or spell adds) still works:
+# polearms behind Hack and Slash, as a made-up example.
+L.execute("ITEMS['item:2008:0:0'] = { equip='INVTYPE_WEAPON', class=2, sub=6, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")
+L.eval("function(ns) ns.Data.ROGUE.unlocks = { { class = 2, subclass = 6, talent = 'Hack and Slash', spell = 200 } } end")(ns)
+assert compare("item:2008:0:0")[:2] == [None, "not-usable"]
+L.execute("TABS[2][2][1][2] = 5")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
+assert compare("item:2008:0:0")[0] > 0
+L.execute("TABS[2][2][1][2] = 0")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
+L.execute("function IsPlayerSpell(id) return id == 200 end")
+assert compare("item:2008:0:0")[0] > 0
 L.execute("IsPlayerSpell = nil; TABS[2][2][1][2] = 5")
 L.globals().fire("CHARACTER_POINTS_CHANGED")
+L.eval("function(ns) ns.Data.ROGUE.unlocks = {} end")(ns)
 # Dual Wield comes at level 10: before that a one-hand weapon only goes in the
 # main hand, and an off-hand-only weapon can't be used yet.
 L.execute("ITEMS['item:2006:0:0'] = { equip='INVTYPE_WEAPONOFFHAND', class=2, sub=15, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")

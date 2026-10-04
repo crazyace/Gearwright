@@ -59,10 +59,8 @@ advises for the leveling spec (Combat for Rogues: any weapon in either hand).
 **Hack and Slash** (Combat row 5, 5 ranks, 20 points in Combat) replaces Classic's
 Sword and Mace Specialization. Per rank: Axe/Sword 1% chance on a melee hit to get
 an extra attack; Dagger/Fist 1% crit; Mace ignores 3% of the target's armor
-(screenshot, 2026-10-03). Its Axe bonus suggests Rogues can use one-handed axes
-here. Gearwright allows them once Hack and Slash has a point or the One-Handed
-Axes skill (spell 196) is known. The probe now records which weapon skills are
-known, to confirm.
+(screenshot, 2026-10-03). Its Axe bonus fits with Rogues using one-handed axes on
+Forever, which any Rogue can train (see Weapon skills).
 
 ## Weapon skills (19:04 capture)
 
@@ -76,8 +74,14 @@ the character sheet's Main Hand tooltip), and a newly trained skill starts at **
 (One-Handed Swords 1/95 after training at Woo Ping, 2026-10-03). No API lists them
 (`GetSkillLineInfo` is gone); Gearwright reads the sheet's "Daggers:  95/95" lines
 whenever they're shown in a tooltip, and treats a skill it sees get trained as 1.
-It warns while a skill is more than 10 under the max. Unknown yet: whether Hack
-and Slash lets Rogues train axes.
+It warns while a skill is more than 10 under the max.
+
+**Rogues can train One-Handed Axes without any talent.** At 19:38 Buliwyf Stonehand
+offered Sassy (no points in Combat) Fist Weapons, Guns, One-Handed Axes and One-Handed
+Maces; by 19:39 all four were known. Bixi Wobblebonk offered nothing (Daggers,
+Crossbows and Thrown already known). Positions from the probe: Buliwyf 61.3, 89.4,
+Bixi 62.1, 89.5, Ironforge, both in the Timberline Arms weapon shop
+(`data/probe/2026-10-03-ironforge-weapon-masters.json`).
 (The probe saved unknown skills as "error" in this capture; fixed.)
 
 Weapon masters (`Data/WeaponMasters.lua`) are seeded from Classic. Checked so far:
