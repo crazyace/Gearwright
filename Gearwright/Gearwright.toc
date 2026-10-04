@@ -39,5 +39,6 @@ UI\MapPins.lua
 UI\Tooltip.lua
 UI\MainFrame.lua
 UI\Notices.lua
+UI\Options.lua
 
 Core\Commands.lua

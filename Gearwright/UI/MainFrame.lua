@@ -249,7 +249,68 @@ TABS.training = {
   end,
 }
 
-UI.TAB_ORDER = { "gear", "upgrades", "crafting", "enchants", "talents", "training" }
+-- Settings: every row is a control. Left-click toggles or picks; on the
+-- look-ahead row, left-click adds a level and right-click takes one away.
+local function onOff(v) return v and "On" or "Off", v and "good" or "muted" end
+
+local function toggleRow(title, sub, key)
+  local value, color = onOff(ns.db[key])
+  return { icon = "Interface\\Icons\\INV_Misc_Note_01", title = title, sub = sub, value = value,
+    valueColor = color, hint = "Click to turn " .. (ns.db[key] and "off" or "on"),
+    onClick = function() ns.db[key] = not ns.db[key] end }
+end
+
+TABS.settings = {
+  label = "Settings", icon = "Interface\\Icons\\Trade_Engineering",
+  build = function()
+    if not ns.db then return {}, "Settings aren't loaded yet." end
+    local rows = {}
+    rows[#rows + 1] = { header = true, title = "Display" }
+    rows[#rows + 1] = toggleRow("Tooltip line", "Gearwright's score on item tooltips", "showTooltip")
+    rows[#rows + 1] = toggleRow("Chat messages", "Quest rewards, loot, rolls, training reminders", "notices")
+    if ns.MinimapButton then
+      rows[#rows + 1] = toggleRow("Minimap button", "Your next goal; click it to open this window", "minimap")
+    end
+
+    rows[#rows + 1] = { header = true, title = "Spec" }
+    local classData = ns.Spec.ClassData()
+    local choices = { { key = false, label = "Automatic", sub = "From your talents (Combat before level 10)" } }
+    for _, key in ipairs({ "assassination", "combat", "subtlety" }) do
+      local spec = classData and classData.specs[key]
+      if spec then choices[#choices + 1] = { key = key, label = spec.label, sub = spec.summary } end
+    end
+    for _, c in ipairs(choices) do
+      local on = (ns.db.specOverride or false) == c.key
+      rows[#rows + 1] = { icon = "Interface\\Icons\\Ability_Stealth", title = c.label, sub = c.sub,
+        value = on and "selected" or "", valueColor = "good", hint = on and nil or "Click to score gear for this",
+        onClick = function() ns.db.specOverride = c.key end }
+    end
+
+    rows[#rows + 1] = { header = true, title = "Upgrade lists" }
+    local n = ns.Advisor.Lookahead()
+    rows[#rows + 1] = { icon = "Interface\\Icons\\INV_Misc_Spyglass_02", title = "Look ahead",
+      sub = "Dungeons and Crafting also list items up to this many levels above you",
+      value = n .. (n == 1 and " level" or " levels"), valueColor = "title",
+      hint = { "Left-click: one more level", "Right-click: one less" },
+      onClick = function(button)
+        local d = button == "RightButton" and -1 or 1
+        ns.db.lookahead = math.max(0, math.min(15, n + d))
+      end }
+
+    rows[#rows + 1] = { header = true, title = "Map" }
+    local pins = ns.db.pins and #ns.db.pins or 0
+    rows[#rows + 1] = { icon = "Interface\\Icons\\INV_Misc_Map_01", title = "Clear map pins",
+      sub = "Weapon masters Gearwright pinned on the world map", value = pins .. " pinned",
+      valueColor = pins > 0 and "title" or "muted", hint = pins > 0 and "Click to remove them all" or nil,
+      onClick = pins > 0 and function() ns.MapPins.Clear() end or nil }
+
+    rows[#rows + 1] = { header = true, title = "Troubleshooting" }
+    rows[#rows + 1] = toggleRow("Debug messages", "Extra chat output when something can't be read", "debug")
+    return rows
+  end,
+}
+
+UI.TAB_ORDER = { "gear", "upgrades", "crafting", "enchants", "talents", "training", "settings" }
 UI.TABS = TABS
 
 function UI.BuildRows(tab)

@@ -634,6 +634,22 @@ swords = next(r for r in rows if r.get("title") == "One-Handed Swords")
 assert swords["value"] == "train" and "Woo Ping, Stormwind" in swords["sub"], swords
 assert next(r for r in rows if r.get("title") == "Daggers")["value"] == "?"
 L.execute("IsPlayerSpell = nil")
+# Settings tab: rows are controls. Turning the tooltip line off, picking a
+# spec, and changing the look-ahead all go through the rows' click handlers.
+def settings_rows():
+    rows = L.eval("function(ns) return (ns.UI.BuildRows('settings')) end")(ns)
+    return {r["title"]: r for r in rows.values()}
+L.eval("function(ns) ns.UI.Create() end")(ns)
+st = settings_rows()
+assert st["Tooltip line"]["value"] == "On" and st["Automatic"]["value"] == "selected" and st["Look ahead"]["value"] == "5 levels"
+st["Tooltip line"]["onClick"]("LeftButton"); st["Subtlety"]["onClick"]("LeftButton")
+st["Look ahead"]["onClick"]("LeftButton"); settings_rows()["Look ahead"]["onClick"]("LeftButton")
+settings_rows()["Look ahead"]["onClick"]("RightButton")
+st = settings_rows()
+assert st["Tooltip line"]["value"] == "Off" and st["Subtlety"]["value"] == "selected" and st["Look ahead"]["value"] == "6 levels", \
+    (st["Tooltip line"]["value"], st["Subtlety"]["value"], st["Look ahead"]["value"])
+assert L.eval("function(ns) return ns.Spec.Detect() end")(ns) == ("subtlety", "override")
+L.eval("function(ns) ns.db.showTooltip = true; ns.db.specOverride = false; ns.db.lookahead = nil end")(ns)
 # Reaching 32: the new spells, plus the two still untrained.
 L.execute("printed = {}")
 L.eval("function(ns) ns.Notices.LevelUp(32) end")(ns)
