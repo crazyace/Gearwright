@@ -540,7 +540,32 @@ local function scanTradeSkill()
     linked[1] == true and (" from " .. tostring(linked[2]) .. "'s linked profession") or "")
 end
 
+-- Trainer window: every service, learned ones included. The window's filter
+-- (available / unavailable / already known) hides some, so the probe turns all
+-- three on, reads the list a moment later, then puts your filter back. Changing
+-- the filter yourself reads the list again.
+local TRAINER_FILTERS = { "available", "unavailable", "used" }
+local trainerBusy = false
+
+local function readTrainer(out)
+  for i = 1, (GetNumTrainerServices and GetNumTrainerServices() or 0) do
+    out.services[i] = capture("GetTrainerServiceInfo", i)
+  end
+  local counts = {}
+  for _, svc in ipairs(out.services) do
+    local status = svc.values and svc.values[2]
+    if status then counts[status] = (counts[status] or 0) + 1 end
+  end
+  out.counts = counts
+  db().scans["trainer:" .. tostring(sanitize(UnitName("npc")))] = out
+  local parts = {}
+  for status, n in pairs(counts) do parts[#parts + 1] = n .. " " .. status end
+  table.sort(parts)
+  say("recorded %d trainer services (%s)", #out.services, table.concat(parts, ", "))
+end
+
 local function scanTrainer()
+  if trainerBusy then return end
   local out = { at = now(), services = {}, npc = sanitize(UnitGUID and UnitGUID("npc")) }
   out.map = capture("C_Map.GetBestMapForUnit", "player")
   local mapID = out.map.values and out.map.values[1]
@@ -550,11 +575,28 @@ local function scanTrainer()
     out.x, out.y = sanitize(out.x), sanitize(out.y)
   end
   out.zone = sanitize(GetRealZoneText and GetRealZoneText())
-  for i = 1, (GetNumTrainerServices and GetNumTrainerServices() or 0) do
-    out.services[i] = capture("GetTrainerServiceInfo", i)
+  if not (GetTrainerServiceTypeFilter and SetTrainerServiceTypeFilter) then
+    out.filters = "none"
+    return readTrainer(out)
   end
-  db().scans["trainer:" .. tostring(sanitize(UnitName("npc")))] = out
-  say("recorded %d trainer services", #out.services)
+  local saved, changed = {}, false
+  for _, f in ipairs(TRAINER_FILTERS) do
+    local ok, on = pcall(GetTrainerServiceTypeFilter, f)
+    saved[f] = ok and (on == true or on == 1) or false
+    if not saved[f] then
+      changed = true
+      pcall(SetTrainerServiceTypeFilter, f, 1)
+    end
+  end
+  out.filters = saved
+  trainerBusy = true
+  C_Timer.After(changed and 0.3 or 0, function()
+    readTrainer(out)
+    for _, f in ipairs(TRAINER_FILTERS) do
+      if not saved[f] then pcall(SetTrainerServiceTypeFilter, f, 0) end
+    end
+    C_Timer.After(0.5, function() trainerBusy = false end) -- ignore our own filter updates
+  end)
 end
 
 -- Loot log: what drops, and from what. The Encounter Journal won't load on
@@ -873,6 +915,7 @@ events:RegisterEvent("ADDON_LOADED")
 events:RegisterEvent("PLAYER_LOGIN")
 events:RegisterEvent("TRADE_SKILL_SHOW")
 events:RegisterEvent("TRAINER_SHOW")
+pcall(events.RegisterEvent, events, "TRAINER_UPDATE")
 events:RegisterEvent("INSPECT_READY")
 events:RegisterEvent("LOOT_OPENED")
 for _, e in ipairs({ "AUCTION_HOUSE_SHOW", "AUCTION_HOUSE_CLOSED", "REPLICATE_ITEM_LIST_UPDATE" }) do
@@ -888,6 +931,9 @@ events:SetScript("OnEvent", function(_, event, arg1)
     C_Timer.After(0.5, scanTradeSkill) -- let the list populate
   elseif event == "TRAINER_SHOW" then
     C_Timer.After(0.5, scanTrainer)
+  elseif event == "TRAINER_UPDATE" and not trainerBusy and not P.trainerQueued then
+    P.trainerQueued = true -- you changed the filter: read it again, once
+    C_Timer.After(0.5, function() P.trainerQueued = false; scanTrainer() end)
   elseif event == "LOOT_OPENED" then
     recordLoot()
   elseif event == "AUCTION_HOUSE_SHOW" then
@@ -1061,7 +1107,16 @@ local COMMANDS = {
   items = P.items, ej = P.ej, ah = P.ah,
   sheet = function() P.sheet() end,
   all = function()
-    P.env(); P.api(); P.talents(); P.gear(); P.stats(); P.sheet()
+    P.env(); P.api(); P.talents(); P.gear(); P.stats()
+    -- Never open the character sheet from here: read it only if it's already
+    -- open. It's recorded automatically whenever you open it yourself, and
+    -- /gwp sheet still opens it on purpose.
+    local frame = _G.PaperDollFrame
+    if frame and frame:IsVisible() then
+      P.sheet(true)
+    else
+      say("character sheet not read (open it any time and it's recorded, or /gwp sheet)")
+    end
     say("done. /reload to flush SavedVariables, or /gwp export to copy it out.")
   end,
   inspect = function()

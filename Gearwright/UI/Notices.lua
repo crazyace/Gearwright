@@ -35,6 +35,8 @@ local function describe(row)
   if row.reqLevel then s = s .. (" |cffff9900(at level %d)|r"):format(row.reqLevel) end
   local train = row.train or (row.link and ns.Advisor.TrainingNeeded(row.link))
   if train then s = s .. (" |cffff9900(train %s first)|r"):format(train) end
+  local low = row.lowSkill or (not train and row.link and ns.Advisor.SkillTooLow(row.link))
+  if low then s = s .. (" |cffff9900(%s: level it first)|r"):format(low) end
   return s
 end
 
@@ -142,7 +144,8 @@ function Notices.Train()
   ns.util.print("weapon skills you can still train, nearest trainer first:")
   for _, g in ipairs(plan) do
     local t = g.trainer
-    print(("  %s%s%s: %s"):format(t.name, t.city and (", " .. t.city) or "", WHERE[g.distance] or "",
+    print(("  %s%s%s%s: %s"):format(t.name, t.city and (", " .. t.city) or "",
+      t.detail and (" (" .. t.detail .. ")") or "", WHERE[g.distance] or "",
       table.concat(g.skills, ", ")))
   end
   if #unknown > 0 then print("  no trainer known: " .. table.concat(unknown, ", ")) end

@@ -1,5 +1,5 @@
 -- Gearwright: where to train a weapon skill.
--- Starts from Data/WeaponMasters.lua (Classic positions, unchecked on Forever)
+-- Starts from Data/WeaponMasters.lua (Classic positions, a few checked on Forever)
 -- and learns from the game: opening any trainer that teaches a weapon skill
 -- saves its real position and skills (account-wide), which then win.
 local _, ns = ...
@@ -16,8 +16,21 @@ for _, n in ipairs({ "Daggers", "One-Handed Swords", "Two-Handed Swords", "One-H
 -- Weapon masters for your faction, learned ones first: { { name, mapID, x, y, city, skills, seen } }
 function Trainers.All()
   local faction = ns.API.PlayerFaction()
-  local out, seen = {}, {}
+  local out, seen, seed = {}, {}, {}
+  for _, t in ipairs(ns.Data.WEAPON_MASTERS or {}) do seed[t.npcID] = t end
   for npcID, t in pairs(ns.db and ns.db.trainers or {}) do
+    -- A visit saves the real position; keep the seed's directions with it.
+    -- The trainer's window only lists what your class can learn, so keep the
+    -- seed's other skills too.
+    local s = seed[npcID]
+    if s then
+      if t.detail == nil then t.detail = s.detail end
+      local have = {}
+      for _, k in ipairs(t.skills) do have[k] = true end
+      for _, k in ipairs(s.skills) do
+        if not have[k] then t.skills[#t.skills + 1] = k end
+      end
+    end
     if not faction or not t.faction or t.faction == faction then
       out[#out + 1] = t
       seen[npcID] = true
@@ -67,16 +80,17 @@ end
 local function pin(t)
   ns.MapPins.Add({
     mapID = t.mapID, x = t.x, y = t.y, title = t.name .. " (weapon master)",
-    text = "Teaches " .. table.concat(t.skills, ", "),
-    note = not t.seen and "Classic position, not checked on Forever yet" or nil,
+    text = (t.detail and (t.detail:gsub("^%l", string.upper) .. ". ") or "") .. "Teaches " .. table.concat(t.skills, ", "),
+    note = not (t.seen or t.checked) and "Classic position, not checked on Forever yet" or nil,
   })
 end
 
--- "Woo Ping, Stormwind" for the first trainer of `skill`, or nil.
+-- "Woo Ping, Stormwind (inside the Just Maces shop)" for the nearest trainer
+-- of `skill`, or nil.
 function Trainers.Where(skill)
   local t = Trainers.For(skill)[1]
   if not t then return nil end
-  return t.name .. (t.city and (", " .. t.city) or "")
+  return t.name .. (t.city and (", " .. t.city) or "") .. (t.detail and (" (" .. t.detail .. ")") or "")
 end
 
 -- Pin the trainers of `skill` on the world map and open it on the nearest.
@@ -88,8 +102,9 @@ function Trainers.Show(skill)
   end
   for _, t in ipairs(list) do pin(t) end
   local t = list[1]
-  ns.util.print("train %s with %s%s%s", skill, t.name, t.city and (" in " .. t.city) or "",
-    t.seen and "" or " (Classic position, not checked on Forever yet)")
+  ns.util.print("train %s with %s%s%s%s", skill, t.name, t.city and (" in " .. t.city) or "",
+    t.detail and (", " .. t.detail) or "",
+    (t.seen or t.checked) and "" or " (Classic position, not checked on Forever yet)")
   ns.MapPins.Open(t.mapID)
 end
 

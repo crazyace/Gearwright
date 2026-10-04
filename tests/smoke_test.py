@@ -179,17 +179,26 @@ L.execute("ITEMS['item:2004:0:0'] = { equip='INVTYPE_WEAPONMAINHAND', class=2, s
 assert compare("item:2004:0:0")[:2] == [None, "wrong-weapon-type"]
 L.eval("function(ns) ns.db.specOverride = false end")(ns)
 L.execute("INV[17] = nil")
-# One-handed axes: unlocked by Hack and Slash (5/5 in the mock), or by
-# knowing the One-Handed Axes skill; otherwise a Rogue can't use them.
+# One-handed axes: any Rogue can train them on Forever, talents or not.
 L.execute("ITEMS['item:2005:0:0'] = { equip='INVTYPE_WEAPON', class=2, sub=0, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")
-assert compare("item:2005:0:0")[0] > 0
 L.execute("TABS[2][2][1][2] = 0")
 L.globals().fire("CHARACTER_POINTS_CHANGED")
-assert compare("item:2005:0:0")[:2] == [None, "not-usable"]
-L.execute("function IsPlayerSpell(id) return id == 196 end")
 assert compare("item:2005:0:0")[0] > 0
+# The unlock mechanism (a weapon type a talent or spell adds) still works:
+# polearms behind Hack and Slash, as a made-up example.
+L.execute("ITEMS['item:2008:0:0'] = { equip='INVTYPE_WEAPON', class=2, sub=6, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")
+L.eval("function(ns) ns.Data.ROGUE.unlocks = { { class = 2, subclass = 6, talent = 'Hack and Slash', spell = 200 } } end")(ns)
+assert compare("item:2008:0:0")[:2] == [None, "not-usable"]
+L.execute("TABS[2][2][1][2] = 5")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
+assert compare("item:2008:0:0")[0] > 0
+L.execute("TABS[2][2][1][2] = 0")
+L.globals().fire("CHARACTER_POINTS_CHANGED")
+L.execute("function IsPlayerSpell(id) return id == 200 end")
+assert compare("item:2008:0:0")[0] > 0
 L.execute("IsPlayerSpell = nil; TABS[2][2][1][2] = 5")
 L.globals().fire("CHARACTER_POINTS_CHANGED")
+L.eval("function(ns) ns.Data.ROGUE.unlocks = {} end")(ns)
 # Dual Wield comes at level 10: before that a one-hand weapon only goes in the
 # main hand, and an off-hand-only weapon can't be used yet.
 L.execute("ITEMS['item:2006:0:0'] = { equip='INVTYPE_WEAPONOFFHAND', class=2, sub=15, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=30} }")
@@ -219,7 +228,7 @@ train = L.eval("""function(ns) return ns.Advisor.CompareToEquipped('item:2002:0:
   ns.Advisor.TrainingNeeded('item:2002:0:0'), ns.Advisor.TrainingNeeded('item:2003:0:0') end""")(ns)
 assert tuple(train) == (True, "One-Handed Swords"), tuple(train)  # dagger: nil
 tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:2002:0:0', ns.Advisor.CompareSlots('item:2002:0:0')) end""")(ns).values())
-assert "|cffff9900Train One-Handed Swords first: Woo Ping, Stormwind|r" in tip, tip
+assert "|cffff9900Train One-Handed Swords first: Woo Ping, Stormwind (inside the Just Maces shop)|r" in tip, tip
 # ...and where: the weapon master gets a pin on the world map, drawn when the
 # map shows Stormwind. /gearwright train lists every skill still to train.
 L.execute("""
@@ -238,8 +247,8 @@ printed = {}
 """)
 L.eval("function(ns) ns.Trainers.Show('One-Handed Swords') end")(ns)
 pins = L.eval("function() local p = PINPOINTS[#PINPOINTS] return WorldMapFrame.mapID, p[1], p[2] end")()
-assert pins[0] == 1453 and abs(pins[1] - 572) < 1e-6 and abs(pins[2] + 345.6) < 1e-6, tuple(pins)
-assert "train One-Handed Swords with Woo Ping in Stormwind (Classic position" in L.globals().printed[1], L.globals().printed[1]
+assert pins[0] == 1453 and abs(pins[1] - 639) < 1e-6 and abs(pins[2] + 414) < 1e-6, tuple(pins)  # 63.9, 69.0
+assert L.globals().printed[1].endswith("train One-Handed Swords with Woo Ping in Stormwind, inside the Just Maces shop"), L.globals().printed[1]  # checked
 # An Alliance Rogue standing in Stormwind: Woo Ping (here) first, then Ironforge
 # on the same continent, Darnassus (other continent) last; the map opens here.
 L.execute("""printed = {}; WorldMapFrame.mapID = nil
@@ -251,10 +260,10 @@ C_Map = { GetBestMapForUnit = function() return 1453 end,
 L.globals().SlashCmdList.GEARWRIGHT("train")
 out = list(L.globals().printed.values())
 print("train:", out)
-assert out[1] == "  Woo Ping, Stormwind |cff40ff40(here)|r: Crossbows, One-Handed Swords", out
+assert out[1] == "  Woo Ping, Stormwind (inside the Just Maces shop) |cff40ff40(here)|r: Crossbows, One-Handed Swords", out
 # (axes too: the mock has Hack and Slash 5/5; only Daggers is trained)
-assert out[2] == "  Buliwyf Stonehand, Ironforge: Fist Weapons, Guns, One-Handed Axes, One-Handed Maces", out
-assert out[3] == "  Bixi Wobblebonk, Ironforge: Thrown", out
+assert out[2] == "  Buliwyf Stonehand, Ironforge (in the Timberline Arms weapon shop): Fist Weapons, Guns, One-Handed Axes, One-Handed Maces", out
+assert out[3] == "  Bixi Wobblebonk, Ironforge (in the Timberline Arms weapon shop): Thrown", out
 assert out[4] == "  Ilyenia Moonfire, Darnassus |cff999999(other continent)|r: Bows", out
 assert L.eval("function() return WorldMapFrame.mapID end")() == 1453
 L.execute("UnitFactionGroup = nil; C_Map = nil")
@@ -269,10 +278,26 @@ C_Map = { GetBestMapForUnit = function() return 1453 end,
 """)
 L.globals().fire("TRAINER_SHOW")
 seen = L.eval("function(ns) local t = ns.Trainers.For('One-Handed Swords')[1] return t.x, t.y, t.seen ~= nil, #t.skills end")(ns)
-assert tuple(seen) == (0.6, 0.7, True, 2), tuple(seen)
+assert tuple(seen) == (0.6, 0.7, True, 6), tuple(seen)  # its 2 listed + the seed's other 4
 L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, UnitGUID, C_Map = nil, nil, nil, nil
 function UnitName() return "Tester" end; WorldMapFrame._shown = false; CreateFrame = REAL_CREATEFRAME""")
 L.eval("function(ns) ns.MapPins.Clear(); ns.db.trainers = nil end")(ns)
+# Weapon skill levels: training Swords while Gearwright watches puts it at 1/150
+# (level 30): the sword warns you'll miss until it's levelled. The character
+# sheet's "Swords:  145/150" line, once seen in a tooltip, clears the warning.
+L.eval("function(ns) ns.db.weaponSkills = nil end")(ns)
+L.execute("function IsPlayerSpell(id) return id == 1180 end")
+L.eval("function(ns) ns.Advisor.Context() end")(ns)  # first look: Daggers known, level unknown
+L.execute("function IsPlayerSpell(id) return id == 1180 or id == 201 end")
+low = L.eval("function(ns) return ns.Advisor.SkillTooLow('item:2002:0:0'), ns.Advisor.SkillTooLow('item:2003:0:0') end")(ns)
+assert tuple(low) == ("One-Handed Swords 1/150", None), low  # the dagger's level isn't known: no warning
+tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:2002:0:0', ns.Advisor.CompareSlots('item:2002:0:0')) end""")(ns).values())
+assert "|cffff9900One-Handed Swords 1/150: you'll miss a lot until it's levelled (fight with this weapon type)|r" in tip, tip
+assert L.eval("function(ns) return ns.WeaponSkills.ReadLines({ 'Main Hand', 'DPS:  20.0', '|cffffffffSwords:  145/150|r' }) end")(ns) == 1
+assert L.eval("function(ns) return ns.Advisor.SkillTooLow('item:2002:0:0') end")(ns) is None
+L.eval("function(ns) ns.WeaponSkills.ReadLines({ 'Swords:  40/150' }) end")(ns)
+assert L.eval("function(ns) return ns.Advisor.SkillTooLow('item:2002:0:0') end")(ns) == "One-Handed Swords 40/150"
+L.eval("function(ns) ns.db.weaponSkills = nil end")(ns)
 L.execute("IsPlayerSpell = nil")
 L.execute("INV[17] = nil")
 # Items above your level still score, and say when you can wear them.
@@ -675,7 +700,10 @@ end
 """)
 load_addon("GearwrightProbe","GearwrightProbe.toc")
 L.globals().fire("ADDON_LOADED","GearwrightProbe"); L.globals().fire("PLAYER_LOGIN")
-L.globals().SlashCmdList.GEARWRIGHTPROBE("all")  # window closed: /gwp all opens it, reads it, closes it
+L.globals().SlashCmdList.GEARWRIGHTPROBE("all")  # window closed: /gwp all leaves it closed
+assert L.eval("function() return TOGGLES, SHEET_OPEN end")() == (0, False)
+assert any("character sheet not read" in str(x) for x in L.globals().printed.values())
+L.globals().SlashCmdList.GEARWRIGHTPROBE("sheet")  # /gwp sheet opens it, reads it, closes it
 assert L.eval("function() return TOGGLES, SHEET_OPEN end")() == (2, False)
 dbg = L.eval("""function() local d = GearwrightProbeDB.snapshots[1].sections.sheetDebug
   return d.how, d.hovered, d.stored, d.map[1], d.map[2] end""")()
@@ -771,6 +799,24 @@ drop = L.eval("""function() local e = GearwrightProbeDB.scans.loot.items["5540"]
   local f = e.from["Creature:1732"] return e.name, f.count, f.where, f.name end""")()
 assert tuple(drop) == ("Pearl-handled Dagger", 2, "The Deadmines", "Defias Squallshaper"), tuple(drop)
 L.execute("LOOT = {}; GetLootSourceInfo, GetInstanceInfo, UnitGUID = nil, nil, nil; function UnitName() return 'Tester' end")
+# Trainer window: the probe turns on every filter (learned spells too), reads
+# the full list, then puts the player's filter back.
+L.execute("""
+TRAINER = { { "Backstab", "used" }, { "Sprint", "available" }, { "Vanish", "unavailable" } }
+TFILTER = { available = true, unavailable = true, used = false }
+local function shown() local o = {} for _, s in ipairs(TRAINER) do if TFILTER[s[2]] then o[#o + 1] = s end end return o end
+function GetNumTrainerServices() return #shown() end
+function GetTrainerServiceInfo(i) local s = shown()[i] return s[1], s[2], 0, 0, "", "" end
+function GetTrainerServiceTypeFilter(f) return TFILTER[f] and 1 or nil end
+function SetTrainerServiceTypeFilter(f, on) TFILTER[f] = on == 1 end
+function UnitName(u) return u == "npc" and "Fenthwick" or "Tester" end
+""")
+L.globals().fire("TRAINER_SHOW")
+tr = L.eval("""function() local t = GearwrightProbeDB.scans["trainer:Fenthwick"]
+  return #t.services, t.counts.used, t.filters.used, TFILTER.used end""")()
+assert tuple(tr) == (3, 1, False, False), tuple(tr)  # all 3 read; "used" was off and is off again
+L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, GetTrainerServiceTypeFilter, SetTrainerServiceTypeFilter = nil, nil, nil, nil
+function UnitName() return "Tester" end""")
 # Auction house full scan: gear gets its full record and lowest buyout; other
 # items only a unit price; a gear item whose data never loads is counted.
 L.execute("""

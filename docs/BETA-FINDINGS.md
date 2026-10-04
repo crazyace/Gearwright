@@ -59,10 +59,8 @@ advises for the leveling spec (Combat for Rogues: any weapon in either hand).
 **Hack and Slash** (Combat row 5, 5 ranks, 20 points in Combat) replaces Classic's
 Sword and Mace Specialization. Per rank: Axe/Sword 1% chance on a melee hit to get
 an extra attack; Dagger/Fist 1% crit; Mace ignores 3% of the target's armor
-(screenshot, 2026-10-03). Its Axe bonus suggests Rogues can use one-handed axes
-here. Gearwright allows them once Hack and Slash has a point or the One-Handed
-Axes skill (spell 196) is known. The probe now records which weapon skills are
-known, to confirm.
+(screenshot, 2026-10-03). Its Axe bonus fits with Rogues using one-handed axes on
+Forever, which any Rogue can train (see Weapon skills).
 
 ## Weapon skills (19:04 capture)
 
@@ -70,10 +68,30 @@ known, to confirm.
 Thrown (2567) and Dual Wield (674) known; One-Handed Swords (201), One-Handed Maces
 (198), Fist Weapons (15590), One-Handed Axes (196) not.** As in Classic, a Rogue
 starts with daggers and trains the other weapon types at a weapon master.
-Gearwright still scores those weapons but says to train the skill first. Unknown
-yet: whether Forever has Classic's weapon skill *levels* (a freshly trained skill
-at 1/100 misses a lot), and whether Hack and Slash lets Rogues train axes.
+Gearwright still scores those weapons but says to train the skill first.
+**Weapon skill levels exist, as in Classic**: max 5 x level (Daggers 95/95 at 19, on
+the character sheet's Main Hand tooltip), and a newly trained skill starts at **1**
+(One-Handed Swords 1/95 after training at Woo Ping, 2026-10-03). No API lists them
+(`GetSkillLineInfo` is gone); Gearwright reads the sheet's "Daggers:  95/95" lines
+whenever they're shown in a tooltip, and treats a skill it sees get trained as 1.
+It warns while a skill is more than 10 under the max.
+
+**Rogues can train One-Handed Axes without any talent.** At 19:38 Buliwyf Stonehand
+offered Sassy (no points in Combat) Fist Weapons, Guns, One-Handed Axes and One-Handed
+Maces; by 19:39 all four were known. Bixi Wobblebonk offered nothing (Daggers,
+Crossbows and Thrown already known). Positions from the probe: Buliwyf 61.3, 89.4,
+Bixi 62.1, 89.5, Ironforge, both in the Timberline Arms weapon shop
+(`data/probe/2026-10-03-ironforge-weapon-masters.json`).
 (The probe saved unknown skills as "error" in this capture; fixed.)
+
+Weapon masters (`Data/WeaponMasters.lua`) are seeded from Classic. Checked so far:
+**Woo Ping, Stormwind, at 63.9, 69.0, inside the Just Maces shop** (probe at his
+window, 19:26; the seed had 57.2, 57.6, so expect the other seeded positions to be off
+too until visited). His window lists only what a Rogue can learn from him: Crossbows
+and One-Handed Swords (`GetTrainerServiceInfo`), so a trainer's window doesn't show
+everything they teach. At 19:28 Sassy knew One-Handed Swords and Crossbows.
+Tailoring and Enchanting were opened again at 19:14 as **Gray Magus's** linked
+professions (`data/probe/2026-10-03-woo-ping.json`).
 
 ## Items and stats
 
@@ -260,6 +278,11 @@ their recipe lists (what each profession makes) are what's useful.
 
 ## Trainers (2026-10-03)
 
+The trainer window's filter (available / unavailable / already known) decides what
+`GetTrainerServiceInfo` lists. Fenthwick (Rogue trainer, Ironforge 51.6, 15.0) was read
+at 19:43 with the default filter: 85 services, all "unavailable", nothing already
+known. The probe now turns every filter on before reading and restores yours after.
+
 The trainer window lists every service with its level, rank and category (`GetTrainerServiceInfo`
 returns name, availability, icon, level, rank, category). A level 19 Rogue saw 85 class
 services from level 20 to 60. Worth knowing for Rogue advice:
@@ -345,5 +368,4 @@ ranks what's listed for a character, per slot, with prices.
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety
 - [ ] Agility-per-crit at more levels (`/gwp all` every few levels; beta cap is 30)
 - [ ] Does any gear carry weapon-skill bonuses ("+N Daggers")?
-- [ ] Can a Rogue equip one-handed axes, and only with Hack and Slash? (`/gwp talents`
-      before and after putting a point in it; try equipping an axe)
+- [x] Can a Rogue use one-handed axes? Yes, trainable from Buliwyf Stonehand, no talent needed
