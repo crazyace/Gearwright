@@ -1,0 +1,1205 @@
+{
+ "scans": {
+  "trainer:Fenthwick": {
+   "at": "2026-10-03 19:47:08",
+   "counts": {
+    "unavailable": 85,
+    "used": 22
+   },
+   "filters": {
+    "available": true,
+    "unavailable": true,
+    "used": true
+   },
+   "map": {
+    "status": "ok",
+    "values": [
+     1455
+    ]
+   },
+   "npc": "Creature-0-6783-0-145-5167-000040715A",
+   "services": [
+    {
+     "status": "ok",
+     "values": [
+      "Ambush",
+      "used",
+      132282,
+      0,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "used",
+      132090,
+      0,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "used",
+      132090,
+      0,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Evasion",
+      "used",
+      136205,
+      0,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "used",
+      132292,
+      0,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "used",
+      132292,
+      0,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Expose Armor",
+      "used",
+      132354,
+      0,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Feint",
+      "used",
+      132294,
+      0,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Garrote",
+      "used",
+      132297,
+      0,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Gouge",
+      "used",
+      132155,
+      0,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Gouge",
+      "used",
+      132155,
+      0,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Kick",
+      "used",
+      132219,
+      0,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Pick Pocket",
+      "used",
+      133644,
+      0,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sap",
+      "used",
+      132310,
+      0,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "used",
+      136189,
+      0,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "used",
+      136189,
+      0,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Slice and Dice",
+      "used",
+      132306,
+      0,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sprint",
+      "used",
+      132307,
+      0,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Stealth",
+      "used",
+      132320,
+      0,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Dual Wield",
+      "used",
+      132147,
+      10,
+      "Passive",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Parry",
+      "used",
+      132269,
+      12,
+      "Passive",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Pick Lock",
+      "used",
+      136058,
+      16,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      20,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Crippling Poison",
+      "unavailable",
+      132274,
+      20,
+      "Rank 1",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      20,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Stealth",
+      "unavailable",
+      132320,
+      20,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Distract",
+      "unavailable",
+      132289,
+      22,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Garrote",
+      "unavailable",
+      132297,
+      22,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "unavailable",
+      136189,
+      22,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Vanish",
+      "unavailable",
+      132331,
+      22,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Detect Traps",
+      "unavailable",
+      132319,
+      24,
+      "Passive",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "unavailable",
+      132292,
+      24,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mind-numbing Poison",
+      "unavailable",
+      136066,
+      24,
+      "Rank 1",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Ambush",
+      "unavailable",
+      132282,
+      26,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Cheap Shot",
+      "unavailable",
+      132092,
+      26,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Expose Armor",
+      "unavailable",
+      132354,
+      26,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Kick",
+      "unavailable",
+      132219,
+      26,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      28,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Feint",
+      "unavailable",
+      132294,
+      28,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Instant Poison II",
+      "unavailable",
+      132273,
+      28,
+      "Rank 2",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      28,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sap",
+      "unavailable",
+      132310,
+      28,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Deadly Poison",
+      "unavailable",
+      132290,
+      30,
+      "Rank 1",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Disarm Trap",
+      "unavailable",
+      136162,
+      30,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Garrote",
+      "unavailable",
+      132297,
+      30,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Kidney Shot",
+      "unavailable",
+      132298,
+      30,
+      "Rank 1",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "unavailable",
+      136189,
+      30,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "unavailable",
+      132292,
+      32,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Gouge",
+      "unavailable",
+      132155,
+      32,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Wound Poison",
+      "unavailable",
+      134197,
+      32,
+      "Rank 1",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Ambush",
+      "unavailable",
+      132282,
+      34,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Blind",
+      "unavailable",
+      136175,
+      34,
+      "",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Blinding Powder",
+      "unavailable",
+      133588,
+      34,
+      "",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sprint",
+      "unavailable",
+      132307,
+      34,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      36,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Expose Armor",
+      "unavailable",
+      132354,
+      36,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Instant Poison III",
+      "unavailable",
+      132273,
+      36,
+      "Rank 3",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      36,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Deadly Poison II",
+      "unavailable",
+      132290,
+      38,
+      "Rank 2",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Garrote",
+      "unavailable",
+      132297,
+      38,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mind-numbing Poison II",
+      "unavailable",
+      136066,
+      38,
+      "Rank 2",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "unavailable",
+      136189,
+      38,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "unavailable",
+      132292,
+      40,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Feint",
+      "unavailable",
+      132294,
+      40,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mutilate",
+      "unavailable",
+      236270,
+      40,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Safe Fall",
+      "unavailable",
+      132914,
+      40,
+      "Passive",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Stealth",
+      "unavailable",
+      132320,
+      40,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Wound Poison II",
+      "unavailable",
+      134197,
+      40,
+      "Rank 2",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Ambush",
+      "unavailable",
+      132282,
+      42,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Kick",
+      "unavailable",
+      132219,
+      42,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Slice and Dice",
+      "unavailable",
+      132306,
+      42,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Vanish",
+      "unavailable",
+      132331,
+      42,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      44,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Instant Poison IV",
+      "unavailable",
+      132273,
+      44,
+      "Rank 4",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      44,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Deadly Poison III",
+      "unavailable",
+      132290,
+      46,
+      "Rank 3",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Expose Armor",
+      "unavailable",
+      132354,
+      46,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Garrote",
+      "unavailable",
+      132297,
+      46,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Gouge",
+      "unavailable",
+      132155,
+      46,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "unavailable",
+      136189,
+      46,
+      "Rank 7",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "unavailable",
+      132292,
+      48,
+      "Rank 7",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sap",
+      "unavailable",
+      132310,
+      48,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Wound Poison III",
+      "unavailable",
+      134197,
+      48,
+      "Rank 3",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Ambush",
+      "unavailable",
+      132282,
+      50,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Crippling Poison II",
+      "unavailable",
+      132274,
+      50,
+      "Rank 2",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Kidney Shot",
+      "unavailable",
+      132298,
+      50,
+      "Rank 2",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mutilate",
+      "unavailable",
+      236270,
+      50,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      52,
+      "Rank 7",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Feint",
+      "unavailable",
+      132294,
+      52,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Instant Poison V",
+      "unavailable",
+      132273,
+      52,
+      "Rank 5",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mind-numbing Poison III",
+      "unavailable",
+      136066,
+      52,
+      "Rank 3",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      52,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Deadly Poison IV",
+      "unavailable",
+      132290,
+      54,
+      "Rank 4",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Garrote",
+      "unavailable",
+      132297,
+      54,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sinister Strike",
+      "unavailable",
+      136189,
+      54,
+      "Rank 8",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Eviscerate",
+      "unavailable",
+      132292,
+      56,
+      "Rank 8",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Expose Armor",
+      "unavailable",
+      132354,
+      56,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Wound Poison IV",
+      "unavailable",
+      134197,
+      56,
+      "Rank 4",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Ambush",
+      "unavailable",
+      132282,
+      58,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Kick",
+      "unavailable",
+      132219,
+      58,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Sprint",
+      "unavailable",
+      132307,
+      58,
+      "Rank 3",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Backstab",
+      "unavailable",
+      132090,
+      60,
+      "Rank 8",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Gouge",
+      "unavailable",
+      132155,
+      60,
+      "Rank 5",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Instant Poison VI",
+      "unavailable",
+      132273,
+      60,
+      "Rank 6",
+      "Poisons"
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Mutilate",
+      "unavailable",
+      236270,
+      60,
+      "Rank 4",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Rupture",
+      "unavailable",
+      132302,
+      60,
+      "Rank 6",
+      ""
+     ]
+    },
+    {
+     "status": "ok",
+     "values": [
+      "Stealth",
+      "unavailable",
+      132320,
+      60,
+      "Rank 4",
+      ""
+     ]
+    }
+   ],
+   "x": 0.5166925191879272,
+   "y": 0.1515713334083557,
+   "zone": "Ironforge"
+  }
+ }
+}

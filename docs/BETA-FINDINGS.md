@@ -283,6 +283,18 @@ The trainer window's filter (available / unavailable / already known) decides wh
 at 19:43 with the default filter: 85 services, all "unavailable", nothing already
 known. The probe now turns every filter on before reading and restores yours after.
 
+Read again at 19:47 with all filters on: **107 services, 22 known + 85 to come**
+(`data/probe/2026-10-03-rogue-trainer.json`). Known at level 19: Ambush 1, Backstab 1-2,
+Evasion, Eviscerate 2-3, Expose Armor 1, Feint 1, Garrote 1, Gouge 1-2, Kick 1,
+Pick Pocket, Sap 1, Sinister Strike 2-3, Slice and Dice 1, Sprint 1, Stealth 1,
+Dual Wield (10), Parry (12), Pick Lock (16). Learned spells report level 0, except
+the passives and Pick Lock. Next up: level 20 Backstab 3, Crippling Poison, Rupture,
+Stealth 2; 22 Distract, Garrote 2, Sinister Strike 4, Vanish; 24 Detect Traps,
+Eviscerate 4, Mind-numbing Poison; 26 Ambush 2, Cheap Shot, Expose Armor 2, Kick 2;
+28 Backstab 4, Feint 2, Instant Poison II, Rupture 2, Sap 2; 30 Deadly Poison,
+Disarm Trap, Garrote 3, Kidney Shot, Sinister Strike 5. Mutilate ranks 2-4 at
+40/50/60. No Instant Poison rank 1 at the trainer.
+
 The trainer window lists every service with its level, rank and category (`GetTrainerServiceInfo`
 returns name, availability, icon, level, rank, category). A level 19 Rogue saw 85 class
 services from level 20 to 60. Worth knowing for Rogue advice:
