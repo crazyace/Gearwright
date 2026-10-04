@@ -1,7 +1,7 @@
 -- Gearwright: weapon masters, the trainers who teach weapon skills.
 --
 -- Seeded from Classic (NPC, city, what they teach). Forever may have moved or
--- added some: these are NOT checked in game yet. Gearwright corrects itself:
+-- added some: only entries with `checked = true` have been confirmed in game. Gearwright corrects itself:
 -- whenever you open a trainer that teaches a weapon skill, its real position
 -- and skill list are saved (Engine/Trainers.lua) and used instead.
 --
@@ -11,7 +11,8 @@
 local _, ns = ...
 
 ns.Data.WEAPON_MASTERS = {
-  { npcID = 11867, name = "Woo Ping", faction = "Alliance", mapID = 1453, x = 0.572, y = 0.576,
+  -- Woo Ping: checked on the Forever beta, 2026-10-04 (63.6, 69.2).
+  { npcID = 11867, name = "Woo Ping", faction = "Alliance", mapID = 1453, x = 0.636, y = 0.692, checked = true,
     city = "Stormwind", continent = 1415,
     skills = { "Daggers", "One-Handed Swords", "Two-Handed Swords", "Polearms", "Staves", "Crossbows" } },
   { npcID = 11865, name = "Buliwyf Stonehand", faction = "Alliance", mapID = 1455, x = 0.612, y = 0.895,

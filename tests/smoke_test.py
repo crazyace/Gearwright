@@ -238,8 +238,8 @@ printed = {}
 """)
 L.eval("function(ns) ns.Trainers.Show('One-Handed Swords') end")(ns)
 pins = L.eval("function() local p = PINPOINTS[#PINPOINTS] return WorldMapFrame.mapID, p[1], p[2] end")()
-assert pins[0] == 1453 and abs(pins[1] - 572) < 1e-6 and abs(pins[2] + 345.6) < 1e-6, tuple(pins)
-assert "train One-Handed Swords with Woo Ping in Stormwind (Classic position" in L.globals().printed[1], L.globals().printed[1]
+assert pins[0] == 1453 and abs(pins[1] - 636) < 1e-6 and abs(pins[2] + 415.2) < 1e-6, tuple(pins)  # 63.6, 69.2
+assert L.globals().printed[1].endswith("train One-Handed Swords with Woo Ping in Stormwind"), L.globals().printed[1]  # checked
 # An Alliance Rogue standing in Stormwind: Woo Ping (here) first, then Ironforge
 # on the same continent, Darnassus (other continent) last; the map opens here.
 L.execute("""printed = {}; WorldMapFrame.mapID = nil

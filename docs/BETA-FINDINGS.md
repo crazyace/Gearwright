@@ -75,6 +75,10 @@ yet: whether Forever has Classic's weapon skill *levels* (a freshly trained skil
 at 1/100 misses a lot), and whether Hack and Slash lets Rogues train axes.
 (The probe saved unknown skills as "error" in this capture; fixed.)
 
+Weapon masters (`Data/WeaponMasters.lua`) are seeded from Classic. Checked so far:
+**Woo Ping, Stormwind, at 63.6, 69.2** (2026-10-04; the seed had 57.2, 57.6, so expect
+the other seeded positions to be off too until visited).
+
 ## Items and stats
 
 - `C_Item.GetItemStats` works and returns `ITEM_MOD_*_SHORT` tokens. Seen so far:

@@ -1,5 +1,5 @@
 -- Gearwright: where to train a weapon skill.
--- Starts from Data/WeaponMasters.lua (Classic positions, unchecked on Forever)
+-- Starts from Data/WeaponMasters.lua (Classic positions, a few checked on Forever)
 -- and learns from the game: opening any trainer that teaches a weapon skill
 -- saves its real position and skills (account-wide), which then win.
 local _, ns = ...
@@ -68,7 +68,7 @@ local function pin(t)
   ns.MapPins.Add({
     mapID = t.mapID, x = t.x, y = t.y, title = t.name .. " (weapon master)",
     text = "Teaches " .. table.concat(t.skills, ", "),
-    note = not t.seen and "Classic position, not checked on Forever yet" or nil,
+    note = not (t.seen or t.checked) and "Classic position, not checked on Forever yet" or nil,
   })
 end
 
@@ -89,7 +89,7 @@ function Trainers.Show(skill)
   for _, t in ipairs(list) do pin(t) end
   local t = list[1]
   ns.util.print("train %s with %s%s%s", skill, t.name, t.city and (" in " .. t.city) or "",
-    t.seen and "" or " (Classic position, not checked on Forever yet)")
+    (t.seen or t.checked) and "" or " (Classic position, not checked on Forever yet)")
   ns.MapPins.Open(t.mapID)
 end
 
