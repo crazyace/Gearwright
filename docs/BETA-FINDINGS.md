@@ -70,9 +70,14 @@ known, to confirm.
 Thrown (2567) and Dual Wield (674) known; One-Handed Swords (201), One-Handed Maces
 (198), Fist Weapons (15590), One-Handed Axes (196) not.** As in Classic, a Rogue
 starts with daggers and trains the other weapon types at a weapon master.
-Gearwright still scores those weapons but says to train the skill first. Unknown
-yet: whether Forever has Classic's weapon skill *levels* (a freshly trained skill
-at 1/100 misses a lot), and whether Hack and Slash lets Rogues train axes.
+Gearwright still scores those weapons but says to train the skill first.
+**Weapon skill levels exist, as in Classic**: max 5 x level (Daggers 95/95 at 19, on
+the character sheet's Main Hand tooltip), and a newly trained skill starts at **1**
+(One-Handed Swords 1/95 after training at Woo Ping, 2026-10-03). No API lists them
+(`GetSkillLineInfo` is gone); Gearwright reads the sheet's "Daggers:  95/95" lines
+whenever they're shown in a tooltip, and treats a skill it sees get trained as 1.
+It warns while a skill is more than 10 under the max. Unknown yet: whether Hack
+and Slash lets Rogues train axes.
 (The probe saved unknown skills as "error" in this capture; fixed.)
 
 Weapon masters (`Data/WeaponMasters.lua`) are seeded from Classic. Checked so far:

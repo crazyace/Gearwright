@@ -35,6 +35,8 @@ local function describe(row)
   if row.reqLevel then s = s .. (" |cffff9900(at level %d)|r"):format(row.reqLevel) end
   local train = row.train or (row.link and ns.Advisor.TrainingNeeded(row.link))
   if train then s = s .. (" |cffff9900(train %s first)|r"):format(train) end
+  local low = row.lowSkill or (not train and row.link and ns.Advisor.SkillTooLow(row.link))
+  if low then s = s .. (" |cffff9900(%s: level it first)|r"):format(low) end
   return s
 end
 

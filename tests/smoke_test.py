@@ -273,6 +273,22 @@ assert tuple(seen) == (0.6, 0.7, True, 6), tuple(seen)  # its 2 listed + the see
 L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, UnitGUID, C_Map = nil, nil, nil, nil
 function UnitName() return "Tester" end; WorldMapFrame._shown = false; CreateFrame = REAL_CREATEFRAME""")
 L.eval("function(ns) ns.MapPins.Clear(); ns.db.trainers = nil end")(ns)
+# Weapon skill levels: training Swords while Gearwright watches puts it at 1/150
+# (level 30): the sword warns you'll miss until it's levelled. The character
+# sheet's "Swords:  145/150" line, once seen in a tooltip, clears the warning.
+L.eval("function(ns) ns.db.weaponSkills = nil end")(ns)
+L.execute("function IsPlayerSpell(id) return id == 1180 end")
+L.eval("function(ns) ns.Advisor.Context() end")(ns)  # first look: Daggers known, level unknown
+L.execute("function IsPlayerSpell(id) return id == 1180 or id == 201 end")
+low = L.eval("function(ns) return ns.Advisor.SkillTooLow('item:2002:0:0'), ns.Advisor.SkillTooLow('item:2003:0:0') end")(ns)
+assert tuple(low) == ("One-Handed Swords 1/150", None), low  # the dagger's level isn't known: no warning
+tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:2002:0:0', ns.Advisor.CompareSlots('item:2002:0:0')) end""")(ns).values())
+assert "|cffff9900One-Handed Swords 1/150: you'll miss a lot until it's levelled (fight with this weapon type)|r" in tip, tip
+assert L.eval("function(ns) return ns.WeaponSkills.ReadLines({ 'Main Hand', 'DPS:  20.0', '|cffffffffSwords:  145/150|r' }) end")(ns) == 1
+assert L.eval("function(ns) return ns.Advisor.SkillTooLow('item:2002:0:0') end")(ns) is None
+L.eval("function(ns) ns.WeaponSkills.ReadLines({ 'Swords:  40/150' }) end")(ns)
+assert L.eval("function(ns) return ns.Advisor.SkillTooLow('item:2002:0:0') end")(ns) == "One-Handed Swords 40/150"
+L.eval("function(ns) ns.db.weaponSkills = nil end")(ns)
 L.execute("IsPlayerSpell = nil")
 L.execute("INV[17] = nil")
 # Items above your level still score, and say when you can wear them.

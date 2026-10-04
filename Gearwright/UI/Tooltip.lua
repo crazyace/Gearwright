@@ -40,6 +40,10 @@ function Tooltip.Lines(link, list)
     local where = ns.Trainers.Where(train)
     out[#out + 1] = ("|cffff9900Train %s first%s|r"):format(train, where and (": " .. where) or " at a weapon master")
   end
+  local low = ns.Advisor.SkillTooLow(link, ctx)
+  if low then
+    out[#out + 1] = ("|cffff9900%s: you'll miss a lot until it's levelled (fight with this weapon type)|r"):format(low)
+  end
   if ctx then
     local skip = ns.Stats.Unscored(ns.API.GetItemStats(link), ns.API.GetItemTooltipLines(link), ctx.weights)
     if #skip > 0 then out[#out + 1] = "|cffaaaaaaNot counted: " .. table.concat(skip, ", ") .. "|r" end

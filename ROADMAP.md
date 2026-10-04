@@ -35,6 +35,8 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
       crafted (`Data/Crafted.lua` from `tools/crafted_from_probe.py`; Crafting tab)
 - [x] Crafting knows your other characters' recipes ("Smithy can craft it")
 - [x] Weapon skills: untrained weapons say where to train them; weapon masters pinned on the map
+- [x] Weapon skill levels: warn while a trained skill is low (read from the sheet's weapon tooltips)
+- [ ] Score low-skill weapons lower (Classic miss chance from skill vs. target defense)
 - [ ] Check the weapon masters' positions on Forever (Gearwright saves them when you visit one)
 - [ ] Next-goal button (minimap / LibDataBroker) and a per-character wishlist
 - [ ] Engineering recipes (needs a probe scan from an engineer)

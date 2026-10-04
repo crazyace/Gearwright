@@ -50,7 +50,20 @@ function Advisor.KnownWeaponSkills(classData)
   for sub, skill in pairs(classData.weaponSkills) do
     if ns.API.KnowsSpell(skill.spell) then known[sub] = true; any = true end
   end
-  return any and known or nil
+  if not any then return nil end
+  ns.WeaponSkills.Update(known) -- notices a skill that was just trained
+  return known
+end
+
+-- "One-Handed Swords 1/95" when `link` is a weapon you've trained but whose
+-- skill is still too low to fight well with (Engine/WeaponSkills.lua), else nil.
+function Advisor.SkillTooLow(link, ctx)
+  if not ctx then ctx = Advisor.Context() end
+  if not (ctx and ctx.class.weaponSkills) then return nil end
+  local _, _, classID, subclassID = ns.API.GetItemBasics(link)
+  local skill = classID == 2 and ctx.class.weaponSkills[subclassID]
+  if not skill or (ctx.weaponSkills and not ctx.weaponSkills[subclassID]) then return nil end
+  return ns.WeaponSkills.Warning(subclassID, skill.name)
 end
 
 -- The weapon skill you'd have to train to use `link` ("One-Handed Swords"),
@@ -367,6 +380,7 @@ function Advisor.CraftReport()
           recipeID = r.recipeID, name = r.name, itemID = r.itemID, link = ns.API.GetItemLink(item),
           delta = delta, slot = slot, reqLevel = reqLevel > level and reqLevel or nil,
           profession = r.prof, status = status, alt = alt, train = Advisor.TrainingNeeded(item, ctx),
+          lowSkill = Advisor.SkillTooLow(item, ctx),
         }
         -- An item several professions make: keep the one you can do most about.
         local prev = best[r.itemID]
@@ -453,7 +467,7 @@ function Advisor.DungeonReport()
               local row = {
                 itemID = s.itemID, name = s.name, link = ns.API.GetItemLink(item), delta = delta, slot = slot,
                 reqLevel = reqLevel > level and reqLevel or nil, sources = { s },
-                train = Advisor.TrainingNeeded(item, ctx),
+                train = Advisor.TrainingNeeded(item, ctx), lowSkill = Advisor.SkillTooLow(item, ctx),
               }
               byID[s.itemID] = row
               rows[#rows + 1] = row

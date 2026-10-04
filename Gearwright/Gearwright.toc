@@ -29,6 +29,7 @@ Engine\Scoring.lua
 Engine\Sources.lua
 Engine\Professions.lua
 Engine\Trainers.lua
+Engine\WeaponSkills.lua
 Engine\Advisor.lua
 
 UI\Theme.lua
