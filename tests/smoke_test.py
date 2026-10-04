@@ -799,6 +799,24 @@ drop = L.eval("""function() local e = GearwrightProbeDB.scans.loot.items["5540"]
   local f = e.from["Creature:1732"] return e.name, f.count, f.where, f.name end""")()
 assert tuple(drop) == ("Pearl-handled Dagger", 2, "The Deadmines", "Defias Squallshaper"), tuple(drop)
 L.execute("LOOT = {}; GetLootSourceInfo, GetInstanceInfo, UnitGUID = nil, nil, nil; function UnitName() return 'Tester' end")
+# Trainer window: the probe turns on every filter (learned spells too), reads
+# the full list, then puts the player's filter back.
+L.execute("""
+TRAINER = { { "Backstab", "used" }, { "Sprint", "available" }, { "Vanish", "unavailable" } }
+TFILTER = { available = true, unavailable = true, used = false }
+local function shown() local o = {} for _, s in ipairs(TRAINER) do if TFILTER[s[2]] then o[#o + 1] = s end end return o end
+function GetNumTrainerServices() return #shown() end
+function GetTrainerServiceInfo(i) local s = shown()[i] return s[1], s[2], 0, 0, "", "" end
+function GetTrainerServiceTypeFilter(f) return TFILTER[f] and 1 or nil end
+function SetTrainerServiceTypeFilter(f, on) TFILTER[f] = on == 1 end
+function UnitName(u) return u == "npc" and "Fenthwick" or "Tester" end
+""")
+L.globals().fire("TRAINER_SHOW")
+tr = L.eval("""function() local t = GearwrightProbeDB.scans["trainer:Fenthwick"]
+  return #t.services, t.counts.used, t.filters.used, TFILTER.used end""")()
+assert tuple(tr) == (3, 1, False, False), tuple(tr)  # all 3 read; "used" was off and is off again
+L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, GetTrainerServiceTypeFilter, SetTrainerServiceTypeFilter = nil, nil, nil, nil
+function UnitName() return "Tester" end""")
 # Auction house full scan: gear gets its full record and lowest buyout; other
 # items only a unit price; a gear item whose data never loads is counted.
 L.execute("""

@@ -278,6 +278,11 @@ their recipe lists (what each profession makes) are what's useful.
 
 ## Trainers (2026-10-03)
 
+The trainer window's filter (available / unavailable / already known) decides what
+`GetTrainerServiceInfo` lists. Fenthwick (Rogue trainer, Ironforge 51.6, 15.0) was read
+at 19:43 with the default filter: 85 services, all "unavailable", nothing already
+known. The probe now turns every filter on before reading and restores yours after.
+
 The trainer window lists every service with its level, rank and category (`GetTrainerServiceInfo`
 returns name, availability, icon, level, rank, category). A level 19 Rogue saw 85 class
 services from level 20 to 60. Worth knowing for Rogue advice:
