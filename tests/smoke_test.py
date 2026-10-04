@@ -219,7 +219,7 @@ train = L.eval("""function(ns) return ns.Advisor.CompareToEquipped('item:2002:0:
   ns.Advisor.TrainingNeeded('item:2002:0:0'), ns.Advisor.TrainingNeeded('item:2003:0:0') end""")(ns)
 assert tuple(train) == (True, "One-Handed Swords"), tuple(train)  # dagger: nil
 tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:2002:0:0', ns.Advisor.CompareSlots('item:2002:0:0')) end""")(ns).values())
-assert "|cffff9900Train One-Handed Swords first: Woo Ping, Stormwind|r" in tip, tip
+assert "|cffff9900Train One-Handed Swords first: Woo Ping, Stormwind (inside the Just Maces shop)|r" in tip, tip
 # ...and where: the weapon master gets a pin on the world map, drawn when the
 # map shows Stormwind. /gearwright train lists every skill still to train.
 L.execute("""
@@ -239,7 +239,7 @@ printed = {}
 L.eval("function(ns) ns.Trainers.Show('One-Handed Swords') end")(ns)
 pins = L.eval("function() local p = PINPOINTS[#PINPOINTS] return WorldMapFrame.mapID, p[1], p[2] end")()
 assert pins[0] == 1453 and abs(pins[1] - 636) < 1e-6 and abs(pins[2] + 415.2) < 1e-6, tuple(pins)  # 63.6, 69.2
-assert L.globals().printed[1].endswith("train One-Handed Swords with Woo Ping in Stormwind"), L.globals().printed[1]  # checked
+assert L.globals().printed[1].endswith("train One-Handed Swords with Woo Ping in Stormwind, inside the Just Maces shop"), L.globals().printed[1]  # checked
 # An Alliance Rogue standing in Stormwind: Woo Ping (here) first, then Ironforge
 # on the same continent, Darnassus (other continent) last; the map opens here.
 L.execute("""printed = {}; WorldMapFrame.mapID = nil
@@ -251,7 +251,7 @@ C_Map = { GetBestMapForUnit = function() return 1453 end,
 L.globals().SlashCmdList.GEARWRIGHT("train")
 out = list(L.globals().printed.values())
 print("train:", out)
-assert out[1] == "  Woo Ping, Stormwind |cff40ff40(here)|r: Crossbows, One-Handed Swords", out
+assert out[1] == "  Woo Ping, Stormwind (inside the Just Maces shop) |cff40ff40(here)|r: Crossbows, One-Handed Swords", out
 # (axes too: the mock has Hack and Slash 5/5; only Daggers is trained)
 assert out[2] == "  Buliwyf Stonehand, Ironforge: Fist Weapons, Guns, One-Handed Axes, One-Handed Maces", out
 assert out[3] == "  Bixi Wobblebonk, Ironforge: Thrown", out

@@ -7,13 +7,13 @@
 --
 -- mapID: Classic/Forever uiMapID (Stormwind 1453, Orgrimmar 1454, Ironforge 1455,
 -- Thunder Bluff 1456, Darnassus 1457, Undercity 1458); x, y: 0-1 map position;
--- continent: Eastern Kingdoms 1415, Kalimdor 1414.
+-- continent: Eastern Kingdoms 1415, Kalimdor 1414; detail: how to find them there.
 local _, ns = ...
 
 ns.Data.WEAPON_MASTERS = {
   -- Woo Ping: checked on the Forever beta, 2026-10-04 (63.6, 69.2).
   { npcID = 11867, name = "Woo Ping", faction = "Alliance", mapID = 1453, x = 0.636, y = 0.692, checked = true,
-    city = "Stormwind", continent = 1415,
+    city = "Stormwind", continent = 1415, detail = "inside the Just Maces shop",
     skills = { "Daggers", "One-Handed Swords", "Two-Handed Swords", "Polearms", "Staves", "Crossbows" } },
   { npcID = 11865, name = "Buliwyf Stonehand", faction = "Alliance", mapID = 1455, x = 0.612, y = 0.895,
     city = "Ironforge", continent = 1415,

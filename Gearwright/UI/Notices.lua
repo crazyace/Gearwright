@@ -142,7 +142,8 @@ function Notices.Train()
   ns.util.print("weapon skills you can still train, nearest trainer first:")
   for _, g in ipairs(plan) do
     local t = g.trainer
-    print(("  %s%s%s: %s"):format(t.name, t.city and (", " .. t.city) or "", WHERE[g.distance] or "",
+    print(("  %s%s%s%s: %s"):format(t.name, t.city and (", " .. t.city) or "",
+      t.detail and (" (" .. t.detail .. ")") or "", WHERE[g.distance] or "",
       table.concat(g.skills, ", ")))
   end
   if #unknown > 0 then print("  no trainer known: " .. table.concat(unknown, ", ")) end
