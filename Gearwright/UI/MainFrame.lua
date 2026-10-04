@@ -385,7 +385,7 @@ TABS.settings = {
 
     rows[#rows + 1] = { header = true, title = "Credits" }
     local dj = ns.Data.DUNGEON_JOURNAL
-    rows[#rows + 1] = { icon = "Interface\\Icons\\INV_Misc_Book_09", title = "Exehn - Forever Dungeon Journal",
+    rows[#rows + 1] = { icon = "Interface\\Icons\\INV_Misc_Book_09", title = "Exehn",
       sub = "Dungeon loot and quest rewards" .. (ns.API.DungeonJournalDB() and " (read live from your copy of the addon)"
         or (dj and dj.source and (", from " .. dj.source) or "")) .. ". Used with his permission - thank you!" }
     return rows
