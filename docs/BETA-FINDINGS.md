@@ -62,6 +62,28 @@ an extra attack; Dagger/Fist 1% crit; Mace ignores 3% of the target's armor
 (screenshot, 2026-10-03). Its Axe bonus fits with Rogues using one-handed axes on
 Forever, which any Rogue can train (see Weapon skills).
 
+### Priest tree (beta 1.60.1, level 12 Gnome, 2026-10-04)
+
+One tree (`treeID` 1114, "Priest"), 54 nodes. Spec groups **11608 = Discipline, 11615 = Holy,
+11622 = Shadow** (`Data/Priest/Specs.lua: traitTabGroups`), in the same `posX` bands as the Rogue's.
+A second Holy Specialization node (105865) sits far below the tree (`posY` 21300) with only the
+spec group; the real one is 110855. `Core/API.lua` keeps one node per name. `*` = spell ID over
+1,000,000 (new or reworked for Forever).
+
+Character sheet, same Priest: Intellect 48 "Increases Spell Critical Strike chance by 5.0%"
+(9.6 Intellect per 1% at level 12; `Data/Priest/Weights.lua: intPerSpellCrit`). Wore cloth, a
+one-handed mace (Invader's Mace) and a wand.
+
+| Row | Discipline | Holy | Shadow |
+|---|---|---|---|
+| 1 | Power in Light 5*, Wand Specialization 2, Twin Disciplines 5* | Twilight Focus 3, Improved Renew 3, Holy Specialization 5 | Shadow Focus 5, Blackout 5, Spirit Tap 5 |
+| 2 | Silent Resolve 3, Holy Precision 3*, Improved Power Word: Shield 3, Martyrdom 2 | Spell Warding 5, Divine Fury 5 | Shadow Affinity 3, Improved Shadow Word: Pain 2, Shadow Reach 2 |
+| 3 | Mental Agility 3, Inner Focus 1, Meditation 3 | Holy Nova 1, Blessed Recovery 3, Inspiration 3 | Improved Mind Blast 5, Improved Psychic Scream 2, Mind Flay 1, Improved Mind Flay 2* |
+| 4 | Improved Inner Fire 3, Mental Strength 5, Soul Warding 1, Improved Mana Burn 2 | Holy Reach 2, Improved Healing 3, Searing Light 2, Binding Heal 1 | Improved Fade 2, Vampiric Embrace 1, Shadow Weaving 3 |
+| 5 | Penance 1, Renewed Hope 5 | Litany of Light 2*, Spirit of Redemption 1, Spiritual Guidance 5 | Silence 1, Devouring Contagion 2* |
+| 6 | Divine Aegis 3 | Spiritual Healing 3 | Early Demise 2*, Darkness 5 |
+| 7 | Power Infusion 1 | Prayer of Mending 1 | Shadowform 1 |
+
 ## Weapon skills (19:04 capture)
 
 `IsPlayerSpell` answers for weapon skill spells. Level 19 Rogue: **Daggers (1180),

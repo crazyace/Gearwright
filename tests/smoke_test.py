@@ -469,12 +469,37 @@ ITEMS['item:5006:0:0'] = { equip='INVTYPE_RANGEDRIGHT', class=2, sub=19, stats={
 ITEMS['item:5007:0:0'] = { equip='INVTYPE_WAIST', class=4, sub=1, stats={ITEM_MOD_HOLY_DAMAGE_DONE_SHORT=11}, tip={"Durable Belt of Holy Wrath"} }
 ITEMS['item:5008:0:0'] = { equip='INVTYPE_WAIST', class=4, sub=1, stats={ITEM_MOD_SHADOW_DAMAGE_DONE_SHORT=4, ITEM_MOD_MANA_REGENERATION_SHORT=1, ITEM_MOD_AGILITY_SHORT=3}, tip={"Shadow Belt"} }
 """)
+# Talents replayed from a real level 12 Priest (2026-10-04): Wand Specialization
+# 2/2 (Discipline), Improved Renew 1/3 (Holy).
+pcap = json.loads((R / "data" / "probe" / "2026-10-04-priest.json").read_text())
+pnodes = {n["nodeID"]: n for n in pcap["snapshots"][-1]["sections"]["talents"]["traits"]["trees"][0]["nodes"]}
+G = L.globals()
+ROGUE_TREE = (G.TRAIT_NODES, G.TRAIT_SPELLS, G.SPELL_NAMES, G.TRAIT_NODE_IDS)
+G.TRAIT_NODES = L.table_from({k: n["node"] for k, n in pnodes.items()}, recursive=True)
+G.TRAIT_SPELLS = L.table_from({n["node"]["entryIDs"][0]: n["spellID"] for n in pnodes.values()})
+G.SPELL_NAMES = L.table_from({n["spellID"]: n["spellName"]["values"][0] for n in pnodes.values()})
+G.TRAIT_NODE_IDS = L.table_from(list(pnodes))
 L.globals().fire("TRAIT_CONFIG_UPDATED")
-# No Priest tree in the mock, so this reads the Rogue's: 10 points in its first
-# tab, which for a Priest is Discipline.
 assert list(L.eval("function(ns) return {ns.Spec.Detect()} end")(ns).values()) == ["discipline", "talents"]
+ptabs = L.eval("""function(ns)
+  local function read(groups)
+    local t = ns.API.ReadTalents(groups)
+    local o, holySpec = {}, nil
+    for i, tab in ipairs(t.tabs) do
+      o[i] = tab.points .. "/" .. #tab.talents
+      for _, x in ipairs(tab.talents) do if x.name == "Holy Specialization" then holySpec = x.nodeID end end
+    end
+    return table.concat(o, " "), holySpec
+  end
+  local a, ha = read(ns.Data.PRIEST.traitTabGroups)
+  local b = read(nil)
+  return a, b, ha end""")(ns)
+# 54 nodes, but Holy Specialization twice: the stray copy (105865, far below the
+# tree) is dropped in favour of the real one. The layout finds the same groups.
+assert tuple(ptabs) == ("2/18 1/17 0/18", "2/18 1/17 0/18", 110855), tuple(ptabs)
 PPP = 3 + (12 - 3) * (30 - 20) / (60 - 20)        # power per 1% of output at level 30
-DISC_INT = 0.6 + 0.5 * PPP / 59.5                 # mana + its share of spell crit
+INT_PER_CRIT = 9.6 + (59.5 - 9.6) * (30 - 12) / (60 - 12)
+DISC_INT = 0.6 + 0.5 * PPP / INT_PER_CRIT         # mana + its share of spell crit
 KILT = 2 * (1 + 0.4) + 3 * 0.15                   # spell power = healing + damage
 REVENANT = 48 + 16 * 0.4
 assert abs(compare("item:5002:0:0")[0] - REVENANT) < 1e-9
@@ -520,6 +545,7 @@ L.globals().SlashCmdList.GEARWRIGHT("help")
 assert "  /gearwright spec <discipline|holy|shadow|auto>" in L.globals().printed.values()
 # A Rogue can't hold an orb.
 L.execute("INV = SAVED_INV; UnitClass = function() return 'Rogue', 'ROGUE' end")
+G.TRAIT_NODES, G.TRAIT_SPELLS, G.SPELL_NAMES, G.TRAIT_NODE_IDS = ROGUE_TREE
 L.globals().fire("TRAIT_CONFIG_UPDATED")
 assert compare("item:5003:0:0")[:2] == [None, "not-usable"]
 
