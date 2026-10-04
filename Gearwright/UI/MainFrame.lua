@@ -382,6 +382,12 @@ TABS.settings = {
 
     rows[#rows + 1] = { header = true, title = "Troubleshooting" }
     rows[#rows + 1] = toggleRow("Debug messages", "Extra chat output when something can't be read", "debug")
+
+    rows[#rows + 1] = { header = true, title = "Credits" }
+    local dj = ns.Data.DUNGEON_JOURNAL
+    rows[#rows + 1] = { icon = "Interface\\Icons\\INV_Misc_Book_09", title = "Exehn - Forever Dungeon Journal",
+      sub = "Dungeon loot and quest rewards" .. (ns.API.DungeonJournalDB() and " (read live from your copy of the addon)"
+        or (dj and dj.source and (", from " .. dj.source) or "")) .. ". Used with his permission - thank you!" }
     return rows
   end,
 }

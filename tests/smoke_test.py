@@ -124,7 +124,7 @@ end
 txt = L.globals().SCREEN(ns)
 print("---- main window ----"); print(txt)
 for want in ("Spec:|r Subtlety", "(override)", "Stat weights are provisional", "Head", "item:1001:0:0",
-             "No recommended build for this spec yet.", "Best: Superior Striking", "No dungeon loot known yet"):
+             "No recommended build for this spec yet.", "Best: Superior Striking", "No dungeon upgrades for you"):
     assert want in txt, want
 L.globals().SlashCmdList.GEARWRIGHT("spec auto")  # refreshes the open window
 txt = L.globals().SCREEN(ns)
@@ -737,8 +737,13 @@ L.execute('ns_own = { { itemID = 1002, name = "Better Cap", dungeon = "The Deadm
 own = L.eval("""function(ns) ns.Data.DUNGEON_LOOT = ns_own; ns.Sources.Reset()
   local rows = ns.Advisor.DungeonReport() local s = ns.Sources.For(1002)[1]
   ns.Data.DUNGEON_LOOT = {}; ns.Sources.Reset()
-  return #rows, ns.Sources.Describe(s), ns.Sources.All() end""")(ns)
-assert own[0] == 1 and own[1] == "Rhahk'Zor, The Deadmines" and own[2] is None, own
+  return #rows, ns.Sources.Describe(s) end""")(ns)
+assert own[0] == 1 and own[1] == "Rhahk'Zor, The Deadmines", own
+# Without the addon, Gearwright's copy of Forever Dungeon Journal's data (by
+# Exehn, used with permission) is used: Catacomb Cloak is a Hall of Thanes quest reward.
+bundled = L.eval("""function(ns) ns.Sources.Reset() local s = ns.Sources.For(279899)
+  return ns.Sources.Describe(s[1]), ns.Data.DUNGEON_JOURNAL.source end""")(ns)
+assert bundled[0] == "quest An Ancient Grudge, Hall of Thanes (13-20)" and "Exehn" in bundled[1], bundled
 
 # Probe
 # Character sheet + stats, shaped like the Forever beta: no GetCritChanceFromAgility,

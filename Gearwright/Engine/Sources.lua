@@ -2,10 +2,11 @@
 -- The Encounter Journal is empty on Forever, so dungeon loot comes from:
 --   1. Gearwright's own table (Data/DungeonLoot.lua), built from drops the
 --      probe has seen in game (tools/loot_from_probe.py);
---   2. Forever Dungeon Journal (by Exehn), when it's installed: it keeps boss
---      loot, trash drops and quest rewards for every Forever dungeon in
---      ForeverDungeonJournal_NS.DB. Gearwright only reads that table at
---      runtime; none of its data is copied here.
+--   2. Forever Dungeon Journal by Exehn: boss loot, trash drops and quest
+--      rewards for every Forever dungeon. Used with Exehn's permission, with
+--      credit. Gearwright ships a copy (Data/DungeonJournal.lua, from
+--      tools/fdj_import.py); when the addon itself is installed, its live
+--      table (ForeverDungeonJournal_NS.DB) is read instead, as it may be newer.
 local _, ns = ...
 
 local Sources = {}
@@ -47,6 +48,30 @@ function Sources.FromDungeonJournal(db)
   return out
 end
 
+-- Gearwright's copy (Data/DungeonJournal.lua) -> the same shape.
+function Sources.FromBundled(dj)
+  local out = {}
+  for dungeon, d in pairs(dj and dj.dungeons or {}) do
+    for _, boss in ipairs(d.bosses or {}) do
+      for _, item in ipairs(boss.loot or {}) do
+        out[#out + 1] = { itemID = item[1], name = item[2], quality = item[4], dungeon = dungeon, levels = d.level,
+          kind = boss.trash and "trash" or "boss", from = boss.trash and "trash" or boss.name }
+      end
+    end
+    for _, q in ipairs(d.quests or {}) do
+      for _, item in ipairs(q.rewards or {}) do
+        out[#out + 1] = { itemID = item[1], name = item[2], quality = item[3], dungeon = dungeon, levels = d.level,
+          kind = "quest", from = q.name, faction = q.faction }
+      end
+    end
+  end
+  table.sort(out, function(a, b)
+    if a.dungeon ~= b.dungeon then return a.dungeon < b.dungeon end
+    return a.itemID < b.itemID
+  end)
+  return out
+end
+
 -- Data/DungeonLoot.lua rows -> the same shape.
 function Sources.FromOwnData(rows)
   local out = {}
@@ -64,9 +89,10 @@ function Sources.All()
   if cache then return cache end
   local own = Sources.FromOwnData(ns.Data.DUNGEON_LOOT)
   local db = ns.API.DungeonJournalDB()
-  if #own == 0 and not db then return nil end
+  local journal = db and Sources.FromDungeonJournal(db) or Sources.FromBundled(ns.Data.DUNGEON_JOURNAL)
+  if #own == 0 and #journal == 0 then return nil end
   cache = own
-  for _, s in ipairs(Sources.FromDungeonJournal(db)) do cache[#cache + 1] = s end
+  for _, s in ipairs(journal) do cache[#cache + 1] = s end
   index = {}
   for _, s in ipairs(cache) do
     index[s.itemID] = index[s.itemID] or {}

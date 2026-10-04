@@ -23,19 +23,22 @@ stat weights, and tells you:
 - **Dungeons** - the boss drops and dungeon quest rewards that would be upgrades for you, and
   where they drop (window tab + tooltip line)
 
-The window (`/gearwright`) has a tab per advisor: Gear, Dungeons, Enchants, Talents.
-Hover a row for the item tooltip; Shift-click links it in chat.
+The window (`/gearwright`) has a tab per advisor: Gear, Wishlist, Dungeons, Crafting,
+Enchants, Talents, Training and Settings. Hover a row for the item tooltip; Shift-click
+links it in chat; right-click an upgrade to add it to your wishlist.
 
 ### Dungeon loot
 
 Forever's Encounter Journal is empty, so Gearwright gets dungeon loot two ways:
 
+- **Forever Dungeon Journal's data, by Exehn** (`Data/DungeonJournal.lua`): boss loot,
+  trash drops and dungeon quest rewards for every Forever dungeon. Exehn kindly allowed
+  Gearwright to use it, with credit. Gearwright ships a copy (refresh it with
+  `python tools/fdj_import.py ForeverDungeonJournal-<version>.zip`); if you have Forever
+  Dungeon Journal installed, Gearwright reads its live data instead, which may be newer.
 - **Its own table** (`Data/DungeonLoot.lua`), built from drops recorded in game:
   run dungeons with GearwrightProbe loaded, `/gwp export`, then
   `python tools/loot_from_probe.py data/probe/*.json`.
-- **Forever Dungeon Journal** by Exehn, if you have it
-  installed: Gearwright reads its loot and quest-reward tables while the game runs. Nothing
-  from it is copied into Gearwright.
 
 > Status: **pre-alpha.** v1 targets **Rogue** (Assassination, Combat, Subtlety).
 > Stat weights and builds are early estimates. Enchant amounts are read from the beta's recipes.
@@ -51,6 +54,7 @@ Gearwright/            The addon players install
   UI/                  Theme, tooltip line, main window
 GearwrightProbe/       Dev-only addon: dumps what the Forever client exposes
 tools/                 probe_to_json.py - turns probe output into JSON + a summary
+                       fdj_import.py - builds Data/DungeonJournal.lua from Forever Dungeon Journal
                        enchants_from_probe.py - builds Data/Enchants.lua from a recipe scan
                        loot_from_probe.py - builds Data/DungeonLoot.lua from probe loot logs
                        crafted_from_probe.py - builds Data/Crafted.lua from profession scans
@@ -104,3 +108,10 @@ python tests/smoke_test.py
 ## License
 
 MIT - see [LICENSE](LICENSE).
+
+## Credits
+
+- **Exehn**, author of Forever Dungeon Journal: Gearwright's dungeon loot and dungeon
+  quest rewards come from his addon's data, used with his permission.
+- Auctionator, TrainerSpells and GearJourney were looked at for how the game's APIs
+  behave on Forever; no code or data from them is used.
