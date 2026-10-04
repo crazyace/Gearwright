@@ -363,5 +363,4 @@ ranks what's listed for a character, per slot, with prices.
 - [ ] Confirm spec detection in game after respeccing into Combat and Subtlety
 - [ ] Agility-per-crit at more levels (`/gwp all` every few levels; beta cap is 30)
 - [ ] Does any gear carry weapon-skill bonuses ("+N Daggers")?
-- [ ] Can a Rogue equip one-handed axes, and only with Hack and Slash? (`/gwp talents`
-      before and after putting a point in it; try equipping an axe)
+- [x] Can a Rogue use one-handed axes? Yes, trainable from Buliwyf Stonehand, no talent needed
