@@ -35,6 +35,11 @@ function Tooltip.Lines(link, list)
     local c = list[i]
     out[#out + 1] = ("|cffaaaaaa%s:|r %s|cffaaaaaa%s|r"):format(ns.Advisor.SLOT_NAMES[c.slot] or "?", colored(c.delta), over(c))
   end
+  local train = ns.Advisor.TrainingNeeded(link, ctx)
+  if train then
+    local where = ns.Trainers.Where(train)
+    out[#out + 1] = ("|cffff9900Train %s first%s|r"):format(train, where and (": " .. where) or " at a weapon master")
+  end
   if ctx then
     local skip = ns.Stats.Unscored(ns.API.GetItemStats(link), ns.API.GetItemTooltipLines(link), ctx.weights)
     if #skip > 0 then out[#out + 1] = "|cffaaaaaaNot counted: " .. table.concat(skip, ", ") .. "|r" end

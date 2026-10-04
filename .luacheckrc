@@ -12,10 +12,10 @@ read_globals = {
   "CreateFrame", "UIParent", "UISpecialFrames", "GameTooltip", "ItemRefTooltip", "ChatFontNormal",
   "GetAddOnMetadata", "GetItemStats", "GetItemInfoInstant", "GetInventoryItemLink",
   "GetNumTalentTabs", "GetTalentTabInfo", "GetNumTalents", "GetTalentInfo",
-  "GetNumTradeSkills", "GetTradeSkillLine", "GetNumTrainerServices", "NotifyInspect", "GetLocale", "WOW_PROJECT_ID",
+  "GetNumTradeSkills", "GetTradeSkillLine", "GetNumTrainerServices", "GetTrainerServiceInfo", "NotifyInspect", "GetLocale", "WOW_PROJECT_ID",
   "UnitClass", "UnitFullName", "UnitLevel", "UnitName", "UnitExists",
   "UnitDamage", "UnitAttackSpeed", "GetItemInfo", "GetCoinTextureString",
   "GetNumQuestChoices", "GetQuestItemLink", "GetNumLootItems", "GetLootSlotLink", "GetLootRollItemLink", "GetLootSourceInfo", "UnitGUID", "GetRealZoneText", "UnitFactionGroup", "IsModifiedClick", "ChatEdit_InsertLink", "IsPlayerSpell", "IsSpellKnown", "C_SpellBook", "GetNumSkillLines", "GetSkillLineInfo", "GetProfessions", "GetProfessionInfo", "GetRealmName",
   "EJ_GetInstanceByIndex", "EJ_SelectInstance", "EJ_SelectTier", "LoadAddOn",
-  "issecretvalue", "InCombatLockdown", "geterrorhandler", "tinsert", "date", "time", "C_AuctionHouse",
+  "issecretvalue", "InCombatLockdown", "geterrorhandler", "tinsert", "date", "time", "C_AuctionHouse", "C_Map", "OpenWorldMap", "ToggleWorldMap", "hooksecurefunc",
 }

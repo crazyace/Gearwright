@@ -35,11 +35,33 @@ function Advisor.Context()
     specHow = how,
     proficiency = Advisor.Proficiency(classData),
     dualWield = Advisor.CanDualWield(classData),
+    weaponSkills = Advisor.KnownWeaponSkills(classData),
     weights = ns.Weights.Build(classData, spec, ns.API.CharacterSnapshot()),
   }
 end
 
 -- Gear ------------------------------------------------------------------------
+
+-- Weapon subclasses whose skill you've trained: { [subclass] = true }, or nil
+-- when the client doesn't answer (no skill known at all), so nothing is flagged.
+function Advisor.KnownWeaponSkills(classData)
+  if not classData.weaponSkills then return nil end
+  local known, any = {}, false
+  for sub, skill in pairs(classData.weaponSkills) do
+    if ns.API.KnowsSpell(skill.spell) then known[sub] = true; any = true end
+  end
+  return any and known or nil
+end
+
+-- The weapon skill you'd have to train to use `link` ("One-Handed Swords"),
+-- or nil when it's trained, not a weapon, or not known.
+function Advisor.TrainingNeeded(link, ctx)
+  if not ctx then ctx = Advisor.Context() end
+  if not (ctx and ctx.weaponSkills and ctx.class.weaponSkills) then return nil end
+  local _, _, classID, subclassID = ns.API.GetItemBasics(link)
+  local skill = classID == 2 and ctx.class.weaponSkills[subclassID]
+  if skill and not ctx.weaponSkills[subclassID] then return skill.name end
+end
 
 -- Whether a weapon can go in the off hand yet: the class's Dual Wield level
 -- reached, or the spell known. Classes without a dualWield entry never can.
@@ -344,7 +366,7 @@ function Advisor.CraftReport()
         local row = {
           recipeID = r.recipeID, name = r.name, itemID = r.itemID, link = ns.API.GetItemLink(item),
           delta = delta, slot = slot, reqLevel = reqLevel > level and reqLevel or nil,
-          profession = r.prof, status = status, alt = alt,
+          profession = r.prof, status = status, alt = alt, train = Advisor.TrainingNeeded(item, ctx),
         }
         -- An item several professions make: keep the one you can do most about.
         local prev = best[r.itemID]
@@ -431,6 +453,7 @@ function Advisor.DungeonReport()
               local row = {
                 itemID = s.itemID, name = s.name, link = ns.API.GetItemLink(item), delta = delta, slot = slot,
                 reqLevel = reqLevel > level and reqLevel or nil, sources = { s },
+                train = Advisor.TrainingNeeded(item, ctx),
               }
               byID[s.itemID] = row
               rows[#rows + 1] = row

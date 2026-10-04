@@ -8,8 +8,12 @@ slot that the class can use at that level, with the lowest buyout.
 
 Needs: pip install "lupa>=2.0"
 
+Several scans can be given: each item is taken from the newest scan that
+listed it, so items that sold out since an older scan still show.
+
 Usage:
   python tools/ah_report.py GearwrightProbe.lua --level 20 --spec combat
+  python tools/ah_report.py data/probe/*auction*.json --level 20
   python tools/ah_report.py export.json --level 25 --spec assassination --top 3
 """
 import argparse
@@ -62,7 +66,7 @@ def lua_env(cls):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("probe", help="GearwrightProbe.lua (SavedVariables) or a /gwp export ah .json")
+    ap.add_argument("probe", nargs="+", help="GearwrightProbe.lua (SavedVariables) or /gwp export ah .json files")
     ap.add_argument("--class", dest="cls", default="ROGUE")
     ap.add_argument("--spec", default="combat")
     ap.add_argument("--level", type=int, default=20)
@@ -71,9 +75,10 @@ def main():
     ap.add_argument("--max-gold", type=float, default=None, help="leave out items costing more")
     args = ap.parse_args()
 
-    scan = (load(args.probe).get("scans") or {}).get("auction")
-    if not scan:
-        sys.exit("no auction scan in this file (/gwp ah at the auction house)")
+    scans = [s for s in ((load(p).get("scans") or {}).get("auction") for p in args.probe) if s]
+    if not scans:
+        sys.exit("no auction scan in these files (/gwp ah at the auction house)")
+    scans.sort(key=lambda s: str(s.get("at")))
     L, ns = lua_env(args.cls)
     cls = ns.Data[args.cls]
     spec = cls.specs[args.spec]
@@ -87,15 +92,18 @@ def main():
     # Scans before 2026-10-04 split an item when some listings came without data
     # (empty name in the key): merge by item ID and name.
     merged = {}
-    for rec in (scan.get("gear") or {}).values():
-        key = (rec.get("id"), rec.get("name"))
-        prev = merged.get(key)
-        if not prev:
-            merged[key] = dict(rec)
-            continue
-        prev["listings"] = (prev.get("listings") or 0) + (rec.get("listings") or 0)
-        prices = [x for x in (prev.get("minBuyout"), rec.get("minBuyout")) if x]
-        prev["minBuyout"] = min(prices) if prices else None
+    for scan in scans:  # oldest first: a newer scan replaces an item's price and count
+        here = {}
+        for rec in (scan.get("gear") or {}).values():
+            key = (rec.get("id"), rec.get("name"))
+            prev = here.get(key)
+            if not prev:
+                here[key] = dict(rec, seen=scan.get("at"))
+                continue
+            prev["listings"] = (prev.get("listings") or 0) + (rec.get("listings") or 0)
+            prices = [x for x in (prev.get("minBuyout"), rec.get("minBuyout")) if x]
+            prev["minBuyout"] = min(prices) if prices else None
+        merged.update(here)
 
     best = {}
     for rec in merged.values():
@@ -118,7 +126,8 @@ def main():
         lines = L.table_from([t for t in rec.get("tooltip") or [] if isinstance(t, str)])
         best.setdefault(name, []).append((score(ns, raw, lines, weights, slot), req, rec))
 
-    print(f"{args.cls.capitalize()} {spec.label}, level {args.level}: {scan.get('listings')} listings scanned {scan.get('at')}")
+    print(f"{args.cls.capitalize()} {spec.label}, level {args.level}: "
+          + ", ".join(f"{s.get('listings')} listings at {s.get('at')}" for s in scans))
     print("score = attack-power equivalents (Gearwright's weights, provisional)\n")
     for name in ORDER:
         rows = sorted(best.get(name, []), key=lambda r: (-r[0], r[2].get("minBuyout") or 0))[:args.top]
@@ -126,7 +135,8 @@ def main():
             continue
         print(name)
         for sc, req, rec in rows:
-            print(f"  {sc:6.1f}  {rec.get('name')}  (level {req}, {money(rec.get('minBuyout'))}, {rec.get('listings')} listed)")
+            when = "" if rec.get("seen") == scans[-1].get("at") else f", last seen {rec.get('seen')}"
+            print(f"  {sc:6.1f}  {rec.get('name')}  (level {req}, {money(rec.get('minBuyout'))}, {rec.get('listings')} listed{when})")
     return 0
 
 

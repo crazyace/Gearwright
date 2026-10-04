@@ -86,6 +86,7 @@ python tests/smoke_test.py
 | `/gearwright spec <assassination\|combat\|subtlety\|auto>` | Force or auto-detect spec |
 | `/gearwright tooltip` | Toggle the tooltip upgrade line |
 | `/gearwright notices` | Toggle quest reward / loot upgrade messages |
+| `/gearwright train` | Weapon skills you can still train, who teaches them, pinned on the world map |
 | `/gearwright craft` | Crafted upgrades up to 5 levels ahead, and who can make them |
 | `/gwp all` | Probe: dump env, APIs, talents, gear, stats |
 | `/gwp sheet` | Probe: record the character sheet's stat lines and tooltips (also automatic when you open it) |

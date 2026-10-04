@@ -62,9 +62,10 @@ TABS.upgrades = {
       local sub = slotName(r.slot) .. "  -  " .. ns.Sources.Describe(s)
       if #r.sources > 1 then sub = sub .. (" (+%d more)"):format(#r.sources - 1) end
       if r.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(r.reqLevel) end
+      if r.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(r.train) end
       rows[#rows + 1] = {
         icon = ns.API.GetItemIcon("item:" .. r.itemID) or EMPTY_ICON,
-        title = r.link or r.name, sub = sub, link = r.link,
+        title = r.link or r.name, sub = sub, link = r.link, train = r.train,
         value = plus(r.delta), valueColor = "good",
       }
     end
@@ -89,9 +90,10 @@ TABS.crafting = {
     for _, r in ipairs(list) do
       local sub = slotName(r.slot) .. "  -  " .. Theme.Hex(CRAFT_COLOR[r.status]) .. ns.Advisor.CraftStatusText(r) .. "|r"
       if r.reqLevel then sub = sub .. Theme.Hex("warn") .. (" - level %d|r"):format(r.reqLevel) end
+      if r.train then sub = sub .. Theme.Hex("warn") .. (" - train %s|r"):format(r.train) end
       rows[#rows + 1] = {
         icon = ns.API.GetItemIcon("item:" .. r.itemID) or EMPTY_ICON,
-        title = r.link or r.name, sub = sub, link = r.link,
+        title = r.link or r.name, sub = sub, link = r.link, train = r.train,
         value = plus(r.delta), valueColor = "good",
       }
     end
@@ -202,6 +204,7 @@ local function makeRow(parent)
     if self.link and GameTooltip then
       GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
       GameTooltip:SetHyperlink(self.link)
+      if self.train then GameTooltip:AddLine("Click: show where to train " .. self.train, 1, 0.6, 0) end
       GameTooltip:Show()
     end
   end)
@@ -212,6 +215,8 @@ local function makeRow(parent)
   row:SetScript("OnClick", function(self)
     if self.link and IsModifiedClick and IsModifiedClick("CHATLINK") and ChatEdit_InsertLink then
       ChatEdit_InsertLink(self.link)
+    elseif self.train then
+      ns.Trainers.Show(self.train) -- where to train the weapon skill this item needs
     end
   end)
   return row
@@ -322,6 +327,7 @@ local function drawRows(f, rows, message)
     row.value:SetText(r.value or "")
     Theme.Color(row.value, r.valueColor or "text")
     row.link = r.link
+    row.train = r.train
     row:Show()
   end
   for i = #rows + 1, #f.rows do f.rows[i]:Hide() end

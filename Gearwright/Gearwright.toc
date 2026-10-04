@@ -18,6 +18,7 @@ Data\Stats.lua
 Data\Enchants.lua
 Data\DungeonLoot.lua
 Data\Crafted.lua
+Data\WeaponMasters.lua
 Data\Rogue\Specs.lua
 Data\Rogue\Weights.lua
 Data\Rogue\Talents.lua
@@ -27,9 +28,11 @@ Engine\Weights.lua
 Engine\Scoring.lua
 Engine\Sources.lua
 Engine\Professions.lua
+Engine\Trainers.lua
 Engine\Advisor.lua
 
 UI\Theme.lua
+UI\MapPins.lua
 UI\Tooltip.lua
 UI\MainFrame.lua
 UI\Notices.lua
