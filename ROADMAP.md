@@ -57,6 +57,15 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [ ] Packaging: `.pkgmeta` + GitHub Action release to CurseForge and Wago
 - [ ] CurseForge page: screenshots, "provisional data" disclaimer
 
+## Priest
+
+- [x] Priest data for Discipline, Holy and Shadow (`Data/Priest/`, Classic values): cloth,
+      maces/staves/daggers/wands, orbs in the off hand, caster weights in healing / spell damage
+- [x] Spec groups worked out from the talent tree's layout when a class has none yet
+- [ ] Priest talent capture: spec groups, talent names, builds (`docs/BETA-CHECKLIST.md`)
+- [ ] Priest trainer capture -> `Data/Priest/Trainer.lua`
+- [ ] Measure Intellect per spell crit and check the caster weights in game
+
 ## Phase 2 - Raid tier 1 (Nov 4 - Dec 9)
 
 - [ ] Refine weights from launch-week feedback and logs

@@ -283,7 +283,8 @@ end
 -- Talents -----------------------------------------------------------------------
 -- Forever (beta 1.60.1) exposes talents through the Traits API: one tree holding
 -- all three specs, readable, no secret values. Which spec a node belongs to is
--- given by a per-class group ID (Data/<Class>/Specs.lua: traitTabGroups).
+-- given by a per-class group ID (Data/<Class>/Specs.lua: traitTabGroups). A class
+-- without that map yet gets one worked out from the tree's layout (inferTabGroups).
 -- The Classic API path is kept for clients that still have it.
 --
 -- Returns:
@@ -304,16 +305,73 @@ local function nodeName(configID, info)
   return API.clean(def.overrideName) or (def.spellID and API.clean(spellName(def.spellID))), def.spellID
 end
 
--- tabGroups: { [groupID] = tabIndex }. Nodes in none of the groups are ignored.
+-- Spec group IDs for a class whose map isn't in its Data file yet. On the Rogue
+-- capture every node carries exactly one spec group, alongside smaller groups
+-- shared by a few nodes (12775-12789, one spec's tiers), and the three specs
+-- sit side by side, left to right in tab order (posX 1020-2820, 5020-6820,
+-- 9080-10880). So: take the biggest groups that don't overlap until every node
+-- is covered, then number them left to right. Matches Data/Rogue/Specs.lua.
+local function inferTabGroups(configID, treeIDs)
+  local nodes, size = {}, {}
+  for _, treeID in ipairs(treeIDs) do
+    for _, nodeID in ipairs(C_Traits.GetTreeNodes(treeID) or {}) do
+      local info = C_Traits.GetNodeInfo(configID, nodeID)
+      if info and info.groupIDs and #info.groupIDs > 0 then
+        nodes[#nodes + 1] = info
+        for _, g in ipairs(info.groupIDs) do size[g] = (size[g] or 0) + 1 end
+      end
+    end
+  end
+  local groups = {}
+  for g in pairs(size) do groups[#groups + 1] = g end
+  table.sort(groups, function(a, b)
+    if size[a] ~= size[b] then return size[a] > size[b] end
+    return a < b
+  end)
+  local taken, picked = {}, {}
+  for _, g in ipairs(groups) do
+    local members, clash = {}, false
+    for i, info in ipairs(nodes) do
+      for _, ng in ipairs(info.groupIDs) do
+        if ng == g then
+          if taken[i] then clash = true end
+          members[#members + 1] = i
+        end
+      end
+    end
+    if not clash then
+      local x = 0
+      for _, i in ipairs(members) do taken[i] = true; x = x + (nodes[i].posX or 0) end
+      picked[#picked + 1] = { group = g, x = x / #members }
+    end
+  end
+  if #picked < 2 then return nil end
+  table.sort(picked, function(a, b) return a.x < b.x end)
+  local map = {}
+  for tab, p in ipairs(picked) do map[p.group] = tab end
+  return map
+end
+
+-- tabGroups: { [groupID] = tabIndex }, or nil to infer it. Nodes in none of the
+-- groups are ignored.
 local function readTraits(tabGroups)
-  if not tabGroups then return nil, "no-trait-tab-map" end
   local configID = API.clean(C_ClassTalents.GetActiveConfigID())
   if not configID then return nil, "no-talent-config" end
   local config = C_Traits.GetConfigInfo(configID)
   local treeIDs = config and API.clean(config.treeIDs)
   if type(treeIDs) ~= "table" then return nil, "no-talent-config" end
+  if not tabGroups then
+    tabGroups = inferTabGroups(configID, treeIDs)
+    if not tabGroups then return nil, "no-trait-tab-map" end
+    if ns.db and ns.db.debug then
+      local parts = {}
+      for g, tab in pairs(tabGroups) do parts[#parts + 1] = ("[%d] = %d"):format(g, tab) end
+      table.sort(parts)
+      ns.util.debug("talent spec groups, from the tree layout: { %s }", table.concat(parts, ", "))
+    end
+  end
 
-  local result = { source = "traits", tabs = {} }
+  local result = { source = "traits", tabs = {}, tabGroups = tabGroups }
   for _, tab in pairs(tabGroups) do
     for i = #result.tabs + 1, tab do result.tabs[i] = { points = 0, talents = {} } end
   end

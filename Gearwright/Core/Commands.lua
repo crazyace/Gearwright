@@ -4,7 +4,11 @@ local _, ns = ...
 local function help()
   ns.util.print("commands:")
   print("  /gearwright            toggle the window")
-  print("  /gearwright spec <assassination|combat|subtlety|auto>")
+  local classData = ns.Spec.ClassData()
+  local specs = {}
+  for _, key in ipairs(classData and classData.tabToSpec or {}) do specs[#specs + 1] = key end
+  specs[#specs + 1] = "auto"
+  print("  /gearwright spec <" .. table.concat(specs, "|") .. ">")
   print("  /gearwright tooltip    toggle the tooltip line")
   print("  /gearwright notices    toggle quest reward / loot upgrade messages")
   print("  /gearwright craft      upgrades you can craft (open each profession once first)")

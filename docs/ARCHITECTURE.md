@@ -35,8 +35,12 @@ Each file gets the shared addon namespace `ns` via `local _, ns = ...`.
 1. Create `Data/<CLASS_TOKEN>/` with `Specs.lua`, `Weights.lua`, `Talents.lua` (enchants are shared: `Data/Enchants.lua`)
    (copy the Rogue files; `CLASS_TOKEN` is the second return of `UnitClass`, e.g. `WARRIOR`).
 2. Add the files to `Gearwright.toc`.
-3. Fill `tabToSpec` and `traitTabGroups` from probe output (`tools/probe_to_json.py` lists every
+3. Fill `tabToSpec`. `traitTabGroups` can wait: without it `Core/API.lua` works the spec groups
+   out from the tree's layout (the largest non-overlapping groups, numbered left to right).
+   Copy them in from probe output once you have it (`tools/probe_to_json.py` lists every
    talent node; `docs/BETA-FINDINGS.md` shows how the Rogue groups were found).
+4. A caster sets `model = "caster"` in `Weights.lua` (see below); a class that holds orbs and
+   tomes in the off hand sets `holdables = true` in `Specs.lua`.
 
 ## Scoring model (v1)
 
@@ -47,6 +51,14 @@ Each file gets the shared addon namespace `ns` via `local _, ns = ...`.
   using Agility-per-crit for your level (`Data/<CLASS>/Weights.lua: agiPerCrit`).
 - Weapon DPS is 14 on the main hand, 7 on the off hand (Classic: DPS = weapon DPS + AP/14).
 - Rating stats are per 1%, valued as a share of your damage: 1% is worth 0.14 x main-hand DPS in AP.
+
+Casters (`model = "caster"`, the Priest) score in points of their spec's main power instead:
+bonus healing for a healer, spell damage for Shadow. Spell power is worth healing + spell
+damage; school damage counts for the schools the spec casts; spell hit, spell crit and haste
+are a share of output (`powerPerPercent` by level); Intellect adds its share of spell crit
+(`intPerSpellCrit`). Melee weapon DPS is worth nothing, a wand's DPS is.
+
+A two-hander is compared against both hands, and an off-hand item against an equipped two-hander.
 
 An item is only scored for slots it can go in: the class's armor and weapon
 proficiencies (`Specs.lua: proficiency`) and the spec's weapon rules (`weapons`)

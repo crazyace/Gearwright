@@ -40,7 +40,8 @@ Forever's Encounter Journal is empty, so Gearwright gets dungeon loot two ways:
   run dungeons with GearwrightProbe loaded, `/gwp export`, then
   `python tools/loot_from_probe.py data/probe/*.json`.
 
-> Status: **pre-alpha.** v1 targets **Rogue** (Assassination, Combat, Subtlety).
+> Status: **pre-alpha.** v1 targets **Rogue** (Assassination, Combat, Subtlety) and
+> **Priest** (Discipline, Holy, Shadow; Classic data, not yet checked in game).
 > Stat weights and builds are early estimates. Enchant amounts are read from the beta's recipes.
 > See [ROADMAP.md](ROADMAP.md).
 

@@ -33,6 +33,21 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 - [ ] Hover items with **Gearwright** loaded: does the tooltip line appear?
 - [ ] Open `/gearwright`: does spec detection match what you specced?
 
+## Priest
+
+Gearwright's Priest data (`Data/Priest/`) is Classic's, untested on Forever. On a Priest:
+
+- [ ] Spend a talent point, then `/gwp talents` and `/gwp export` -> `data/probe/YYYY-MM-DD-priest-<spec>.json`.
+      Gives the spec group IDs (copy them into `Data/Priest/Specs.lua: traitTabGroups`) and
+      the real talent names for the builds
+- [ ] `/gearwright debug`, then `/gearwright`: the debug line names the spec groups Gearwright
+      worked out from the tree's layout; does the window's spec match what you specced?
+- [ ] `/gwp all` with some Intellect gear on: spell crit on the sheet gives Intellect per 1% spell crit
+- [ ] Open your **class trainer** with the probe loaded (Priest spell list for `tools/trainer_from_probe.py`)
+- [ ] Can a Priest equip one-handed maces, staves, daggers and wands? Anything else?
+- [ ] `/gwp items <id>` on an item with "chance to hit with spells" or "critical strike with
+      spells": confirms the spell hit/crit tokens
+
 ## Questions to answer in `docs/BETA-FINDINGS.md`
 
 | Question | Answer | Capture |

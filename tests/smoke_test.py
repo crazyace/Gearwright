@@ -441,6 +441,88 @@ txt = L.globals().SCREEN(ns)
 assert "Spec:|r Assassination" in txt and "(talents)" in txt, txt
 L.globals().SlashCmdList.GEARWRIGHT("")
 
+# A class with no traitTabGroups yet gets them from the tree's layout: on the
+# real Rogue capture that finds exactly Data/Rogue/Specs.lua's groups.
+inferred = L.eval("""function(ns)
+  local t = ns.API.ReadTalents(nil)
+  local o = {}
+  for g, tab in pairs(t.tabGroups) do o[#o + 1] = g .. "=" .. tab end
+  table.sort(o)
+  return table.concat(o, " "), t.tabs[1].points, #t.tabs[1].talents, #t.tabs[2].talents, #t.tabs[3].talents end""")(ns)
+assert tuple(inferred) == ("11572=3 11573=2 11580=1", 10, 17, 17, 19), tuple(inferred)
+
+# Priest ------------------------------------------------------------------------
+# Caster scoring, in points of the spec's main power. Item stats are real ones
+# from the 2026-10-03 auction house scans.
+L.execute("""
+SAVED_INV = INV; INV = {}
+UnitClass = function() return "Priest", "PRIEST" end
+ITEMS['item:5001:0:0'] = { equip='INVTYPE_LEGS', class=4, sub=1, stats={ITEM_MOD_SPELL_POWER_SHORT=2, ITEM_MOD_STAMINA_SHORT=3},
+  tip={"Simple Kilt", "Equip: Increases damage and healing done by magical spells and effects by up to 2."} }
+ITEMS['item:5002:0:0'] = { equip='INVTYPE_LEGS', class=4, sub=1, stats={ITEM_MOD_SPELL_DAMAGE_DONE_SHORT=16, ITEM_MOD_SPELL_HEALING_DONE_SHORT=48},
+  tip={"Revenant Leggings of Healing", "Equip: Increases healing done by up to 48 and damage done by up to 16 for all magical spells and effects."} }
+ITEMS['item:5003:0:0'] = { equip='INVTYPE_HOLDABLE', class=4, sub=0, stats={ITEM_MOD_SHADOW_DAMAGE_DONE_SHORT=6, ITEM_MOD_SPELL_HEALING_DONE_SHORT=9, ITEM_MOD_SPIRIT_SHORT=4},
+  tip={"Orb of Mistmantle"} }
+ITEMS['item:5004:0:0'] = { equip='INVTYPE_2HWEAPON', class=2, sub=10, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=12, ITEM_MOD_INTELLECT_SHORT=10, ITEM_MOD_SPIRIT_SHORT=10}, tip={"Staff"} }
+ITEMS['item:5005:0:0'] = { equip='INVTYPE_WEAPON', class=2, sub=4, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=9, ITEM_MOD_INTELLECT_SHORT=2}, tip={"Mace"} }
+ITEMS['item:5006:0:0'] = { equip='INVTYPE_RANGEDRIGHT', class=2, sub=19, stats={ITEM_MOD_DAMAGE_PER_SECOND_SHORT=10}, tip={"Wand"} }
+ITEMS['item:5007:0:0'] = { equip='INVTYPE_WAIST', class=4, sub=1, stats={ITEM_MOD_HOLY_DAMAGE_DONE_SHORT=11}, tip={"Durable Belt of Holy Wrath"} }
+ITEMS['item:5008:0:0'] = { equip='INVTYPE_WAIST', class=4, sub=1, stats={ITEM_MOD_SHADOW_DAMAGE_DONE_SHORT=4, ITEM_MOD_MANA_REGENERATION_SHORT=1, ITEM_MOD_AGILITY_SHORT=3}, tip={"Shadow Belt"} }
+""")
+L.globals().fire("TRAIT_CONFIG_UPDATED")
+# No Priest tree in the mock, so this reads the Rogue's: 10 points in its first
+# tab, which for a Priest is Discipline.
+assert list(L.eval("function(ns) return {ns.Spec.Detect()} end")(ns).values()) == ["discipline", "talents"]
+PPP = 3 + (12 - 3) * (30 - 20) / (60 - 20)        # power per 1% of output at level 30
+DISC_INT = 0.6 + 0.5 * PPP / 59.5                 # mana + its share of spell crit
+KILT = 2 * (1 + 0.4) + 3 * 0.15                   # spell power = healing + damage
+REVENANT = 48 + 16 * 0.4
+assert abs(compare("item:5002:0:0")[0] - REVENANT) < 1e-9
+L.execute("INV[7] = 'item:5001:0:0'")
+assert abs(compare("item:5002:0:0")[0] - (REVENANT - KILT)) < 1e-9
+# Cloth only; no swords; leather and plate are out.
+assert compare("item:1001:0:0")[:2] == [None, "not-usable"]
+assert compare("item:2002:0:0")[:2] == [None, "not-usable"]
+# One-hand weapons only go in the main hand (no Dual Wield); melee DPS is worth
+# nothing, a wand's DPS is.
+MACE = 2 * DISC_INT
+d = compare("item:5005:0:0")
+assert d[1] == 16 and abs(d[0] - MACE) < 1e-9, d
+assert abs(compare("item:5006:0:0")[0] - 10 * 0.5) < 1e-9
+# An orb goes in the off hand.
+ORB = 6 * 0.4 + 9 + 4 * 0.5
+d = compare("item:5003:0:0")
+assert d[1] == 17 and abs(d[0] - ORB) < 1e-9, d
+# A staff replaces the mace AND the orb; an orb in place of a staff loses the staff.
+STAFF = 10 * DISC_INT + 10 * 0.5
+L.execute("INV[16] = 'item:5005:0:0'; INV[17] = 'item:5003:0:0'")
+d = compare("item:5004:0:0")
+assert d[1] == 16 and abs(d[0] - (STAFF - MACE - ORB)) < 1e-9 and abs(d[3] - (MACE + ORB)) < 1e-9, d
+L.execute("INV[16] = 'item:5004:0:0'; INV[17] = nil")
+d = compare("item:5003:0:0")
+assert d[1] == 17 and abs(d[0] - (ORB - STAFF)) < 1e-9, d
+# Spell schools: Discipline uses Holy and Shadow spells; Shadow only Shadow.
+assert abs(compare("item:5007:0:0")[0] - 11 * 0.4) < 1e-9
+L.eval("function(ns) ns.db.specOverride = 'shadow' end")(ns)
+assert compare("item:5007:0:0")[0] == 0
+SH_BELT = 4 * 1 + 1 * 1.0
+assert abs(compare("item:5008:0:0")[0] - SH_BELT) < 1e-9
+tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:5008:0:0', ns.Advisor.CompareSlots('item:5008:0:0')) end""")(ns).values())
+assert "(Shadow)" in tip[0] and "|cffaaaaaaNot counted: Agility|r" in tip, tip
+L.eval("function(ns) ns.db.specOverride = false end")(ns)
+# The window and the help name the Priest's specs.
+L.globals().SlashCmdList.GEARWRIGHT("")
+txt = L.globals().SCREEN(ns)
+assert "Spec:|r Discipline" in txt and "From your talents (Shadow before level 10)" in txt and "Holy" in txt, txt
+L.globals().SlashCmdList.GEARWRIGHT("")
+L.execute("printed = {}")
+L.globals().SlashCmdList.GEARWRIGHT("help")
+assert "  /gearwright spec <discipline|holy|shadow|auto>" in L.globals().printed.values()
+# A Rogue can't hold an orb.
+L.execute("INV = SAVED_INV; UnitClass = function() return 'Rogue', 'ROGUE' end")
+L.globals().fire("TRAIT_CONFIG_UPDATED")
+assert compare("item:5003:0:0")[:2] == [None, "not-usable"]
+
 # Real beta cloak: "+3 Attack Power" is in GetItemStats AND an Equip: line,
 # and the humanoid-only AP line must not count.
 gear = cap["snapshots"][0]["sections"]["gear"]
