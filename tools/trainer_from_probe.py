@@ -7,12 +7,14 @@ the trainers you name into the class's spell list for Gearwright's train
 reminders, plus where those trainers stand.
 
 Spells you had already learned report level 0 on Forever, so they're only
-kept when another capture (e.g. a lower-level character's) gives their level.
-Gearwright fills in the rest by itself from trainer visits in game.
+kept when another capture (e.g. a lower-level character's) or a checked list
+(--verified, e.g. data/verified/rogue-trainer-low-levels.json) gives their
+level. Gearwright fills in the rest by itself from trainer visits in game.
 
 Usage:
   python tools/trainer_from_probe.py --class ROGUE --trainer Fenthwick \\
-      --trainer "Lord Tony Romano" --city "Lord Tony Romano=Stormwind" data/probe/*.json
+      --trainer "Lord Tony Romano" --city "Lord Tony Romano=Stormwind" \\
+      --verified data/verified/rogue-trainer-low-levels.json data/probe/*.json
 """
 import argparse
 import json
@@ -37,6 +39,7 @@ def main():
     ap.add_argument("--class", dest="cls", required=True)
     ap.add_argument("--trainer", action="append", required=True)
     ap.add_argument("--city", action="append", default=[], help='"Trainer=City" for captures without a position')
+    ap.add_argument("--verified", action="append", default=[], help="checked spell list (name, rank, level)")
     ap.add_argument("-o", "--out")
     args = ap.parse_args()
     cities = dict(c.split("=", 1) for c in args.city)
@@ -69,6 +72,16 @@ def main():
                     row["level"] = level
                 if isinstance(cost, int) and cost > 0:
                     row["cost"] = cost
+
+    # Checked lists fill in levels the captures don't have; a capture still wins.
+    for path in args.verified:
+        for v in json.loads(Path(path).read_text()).get("spells") or []:
+            row = spells.setdefault((v["name"], v.get("rank") or ""),
+                                    {"name": v["name"], "rank": v.get("rank") or "", "level": 0, "cost": None})
+            if not row["level"]:
+                row["level"] = v["level"]
+            if not row["cost"] and v.get("cost"):
+                row["cost"] = v["cost"]
 
     rows = sorted((r for r in spells.values() if r["level"] > 0), key=lambda r: (r["level"], r["name"], r["rank"]))
     lines = [

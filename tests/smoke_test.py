@@ -924,6 +924,7 @@ assert (OUT / "crafted.lua").read_text() == (R / "Gearwright" / "Data" / "Crafte
 # Data/Rogue/Trainer.lua is current with the saved trainer captures.
 assert subprocess.run([sys.executable, str(R / "tools" / "trainer_from_probe.py"), "--class", "ROGUE",
                        "--trainer", "Fenthwick", "--trainer", "Lord Tony Romano", "--city", "Lord Tony Romano=Stormwind",
+                       "--verified", str(R / "data" / "verified" / "rogue-trainer-low-levels.json"),
                        *map(str, sorted((R / "data" / "probe").glob("*.json"))), "-o", str(OUT / "trainer.lua")],
                       check=True, capture_output=True).returncode == 0
 assert (OUT / "trainer.lua").read_text() == (R / "Gearwright" / "Data" / "Rogue" / "Trainer.lua").read_text(), "rerun tools/trainer_from_probe.py"

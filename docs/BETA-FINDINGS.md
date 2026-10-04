@@ -301,6 +301,14 @@ Eviscerate 4, Mind-numbing Poison; 26 Ambush 2, Cheap Shot, Expose Armor 2, Kick
 Disarm Trap, Garrote 3, Kidney Shot, Sinister Strike 5. Mutilate ranks 2-4 at
 40/50/60. No Instant Poison rank 1 at the trainer.
 
+Levels 1-18 (2026-10-04): the TrainerSpells addon's Forever Rogue list (all rights
+reserved, used only as a checklist) agreed with this capture on all 88 spells it
+dates, and Jeff checked its 19 earlier ones on Wowhead's Forever database: Stealth 1
+(1), Backstab 1 and Pick Pocket (4), Sinister Strike 2 and Gouge 1 (6), Evasion and
+Eviscerate 2 (8), Sprint 1, Slice and Dice 1, Sap 1 (10), Kick 1 and Backstab 2 (12),
+Garrote 1, Sinister Strike 3, Expose Armor 1 (14), Feint 1 and Eviscerate 3 (16),
+Gouge 2 and Ambush 1 (18). Saved as `data/verified/rogue-trainer-low-levels.json`.
+
 The trainer window lists every service with its level, rank and category (`GetTrainerServiceInfo`
 returns name, availability, icon, level, rank, category). A level 19 Rogue saw 85 class
 services from level 20 to 60. Worth knowing for Rogue advice:
