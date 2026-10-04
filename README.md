@@ -112,8 +112,7 @@ MIT - see [LICENSE](LICENSE).
 ## Sibling addon
 
 [Battlewright](https://github.com/crazyace/Battlewright) shows what to press next in a
-fight. GearwrightProbe's `/gwp combat` checks what Forever lets addons read in combat
-for it.
+fight. Its combat testing (BattlewrightProbe, `/bwp combat`) lives in that repo.
 
 ## Credits
 

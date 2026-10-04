@@ -96,7 +96,5 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 
 ## Battlewright
 
-Moved to its own repo: https://github.com/crazyace/Battlewright. Still here:
-
-- [x] `/gwp combat` in GearwrightProbe: records whether combat data is readable
-- [ ] Run it on the beta and pass the result to Battlewright
+Moved to its own repo, with its combat testing (BattlewrightProbe):
+https://github.com/crazyace/Battlewright
