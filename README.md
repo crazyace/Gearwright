@@ -53,7 +53,6 @@ Gearwright/            The addon players install
   Engine/              Spec detection, scoring, the advisors (pure logic)
   UI/                  Theme, tooltip line, main window
 GearwrightProbe/       Dev-only addon: dumps what the Forever client exposes
-Battlewright/          Sibling addon: rotation helper (what to press next); see Battlewright/README.md
 tools/                 probe_to_json.py - turns probe output into JSON + a summary
                        fdj_import.py - builds Data/DungeonJournal.lua from Forever Dungeon Journal
                        enchants_from_probe.py - builds Data/Enchants.lua from a recipe scan
@@ -109,6 +108,12 @@ python tests/smoke_test.py
 ## License
 
 MIT - see [LICENSE](LICENSE).
+
+## Sibling addon
+
+[Battlewright](https://github.com/crazyace/Battlewright) shows what to press next in a
+fight. GearwrightProbe's `/gwp combat` checks what Forever lets addons read in combat
+for it.
 
 ## Credits
 

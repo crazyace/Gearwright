@@ -94,11 +94,9 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 | 2026-10-03 | Drop the Encounter Journal; log real drops | `LoadAddOn("Blizzard_EncounterJournal")` = WRONG_GAME_TYPE, no instance answers |
 | 2026-10-03 | Score enchants instead of listing them per spec | Recipe descriptions give exact amounts; one table serves every class and spec |
 
-## Battlewright (rotation helper, separate addon)
+## Battlewright
 
-- [x] Addon skeleton: state reader (secret-aware), spec from talent spells, icon display, /bw
-- [x] Rogue priorities, first version (Slice and Dice, Rupture, Eviscerate, builders, openers)
-- [ ] `/gwp combat` on the beta: can addons read energy, combo points, auras and cooldowns in combat?
-- [ ] Tune the priorities against Forever's talents (Venom, Restless Blades, Thousand Cuts...)
-- [ ] Interrupts (Kick when the target is casting), multiple targets (Blade Flurry)
+Moved to its own repo: https://github.com/crazyace/Battlewright. Still here:
 
+- [x] `/gwp combat` in GearwrightProbe: records whether combat data is readable
+- [ ] Run it on the beta and pass the result to Battlewright

@@ -22,4 +22,3 @@ jobs:
           python-version: "3.12"
       - run: pip install "lupa>=2.0"
       - run: python tests/smoke_test.py
-      - run: python tests/battlewright_test.py

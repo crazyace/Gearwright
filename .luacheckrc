@@ -3,8 +3,7 @@ self = false
 max_line_length = 140
 exclude_files = { "tests/", "tools/" }
 globals = {
-  "GearwrightDB", "GearwrightProbeDB", "BattlewrightDB", "SlashCmdList",
-  "SLASH_BATTLEWRIGHT1", "SLASH_BATTLEWRIGHT2",
+  "GearwrightDB", "GearwrightProbeDB", "SlashCmdList",
   "SLASH_GEARWRIGHT1", "SLASH_GEARWRIGHT2", "SLASH_GEARWRIGHTPROBE1",
 }
 read_globals = {
