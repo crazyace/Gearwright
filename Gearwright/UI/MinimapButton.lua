@@ -9,8 +9,16 @@ ns.MinimapButton = Button
 local ICON = "Interface\\Icons\\INV_Misc_Gear_01"
 local RADIUS = 80
 
+-- The next goal, worked out in the background (util.Background) after anything
+-- that can change it. Working it out scores every crafted item, which froze the
+-- game for a moment when it ran on every mouse-over; hovering only reads this.
+local goal, known = nil, false
+
 local function goalLines()
-  local goal = ns.Wishlist.NextGoal()
+  if not known then
+    Button.Refresh()
+    return { "|cff999999Working it out...|r" }
+  end
   if not goal then return { "No upgrade known yet" } end
   return {
     ("%s |cff40ff40+%.1f|r"):format(goal.link or goal.name or "?", goal.delta),
@@ -21,7 +29,6 @@ end
 
 -- Short text for info bars: "Gloves of the Fang (in 2 levels)".
 function Button.ShortText()
-  local goal = ns.Wishlist.NextGoal()
   if not goal then return "Gearwright" end
   local name = goal.name or (goal.link and goal.link:match("%[(.-)%]")) or "next goal"
   return name .. (goal.levelsAway > 0 and (" (in %d)"):format(goal.levelsAway) or "")
@@ -111,15 +118,30 @@ local function makeFeed()
   })
 end
 
-local queued
-function Button.Refresh()
-  if not feed or queued or not C_Timer then return end
-  queued = true
-  C_Timer.After(1, function()
-    queued = false
-    local ok, text = pcall(Button.ShortText)
-    if ok then feed.text = text end
+-- Work the goal out again, a second after the last change (several events
+-- often come together); one run at a time, with another after it if asked.
+local queued, running, again, waiting = false, false, false, false
+local function run()
+  if running then again = true; return end
+  running = true
+  ns.util.Background(ns.Wishlist.NextGoal, function(ok, g, pending)
+    running = false
+    if ok then
+      goal, known = g, true
+      waiting = type(pending) == "number" and pending > 0 -- items still on their way from the server
+      if feed then feed.text = Button.ShortText() end
+    else
+      ns.util.debug("next goal: %s", tostring(g))
+    end
+    if again then again = false; Button.Refresh() end
   end)
+end
+
+function Button.Refresh()
+  if queued then return end
+  if not C_Timer then return run() end
+  queued = true
+  C_Timer.After(1, function() queued = false; run() end)
 end
 
 ns:On("PLAYER_LOGIN", function()
@@ -127,4 +149,7 @@ ns:On("PLAYER_LOGIN", function()
   pcall(makeFeed)
   if C_Timer then C_Timer.After(5, Button.Refresh) end
 end)
-for _, event in ipairs({ "PLAYER_LEVEL_UP", "PLAYER_EQUIPMENT_CHANGED" }) do ns:On(event, Button.Refresh) end
+for _, event in ipairs({ "PLAYER_LEVEL_UP", "PLAYER_EQUIPMENT_CHANGED", unpack(ns.API.TALENT_EVENTS) }) do
+  ns:On(event, Button.Refresh)
+end
+ns:On("GET_ITEM_INFO_RECEIVED", function() if waiting then Button.Refresh() end end)

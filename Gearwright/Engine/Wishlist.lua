@@ -73,7 +73,9 @@ function Wishlist.Report()
   return out
 end
 
--- The next goal: { link, name, delta, levelsAway, from, wished } or nil.
+-- The next goal: { link, name, delta, levelsAway, from, wished } or nil, and
+-- how many items are still being read from the server. Slow: it scores every
+-- crafted item. The minimap button keeps a copy worked out in the background.
 function Wishlist.NextGoal()
   for _, s in ipairs(Wishlist.Report()) do
     if not s.equipped and s.delta and s.delta > 0 then
@@ -81,15 +83,15 @@ function Wishlist.NextGoal()
         from = s.entry.from, wished = true }
     end
   end
-  local gear = ns.Advisor.GearOverview()
+  local gear, pending = ns.Advisor.GearOverview()
   local best
   for _, g in ipairs(gear or {}) do
     if g.best and (not best or g.best.delta > best.delta) then best = g.best end
   end
-  if not best then return nil end
+  if not best then return nil, pending end
   local level = ns.API.clean(UnitLevel("player")) or 1
   return { link = best.link, name = best.name, delta = best.delta, from = best.from,
-    levelsAway = best.reqLevel and best.reqLevel > level and (best.reqLevel - level) or 0 }
+    levelsAway = best.reqLevel and best.reqLevel > level and (best.reqLevel - level) or 0 }, pending
 end
 
 -- "available now" / "in 2 levels"

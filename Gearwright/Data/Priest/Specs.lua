@@ -29,15 +29,6 @@ P.proficiency = {
 -- Off-hand items ("Held In Off-hand": orbs, tomes) go in the off hand.
 P.holdables = true
 
--- Weapon skills, by weapon subclass. As in Classic, a Priest starts with Maces
--- and Wands (left out: there's no weapon master to send you to) and trains
--- Staves and Daggers at a weapon master. Not yet checked on Forever.
-P.weaponSkills = {
-  [4] = { spell = 198, name = "One-Handed Maces" },
-  [10] = { spell = 227, name = "Staves" },
-  [15] = { spell = 1180, name = "Daggers" },
-}
-
 P.unlocks = {}
 
 -- No dualWield entry: a one-hand weapon only goes in the main hand.
