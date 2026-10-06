@@ -53,6 +53,8 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [ ] One recommended build per spec (raid DPS)
 - [x] Enchant advice: best stat enchant per slot, scored with the spec weights
 - [ ] Score proc enchants (Crusader, Fiery Weapon)
+- [x] Consumables: weapon buffs (stones, oils, poisons), elixirs and potions for your level,
+      scored with the spec weights (`Data/Consumables.lua`; effects are Classic's until checked)
 - [ ] Tooltip upgrade line verified on weapons, rings, trinkets
 - [ ] Packaging: `.pkgmeta` + GitHub Action release to CurseForge and Wago
 - [ ] CurseForge page: screenshots, "provisional data" disclaimer

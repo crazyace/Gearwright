@@ -46,6 +46,21 @@ Gearwright's Priest data (`Data/Priest/`) is Classic's, untested on Forever. On 
 - [ ] `/gwp items <id>` on an item with "chance to hit with spells" or "critical strike with
       spells": confirms the spell hit/crit tokens
 
+## Consumables
+
+`Data/Consumables.lua` has Classic's effects and levels. On any character with the probe loaded (then
+`/gwp export` into `data/probe/`):
+
+- [ ] `/gwp items 2862 2863 2871 7964 3239 3240 3241 7965 20744 20746 20745` -> stones and oils:
+      effect and required level
+- [ ] `/gwp items 6947 6949 2892 2457 3390 8949 2454 3391 3383 6373 17708` -> poisons and elixirs
+- [ ] `/gwp items 118 858 929 1710 2455 3385 3827 6149` -> healing and mana potions
+- [ ] Open **Alchemy** on any character (recorded automatically): are elixirs and mana potions
+      still Alchemy? (healing potions are First Aid on Forever)
+- [ ] Put a stone or poison on a weapon, then `/gearwright` -> Consumables: does it say
+      "applied, N min left"?
+- [ ] Rogue: is Instant Poison's proc chance still 20% and Deadly Poison's 30%?
+
 ## Questions to answer in `docs/BETA-FINDINGS.md`
 
 | Question | Answer | Capture |

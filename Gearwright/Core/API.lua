@@ -255,6 +255,17 @@ function API.GetEquippedLink(slot, unit)
   return API.clean(GetInventoryItemLink(unit or "player", slot))
 end
 
+-- Temporary weapon buffs (stones, oils, poisons): { [16] = minutes left or
+-- false, [17] = ... }, or nil when the client has no GetWeaponEnchantInfo.
+function API.GetWeaponBuffs()
+  if not GetWeaponEnchantInfo then return nil end
+  local ok, hasMain, mainMs, _, _, hasOff, offMs = pcall(GetWeaponEnchantInfo)
+  if not ok then return nil end
+  hasMain, mainMs, hasOff, offMs = API.clean(hasMain), API.clean(mainMs), API.clean(hasOff), API.clean(offMs)
+  local function left(has, ms) return has and math.ceil((tonumber(ms) or 0) / 60000) or false end
+  return { [16] = left(hasMain, mainMs), [17] = left(hasOff, offMs) }
+end
+
 -- Enchant ID embedded in an item link ("item:itemID:enchantID:..."), 0 if none.
 function API.GetEnchantID(link)
   if not link then return nil end

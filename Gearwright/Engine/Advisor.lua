@@ -337,6 +337,43 @@ function Advisor.EnchantReport()
   return rows, ctx
 end
 
+-- Consumables ---------------------------------------------------------------------
+-- Weapon buffs, elixirs and potions (Data/Consumables.lua), scored by
+-- Engine/Consumables.lua with the same weights as gear.
+
+-- The report from Consumables.Report, plus for each weapon row `link` and
+-- `active` (minutes left on the buff it has now, false for none, nil when the
+-- client doesn't say).
+function Advisor.ConsumableReport()
+  local ctx, reason = Advisor.Context()
+  if not ctx then return nil, reason end
+  local data = ns.Data.CONSUMABLES
+  if not data then return nil, "no-consumable-data" end
+
+  local char = ns.API.CharacterSnapshot()
+  local speeds = { [16] = ctx.weights.mainHandSpeed or char.mainHandSpeed, [17] = ctx.weights.offHandSpeed or char.offHandSpeed }
+  local hands, links = {}, {}
+  for _, slot in ipairs({ 16, 17 }) do
+    local link = ns.API.GetEquippedLink(slot)
+    local _, _, classID, subclassID = ns.API.GetItemBasics(link)
+    if classID == 2 then
+      hands[slot] = { kind = ns.Consumables.WeaponKind(subclassID), speed = speeds[slot] }
+      links[slot] = link
+    end
+  end
+  local _, classToken = ns.Spec.ClassData()
+  local report = ns.Consumables.Report(data, {
+    level = char.level or 1, lookahead = Advisor.Lookahead(), weights = ctx.weights,
+    classToken = classToken, usesMana = ctx.class.weights.model == "caster", hands = hands,
+  })
+  local buffs = ns.API.GetWeaponBuffs()
+  for _, row in ipairs(report.weapon) do
+    row.link = links[row.slot]
+    if buffs then row.active = buffs[row.slot] or false end
+  end
+  return report, ctx
+end
+
 -- Crafting ----------------------------------------------------------------------
 
 Advisor.CRAFT_LOOKAHEAD = 5 -- default: also show items up to this many levels above you

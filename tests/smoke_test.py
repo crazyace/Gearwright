@@ -124,7 +124,8 @@ end
 txt = L.globals().SCREEN(ns)
 print("---- main window ----"); print(txt)
 for want in ("Spec:|r Subtlety", "(override)", "Stat weights are provisional", "Head", "item:1001:0:0",
-             "No recommended build for this spec yet.", "Best: Superior Striking", "No dungeon upgrades for you"):
+             "No recommended build for this spec yet.", "Best: Superior Striking",
+             "Main Hand: Deadly Poison", "Elixir of Agility", "Greater Healing Potion", "No dungeon upgrades for you"):
     assert want in txt, want
 L.globals().SlashCmdList.GEARWRIGHT("spec auto")  # refreshes the open window
 txt = L.globals().SCREEN(ns)
@@ -534,6 +535,20 @@ SH_BELT = 4 * 1 + 1 * 1.0
 assert abs(compare("item:5008:0:0")[0] - SH_BELT) < 1e-9
 tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:5008:0:0', ns.Advisor.CompareSlots('item:5008:0:0')) end""")(ns).values())
 assert "(Shadow)" in tip[0] and "|cffaaaaaaNot counted: Agility|r" in tip, tip
+# Consumables for a level 30 Shadow Priest with a staff: Lesser Wizard Oil
+# (+16 spell damage), Elixir of Wisdom (Arcane Elixir only from 37), no poisons, and a mana
+# potion as well as a healing one.
+con = L.eval("""function(ns) local r = ns.Advisor.ConsumableReport() local o = {}
+  for _, w in ipairs(r.weapon) do o[#o + 1] = w.slot .. " " .. w.best.item.name .. " " .. w.best.score end
+  for _, e in ipairs(r.elixirs) do o[#o + 1] = e.group .. " " .. (e.best and e.best.item.name or ("next " .. e.next.item.name)) end
+  for _, p in ipairs(r.potions) do o[#o + 1] = p.restores .. " " .. p.best.item.name end
+  return table.concat(o, "; ") end""")(ns)
+assert con == "16 Lesser Wizard Oil 16; intellect Elixir of Wisdom; health Greater Healing Potion; mana Mana Potion", con
+# Discipline values mana: Minor Mana Oil's 4 mp5 (x2.0) beats 16 spell damage (x0.4).
+L.eval("function(ns) ns.db.specOverride = 'discipline' end")(ns)
+con = L.eval("function(ns) local w = ns.Advisor.ConsumableReport().weapon[1] return w.best.item.name, w.best.score end")(ns)
+assert con[0] == "Minor Mana Oil" and abs(con[1] - 8) < 1e-9, con
+L.eval("function(ns) ns.db.specOverride = 'shadow' end")(ns)
 L.eval("function(ns) ns.db.specOverride = false end")(ns)
 # The window and the help name the Priest's specs.
 L.globals().SlashCmdList.GEARWRIGHT("")
@@ -613,6 +628,39 @@ L.execute('ITEMS["item:5001:0:0"].tip = {"Bracers", "Enchanted: Agility +9"}')
 ok = L.eval("function(ns) local rows = ns.Advisor.EnchantReport() return rows[2].ok end")(ns)
 assert ok is True
 L.execute("INV[9], INV[5] = nil, nil")
+
+# Consumables ------------------------------------------------------------------
+# Level 30 Combat Rogue, 1.7 s daggers. Deadly Poison: a 30% chance per hit of
+# 36 damage, so 0.3 x 36 / 1.7 DPS per hand, worth 14 AP per DPS in either hand.
+DEADLY = 0.3 * 36 / 1.7
+cons = L.eval("""function(ns) local r = ns.Advisor.ConsumableReport() local o = {}
+  for _, w in ipairs(r.weapon) do o[#o + 1] = { w.slot, w.best.item.name, w.best.score, w.active == nil } end
+  return o, r.elixirs[1].best.item.name, r.elixirs[1].best.score, #r.potions end""")(ns)
+weap = [list(w.values()) for w in cons[0].values()]
+assert [w[:2] for w in weap] == [[16, "Deadly Poison"]] and abs(weap[0][2] - DEADLY * 14) < 1e-9, weap
+assert cons[1] == "Elixir of Agility" and abs(cons[2] - 15 * agi) < 1e-9 and cons[3] == 1, cons
+# Two daggers: Deadly Poison's five stacks (15 DPS) are shared, so with a fast
+# off hand the main hand's share is taken off first.
+L.execute("INV[17] = 'item:2003:0:0'")
+cons = L.eval("""function(ns) local c, d = ns.Consumables, ns.Data.CONSUMABLES.poisons[7]
+  local r = ns.Advisor.ConsumableReport()
+  return r.weapon[2].best.item.name, c.PoisonDps(d, 1.7), c.PoisonDps(d, 0.5), c.PoisonDps(d, 0.5, 2) end""")(ns)
+assert cons[0] == "Deadly Poison" and abs(cons[1] - DEADLY) < 1e-9 and cons[2] == 15 and cons[3] == 2, cons
+# Below level 20 there are no poisons yet: a sharpening stone, and the poison
+# shows as coming up within the look-ahead. A sword is sharp, a mace blunt.
+L.execute("UnitLevel = function() return 16 end")
+cons = L.eval("""function(ns) local w = ns.Advisor.ConsumableReport().weapon[1]
+  return w.best.item.name, w.best.score, w.next and w.next.item.name,
+    ns.Consumables.WeaponKind(7), ns.Consumables.WeaponKind(4), ns.Consumables.WeaponKind(19) end""")(ns)
+assert tuple(cons) == ("Heavy Sharpening Stone", 4 * 14 / 1.7, "Instant Poison", "sharp", "blunt", None), cons
+L.execute("UnitLevel = function() return 14 end")  # level 20 is beyond the 5-level look-ahead
+assert L.eval("function(ns) local w = ns.Advisor.ConsumableReport().weapon[1] return w.best.item.name, w.next.item.name end")(ns) == ("Coarse Sharpening Stone", "Heavy Sharpening Stone")
+L.execute("UnitLevel = function() return 30 end")
+# What's on the weapons now, from GetWeaponEnchantInfo (milliseconds left).
+L.execute("function GetWeaponEnchantInfo() return true, 1380000, 0, 7, false, 0, 0, 0 end")
+rows = L.eval("""function(ns) local rows = ns.UI.BuildRows('consumables') return rows[2].sub, rows[3].sub, rows[2].title end""")(ns)
+assert "applied, 23 min left" in rows[0] and "nothing applied" in rows[1] and rows[2] == "Main Hand: Deadly Poison", rows
+L.execute("GetWeaponEnchantInfo = nil; INV[17] = nil")
 
 # Crafting ---------------------------------------------------------------------
 # Recipe 1 makes the better cap; 2 is above level 35; 3 is plate; 4 makes
