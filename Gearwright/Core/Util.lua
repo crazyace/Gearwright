@@ -44,3 +44,43 @@ function util.round(n, places)
   local m = 10 ^ (places or 0)
   return math.floor(n * m + 0.5) / m
 end
+
+-- Background work -------------------------------------------------------------
+-- util.Background(fn, done) runs fn() a slice per frame instead of all at once,
+-- so a long job (scoring every crafted item) doesn't freeze the game. Long
+-- loops call util.Breathe() as they go; it hands the frame back once the slice
+-- is used up, and does nothing outside a background job. done(ok, ...) gets
+-- fn's results (or false, error) when it finishes.
+local SLICE_MS, SLICE_STEPS = 4, 25
+local jobs = {}
+local sliceStart, steps = 0, 0
+
+local function now() return debugprofilestop and debugprofilestop() end
+
+function util.Breathe()
+  local co, isMain = coroutine.running()
+  if not co or isMain then return end -- Lua 5.1 returns nil on the main thread
+  steps = steps + 1
+  local t = now()
+  if (t and t - sliceStart >= SLICE_MS) or (not t and steps >= SLICE_STEPS) then coroutine.yield() end
+end
+
+local function step()
+  local job = jobs[1]
+  if not job then return util.runner:Hide() end
+  sliceStart, steps = now() or 0, 0
+  local res = { coroutine.resume(job.co) }
+  if coroutine.status(job.co) == "dead" then
+    table.remove(jobs, 1)
+    if job.done then job.done(unpack(res)) end
+  end
+end
+
+function util.Background(fn, done)
+  if not util.runner then
+    util.runner = CreateFrame("Frame")
+    util.runner:SetScript("OnUpdate", step)
+  end
+  jobs[#jobs + 1] = { co = coroutine.create(fn), done = done }
+  util.runner:Show()
+end

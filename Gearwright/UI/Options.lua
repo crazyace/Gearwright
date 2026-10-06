@@ -12,7 +12,7 @@ local function build()
   text:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
   text:SetPoint("RIGHT", -16, 0)
   text:SetJustifyH("LEFT")
-  text:SetText("Gear, training, enchant and crafting advice. Its settings are in its own window "
+  text:SetText("Gear, enchant, consumable and crafting advice. Its settings are in its own window "
     .. "(/gearwright, Settings tab).")
   local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
   button:SetSize(200, 24)

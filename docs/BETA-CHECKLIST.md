@@ -21,14 +21,11 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 - [ ] Equip an item with an "Equip: +x% hit/crit" line -> `/gwp gear` (confirms what equipping changes)
 - [x] Open your **class trainer** (recorded automatically)
 - [x] Open **Enchanting** on any character (recorded automatically)
-- [ ] Run a dungeon with the probe loaded: every loot window is logged with what dropped it
 - [ ] Open both your professions once, then check `/gearwright` -> Crafting and Enchants
 - [ ] On an engineer (any character): open Engineering with the probe loaded
 - [ ] At the auction house: `/gwp ah` and keep the window open until it says done (once per
       15 minutes, server rule). Send the SavedVariables file (`WTF/Account/<ACCOUNT>/SavedVariables/
       GearwrightProbe.lua`, after `/reload` or logout), or `/gwp export ah` if it's small enough
-- [ ] Visit a weapon master (Woo Ping in Stormwind, Buliwyf Stonehand in Ironforge) with the
-      probe loaded: records where it really is and what it teaches
 - [ ] Target another Rogue -> `/gwp inspect`
 - [ ] Hover items with **Gearwright** loaded: does the tooltip line appear?
 - [ ] Open `/gearwright`: does spec detection match what you specced?
@@ -41,7 +38,6 @@ Gearwright's Priest data (`Data/Priest/`) is Classic's, untested on Forever. On 
       (spec groups 11608 / 11615 / 11622, every talent name)
 - [ ] `/gearwright`: does the window's spec match what you specced?
 - [x] `/gwp all` with some Intellect gear on: 9.6 Intellect per 1% spell crit at level 12
-- [ ] Open your **class trainer** with the probe loaded (Priest spell list for `tools/trainer_from_probe.py`)
 - [ ] Can a Priest equip staves and daggers? (maces and wands: yes)
 - [ ] `/gwp items <id>` on an item with "chance to hit with spells" or "critical strike with
       spells": confirms the spell hit/crit tokens

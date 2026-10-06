@@ -33,10 +33,6 @@ end
 local function describe(row)
   local s = ("%s |cff40ff40+%.1f|r vs %s"):format(row.link, row.delta, ns.Advisor.SLOT_NAMES[row.slot] or "equipped")
   if row.reqLevel then s = s .. (" |cffff9900(at level %d)|r"):format(row.reqLevel) end
-  local train = row.train or (row.link and ns.Advisor.TrainingNeeded(row.link))
-  if train then s = s .. (" |cffff9900(train %s first)|r"):format(train) end
-  local low = row.lowSkill or (not train and row.link and ns.Advisor.SkillTooLow(row.link))
-  if low then s = s .. (" |cffff9900(%s: level it first)|r"):format(low) end
   return s
 end
 
@@ -123,78 +119,6 @@ end
 ns:On("LOOT_OPENED", function() Notices.Loot() end)
 ns:On("START_LOOT_ROLL", function(rollID) Notices.Roll(rollID) end)
 
--- Weapon skills -------------------------------------------------------------------
--- /gearwright train: the weapon skills your class can use but you haven't
--- trained, who teaches them, and pins on the map.
-function Notices.Train()
-  local ctx, reason = ns.Advisor.Context()
-  if not ctx then return ns.util.print("train: %s", tostring(reason)) end
-  if not ctx.weaponSkills then
-    return ns.util.print("train: this client doesn't say which weapon skills you know")
-  end
-  local missing = {}
-  local prof = ctx.proficiency or ctx.class.proficiency
-  for sub, skill in pairs(ctx.class.weaponSkills or {}) do
-    if not ctx.weaponSkills[sub] and prof[2] and prof[2][sub] then missing[#missing + 1] = skill.name end
-  end
-  table.sort(missing)
-  if #missing == 0 then return ns.util.print("you know every weapon skill your class can use") end
-  local plan, unknown = ns.Trainers.Plan(missing)
-  local WHERE = { [0] = " |cff40ff40(here)|r", [1] = "", [2] = " |cff999999(other continent)|r" }
-  ns.util.print("weapon skills you can still train, nearest trainer first:")
-  for _, g in ipairs(plan) do
-    local t = g.trainer
-    print(("  %s%s%s%s: %s"):format(t.name, t.city and (", " .. t.city) or "",
-      t.detail and (" (" .. t.detail .. ")") or "", WHERE[g.distance] or "",
-      table.concat(g.skills, ", ")))
-  end
-  if #unknown > 0 then print("  no trainer known: " .. table.concat(unknown, ", ")) end
-  ns.Trainers.ShowPlan(plan)
-  return missing
-end
-
--- Class trainer -------------------------------------------------------------------
--- Reminders of what to learn: on level-up (what's new, plus anything still
--- untrained), once at login, and /gearwright spells.
-
-local function spellList(list, max)
-  local names = {}
-  for i = 1, math.min(#list, max or #list) do names[i] = ns.ClassTrainer.Label(list[i]) end
-  local more = max and #list > max and (" and %d more"):format(#list - max) or ""
-  return table.concat(names, ", ") .. more
-end
-
-local function trainerText()
-  local names = {}
-  for i, t in ipairs(ns.ClassTrainer.Trainers()) do
-    if i > 2 then break end
-    names[#names + 1] = t.name .. (t.city and (", " .. t.city) or "")
-  end
-  return #names > 0 and table.concat(names, " or ") or "your class trainer"
-end
-
-local function costText(list)
-  local c = ns.ClassTrainer.Cost(list)
-  return c and (" (" .. money(c) .. ")") or ""
-end
-
-function Notices.LevelUp(level)
-  if not enabled() then return end
-  local new = ns.ClassTrainer.NewAt(level)
-  local all = ns.ClassTrainer.ToTrain(level)
-  local older = {}
-  for _, s in ipairs(all) do if s.level < level then older[#older + 1] = s end end
-  if #new == 0 and #older == 0 then return end
-  if #new > 0 then
-    ns.util.print("level %d: new at the trainer: %s%s", level, spellList(new), costText(new))
-  end
-  if #older > 0 then
-    ns.util.print("still to train from earlier levels: %s", spellList(older, 6))
-  end
-  ns.util.print("train at %s", trainerText())
-  return new, older
-end
-
 -- Wishlist items that just became wearable.
 function Notices.WishlistLevelUp(level)
   if not enabled() then return end
@@ -210,53 +134,9 @@ end
 
 ns:On("PLAYER_LEVEL_UP", function(level)
   level = ns.API.clean(level)
-  Notices.LevelUp(level)
   -- Required levels are checked against UnitLevel, which may lag the event.
   if C_Timer then C_Timer.After(1, function() Notices.WishlistLevelUp(level) end) end
 end)
-
-function Notices.SpellsAtLogin()
-  if not enabled() then return end
-  local list = ns.ClassTrainer.ToTrain()
-  if #list == 0 then return end
-  ns.util.print("you can train %d spell%s: %s  (/gearwright spells)", #list, #list == 1 and "" or "s", spellList(list, 5))
-  return list
-end
-
-ns:On("PLAYER_LOGIN", function()
-  if C_Timer then C_Timer.After(6, Notices.SpellsAtLogin) end
-end)
-
--- /gearwright spells: what to train now, and what's coming up.
-function Notices.Spells()
-  local level = ns.API.clean(UnitLevel("player")) or 1
-  local list, visited = ns.ClassTrainer.ToTrain(level)
-  if not visited then
-    ns.util.print("visit your class trainer once so Gearwright knows what you've learned")
-  elseif #list == 0 then
-    ns.util.print("you've trained everything up to level %d", level)
-  else
-    ns.util.print("to train now%s:", costText(list))
-    local byLevel, order = {}, {}
-    for _, s in ipairs(list) do
-      if not byLevel[s.level] then byLevel[s.level] = {}; order[#order + 1] = s.level end
-      table.insert(byLevel[s.level], s)
-    end
-    for _, l in ipairs(order) do print(("  %d: %s"):format(l, spellList(byLevel[l]))) end
-  end
-  local shown = 0
-  for l = level + 1, level + 6 do
-    local new = ns.ClassTrainer.NewAt(l)
-    if #new > 0 then
-      if shown == 0 then ns.util.print("coming up:") end
-      print(("  %d: %s%s"):format(l, spellList(new), costText(new)))
-      shown = shown + 1
-      if shown == 3 then break end
-    end
-  end
-  ns.util.print("train at %s", trainerText())
-  return list
-end
 
 -- Crafting ---------------------------------------------------------------------
 -- /gearwright craft: crafted upgrades from every profession, with whether you

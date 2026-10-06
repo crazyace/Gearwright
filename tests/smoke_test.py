@@ -124,8 +124,7 @@ end
 txt = L.globals().SCREEN(ns)
 print("---- main window ----"); print(txt)
 for want in ("Spec:|r Subtlety", "(override)", "Stat weights are provisional", "Head", "item:1001:0:0",
-             "No recommended build for this spec yet.", "Best: Superior Striking",
-             "Main Hand: Deadly Poison", "Elixir of Agility", "Greater Healing Potion", "No dungeon upgrades for you"):
+             "Best: Superior Striking", "Main Hand: Deadly Poison", "Elixir of Agility", "Greater Healing Potion"):
     assert want in txt, want
 L.globals().SlashCmdList.GEARWRIGHT("spec auto")  # refreshes the open window
 txt = L.globals().SCREEN(ns)
@@ -222,84 +221,6 @@ print("tooltip:", tip)
 assert "+140.0|r in Main Hand over equipped" in tip[0] and "(Combat)" in tip[0], tip
 assert tip[1].startswith("|cffaaaaaaOff Hand:|r") and "+56.0|r" in tip[1] and "over Pearl-handled Dagger" in tip[1], tip
 assert tip[2] == "|cffaaaaaaNot counted: Intellect, chance on hit effect|r", tip
-# Weapon skills: with only Daggers trained, a sword still scores but says to
-# train One-Handed Swords first; a dagger doesn't.
-L.execute("function IsPlayerSpell(id) return id == 1180 end")
-train = L.eval("""function(ns) return ns.Advisor.CompareToEquipped('item:2002:0:0') ~= nil,
-  ns.Advisor.TrainingNeeded('item:2002:0:0'), ns.Advisor.TrainingNeeded('item:2003:0:0') end""")(ns)
-assert tuple(train) == (True, "One-Handed Swords"), tuple(train)  # dagger: nil
-tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:2002:0:0', ns.Advisor.CompareSlots('item:2002:0:0')) end""")(ns).values())
-assert "|cffff9900Train One-Handed Swords first: Woo Ping, Stormwind (inside the Just Maces shop)|r" in tip, tip
-# ...and where: the weapon master gets a pin on the world map, drawn when the
-# map shows Stormwind. /gearwright train lists every skill still to train.
-L.execute("""
-local canvas = CreateFrame("Frame"); canvas.GetWidth = function() return 1000 end; canvas.GetHeight = function() return 600 end
-WorldMapFrame = CreateFrame("Frame"); WorldMapFrame._shown = true
-WorldMapFrame.GetCanvas = function() return canvas end
-WorldMapFrame.GetMapID = function(self) return self.mapID end
-WorldMapFrame.SetMapID = function(self, id) self.mapID = id end
-PINPOINTS = {}
-REAL_CREATEFRAME = CreateFrame
-local cf = CreateFrame
-CreateFrame = function(kind, name, parent, ...) local f = cf(kind, name, parent, ...)
-  f.SetPoint = function(self, a, rel, b, x, y) PINPOINTS[#PINPOINTS + 1] = { x, y } end
-  return f end
-printed = {}
-""")
-L.eval("function(ns) ns.Trainers.Show('One-Handed Swords') end")(ns)
-pins = L.eval("function() local p = PINPOINTS[#PINPOINTS] return WorldMapFrame.mapID, p[1], p[2] end")()
-assert pins[0] == 1453 and abs(pins[1] - 639) < 1e-6 and abs(pins[2] + 414) < 1e-6, tuple(pins)  # 63.9, 69.0
-assert L.globals().printed[1].endswith("train One-Handed Swords with Woo Ping in Stormwind, inside the Just Maces shop"), L.globals().printed[1]  # checked
-# An Alliance Rogue standing in Stormwind: Woo Ping (here) first, then Ironforge
-# on the same continent, Darnassus (other continent) last; the map opens here.
-L.execute("""printed = {}; WorldMapFrame.mapID = nil
-function UnitFactionGroup() return "Alliance" end
-local parents = { [1453] = 1429, [1429] = 1415, [1455] = 1426, [1426] = 1415, [1457] = 1414 }
-C_Map = { GetBestMapForUnit = function() return 1453 end,
-  GetPlayerMapPosition = function() return { GetXY = function() return 0.5, 0.5 end } end,
-  GetMapInfo = function(id) return { mapType = (id == 1415 or id == 1414) and 2 or 3, parentMapID = parents[id] } end }""")
-L.globals().SlashCmdList.GEARWRIGHT("train")
-out = list(L.globals().printed.values())
-print("train:", out)
-assert out[1] == "  Woo Ping, Stormwind (inside the Just Maces shop) |cff40ff40(here)|r: Crossbows, One-Handed Swords", out
-# (axes too: the mock has Hack and Slash 5/5; only Daggers is trained)
-assert out[2] == "  Buliwyf Stonehand, Ironforge (in the Timberline Arms weapon shop): Fist Weapons, Guns, One-Handed Axes, One-Handed Maces", out
-assert out[3] == "  Bixi Wobblebonk, Ironforge (in the Timberline Arms weapon shop): Thrown", out
-assert out[4] == "  Ilyenia Moonfire, Darnassus |cff999999(other continent)|r: Bows", out
-assert L.eval("function() return WorldMapFrame.mapID end")() == 1453
-L.execute("UnitFactionGroup = nil; C_Map = nil")
-# Opening a weapon master saves where it really is, and that wins over Classic's.
-L.execute("""
-function GetNumTrainerServices() return 2 end
-function GetTrainerServiceInfo(i) return ({ "One-Handed Swords", "Staves" })[i], "", "available" end
-function UnitGUID() return "Creature-0-1-0-1-11867-0001" end
-function UnitName(u) return u == "npc" and "Woo Ping" or "Tester" end
-C_Map = { GetBestMapForUnit = function() return 1453 end,
-  GetPlayerMapPosition = function() return { GetXY = function() return 0.6, 0.7 end } end }
-""")
-L.globals().fire("TRAINER_SHOW")
-seen = L.eval("function(ns) local t = ns.Trainers.For('One-Handed Swords')[1] return t.x, t.y, t.seen ~= nil, #t.skills end")(ns)
-assert tuple(seen) == (0.6, 0.7, True, 6), tuple(seen)  # its 2 listed + the seed's other 4
-L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, UnitGUID, C_Map = nil, nil, nil, nil
-function UnitName() return "Tester" end; WorldMapFrame._shown = false; CreateFrame = REAL_CREATEFRAME""")
-L.eval("function(ns) ns.MapPins.Clear(); ns.db.trainers = nil end")(ns)
-# Weapon skill levels: training Swords while Gearwright watches puts it at 1/150
-# (level 30): the sword warns you'll miss until it's levelled. The character
-# sheet's "Swords:  145/150" line, once seen in a tooltip, clears the warning.
-L.eval("function(ns) ns.db.weaponSkills = nil end")(ns)
-L.execute("function IsPlayerSpell(id) return id == 1180 end")
-L.eval("function(ns) ns.Advisor.Context() end")(ns)  # first look: Daggers known, level unknown
-L.execute("function IsPlayerSpell(id) return id == 1180 or id == 201 end")
-low = L.eval("function(ns) return ns.Advisor.SkillTooLow('item:2002:0:0'), ns.Advisor.SkillTooLow('item:2003:0:0') end")(ns)
-assert tuple(low) == ("One-Handed Swords 1/150", None), low  # the dagger's level isn't known: no warning
-tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:2002:0:0', ns.Advisor.CompareSlots('item:2002:0:0')) end""")(ns).values())
-assert "|cffff9900One-Handed Swords 1/150: you'll miss a lot until it's levelled (fight with this weapon type)|r" in tip, tip
-assert L.eval("function(ns) return ns.WeaponSkills.ReadLines({ 'Main Hand', 'DPS:  20.0', '|cffffffffSwords:  145/150|r' }) end")(ns) == 1
-assert L.eval("function(ns) return ns.Advisor.SkillTooLow('item:2002:0:0') end")(ns) is None
-L.eval("function(ns) ns.WeaponSkills.ReadLines({ 'Swords:  40/150' }) end")(ns)
-assert L.eval("function(ns) return ns.Advisor.SkillTooLow('item:2002:0:0') end")(ns) == "One-Handed Swords 40/150"
-L.eval("function(ns) ns.db.weaponSkills = nil end")(ns)
-L.execute("IsPlayerSpell = nil")
 L.execute("INV[17] = nil")
 # Items above your level still score, and say when you can wear them.
 d = compare("item:1003:0:0")
@@ -425,16 +346,6 @@ assert L.globals().NODE_READS == reads
 L.globals().fire("PLAYER_TALENT_UPDATE")
 L.eval("function(ns) ns.Spec.Detect() end")(ns)
 assert L.globals().NODE_READS == reads + len(nodes)
-# The talent advisor compares against a build by name.
-L.execute("""ROGUE_BUILD = { ["Malice"] = 5, ["Murder"] = 2, ["Ruthlessness"] = 3 }""")
-rows = L.eval("""function(ns)
-  ns.Data.ROGUE.builds.assassination.talents = ROGUE_BUILD
-  local rows = ns.Advisor.TalentReport()
-  ns.Data.ROGUE.builds.assassination.talents = {}
-  local o = {} for i, r in ipairs(rows) do o[i] = r.name .. " " .. r.have .. "/" .. r.want end
-  return table.concat(o, ", ") end""")(ns)
-print("talent report:", rows)
-assert rows == "Murder 0/2", rows
 # Window shows the detected spec and refreshes on a talent event.
 L.globals().SlashCmdList.GEARWRIGHT("")
 L.globals().fire("TRAIT_CONFIG_UPDATED")
@@ -761,53 +672,6 @@ forgot = L.eval("""function(ns) local before = ns.API.GetItemDetails('item:1003:
   return before, after end""")(ns)
 assert tuple(forgot) == (40, 40), tuple(forgot)
 
-# Class trainer reminders ----------------------------------------------------------
-# Before any visit Gearwright only knows the spell list (Data/Rogue/Trainer.lua):
-# a level-up names the new spells; /gearwright spells asks for a visit.
-L.execute("printed = {}")
-new = L.eval("function(ns) local n = ns.Notices.LevelUp(30) local o = {} for i, s in ipairs(n) do o[i] = ns.ClassTrainer.Label(s) end return table.concat(o, ', ') end")(ns)
-assert new == "Deadly Poison 1, Disarm Trap, Garrote 3, Kidney Shot 1, Sinister Strike 5", new
-out = "\n".join(L.globals().printed.values())
-assert "level 30: new at the trainer: Deadly Poison 1, Disarm Trap, Garrote 3, Kidney Shot 1, Sinister Strike 5" in out, out
-assert "train at Fenthwick, Ironforge or Lord Tony Romano, Stormwind" in out, out
-L.execute("printed = {}")
-L.globals().SlashCmdList.GEARWRIGHT("spells")
-out = "\n".join(L.globals().printed.values())
-assert "visit your class trainer once" in out and "  32: Eviscerate 5, Gouge 3, Wound Poison 1" in out, out
-# A visit at level 30: the window lists what's left to learn (Rupture 2, Kidney
-# Shot) and what's coming; everything else up to 30 isn't listed, so it's learned.
-L.execute("""
-SERVICES = {
-  { "Rupture", "available", 1, 28, "Rank 2", "", 1500 },
-  { "Kidney Shot", "available", 1, 30, "Rank 1", "", 2000 },
-  { "Eviscerate", "unavailable", 1, 32, "Rank 5", "", 2500 },
-}
-function GetNumTrainerServices() return #SERVICES end
-function GetTrainerServiceInfo(i) local s = SERVICES[i] return s[1], s[2], s[3], s[4], s[5], s[6] end
-function GetTrainerServiceCost(i) return SERVICES[i][7] end
-function UnitGUID() return "Creature-0-1-0-1-5167-0001" end
-function UnitName(u) return u == "npc" and "Fenthwick" or "Tester" end
-""")
-L.globals().fire("TRAINER_SHOW")
-L.execute("printed = {}")
-todo = L.eval("function(ns) local t = ns.ClassTrainer.ToTrain(30) local o = {} for i, s in ipairs(t) do o[i] = ns.ClassTrainer.Label(s) end return table.concat(o, ', ') end")(ns)
-assert todo == "Rupture 2, Kidney Shot 1", todo
-L.globals().SlashCmdList.GEARWRIGHT("spells")
-out = "\n".join(L.globals().printed.values())
-assert "to train now (0g 35s 0c):" in out and "  28: Rupture 2" in out and "  30: Kidney Shot 1" in out, out
-# The Training tab: spells to train now (with the cost), what's next, and every
-# weapon skill (here only Daggers is known: the rest say where to train them).
-L.execute("function IsPlayerSpell(id) return id == 1180 end")
-rows = L.eval("function(ns) return (ns.UI.BuildRows('training')) end")(ns)
-rows = [dict(r.items()) for r in rows.values()]
-print("training tab:", [(r.get("title"), r.get("value")) for r in rows])
-titles = [r.get("title") for r in rows]
-assert titles[0] == "Train now - 0g 35s 0c" and titles[1:3] == ["Rupture 2", "Kidney Shot 1"], titles
-assert "Coming up" in titles and "Eviscerate 5" in titles and "Weapon skills" in titles, titles
-swords = next(r for r in rows if r.get("title") == "One-Handed Swords")
-assert swords["value"] == "train" and "Woo Ping, Stormwind" in swords["sub"], swords
-assert next(r for r in rows if r.get("title") == "Daggers")["value"] == "?"
-L.execute("IsPlayerSpell = nil")
 # Settings tab: rows are controls. Turning the tooltip line off, picking a
 # spec, and changing the look-ahead all go through the rows' click handlers.
 def settings_rows():
@@ -824,60 +688,29 @@ assert st["Tooltip line"]["value"] == "Off" and st["Subtlety"]["value"] == "sele
     (st["Tooltip line"]["value"], st["Subtlety"]["value"], st["Look ahead"]["value"])
 assert L.eval("function(ns) return ns.Spec.Detect() end")(ns) == ("subtlety", "override")
 L.eval("function(ns) ns.db.showTooltip = true; ns.db.specOverride = false; ns.db.lookahead = nil end")(ns)
-# Reaching 32: the new spells, plus the two still untrained.
-L.execute("printed = {}")
-L.eval("function(ns) ns.Notices.LevelUp(32) end")(ns)
-out = "\n".join(L.globals().printed.values())
-assert "level 32: new at the trainer: Eviscerate 5, Gouge 3, Wound Poison 1" in out, out
-assert "still to train from earlier levels: Rupture 2, Kidney Shot 1" in out, out
-L.execute("""GetNumTrainerServices, GetTrainerServiceInfo, GetTrainerServiceCost, UnitGUID = nil, nil, nil, nil
-function UnitName() return "Tester" end; printed = {}""")
-L.eval("function(ns) ns.db.trained = nil; ns.db.classSpells = nil; ns.db.classTrainers = nil end")(ns)
-
-# Dungeons ------------------------------------------------------------------------
-# Forever Dungeon Journal's table, in its own shape: boss loot {id, name, slot,
-# quality}, quest rewards {id, name, quality}. Gearwright only reads it.
-L.execute("""
-function UnitFactionGroup() return "Alliance" end
-ForeverDungeonJournal_NS = { DB = {
-  ["Hall of Thanes"] = { level = "13-20",
-    bosses = { { name = "Faldrim Anvilmar", loot = { {1002, "Better Cap", "Head, Leather", 3}, {3001, "Plate Helm", "Head, Plate", 3} } },
-               { name = "Trash Drops", trash = true, loot = { {1003, "Future Cap", "Head, Leather", 3} } } },
-    quests = { { name = "The Restless Dead", faction = "Alliance", rewardItems = { {1005, "Crafted Cap", 3} } },
-               { name = "Horde Only", faction = "Horde", rewardItems = { {2003, "Dagger", 3} } } } },
-  ["The Deadmines"] = { level = "17-26", bosses = { { name = "Sneed", loot = { {1002, "Better Cap", "Head, Leather", 3} } } } },
-} }
-""")
-L.eval("function(ns) ns.Sources.Reset() end")(ns)
-dung = L.eval("""function(ns) local rows = ns.Advisor.DungeonReport() local out = {}
-  for i, r in ipairs(rows) do out[i] = {r.itemID, #r.sources, ns.Sources.Describe(r.sources[1])} end return out end""")(ns)
-dung = [list(r.values()) for r in dung.values()]
-print("dungeon upgrades:", dung)
-# 1005 (quest) and 1002 (two bosses) are upgrades; plate is unusable, 1003 is
-# level 40 (beyond 5 levels ahead), the Horde quest is for the other faction.
-assert [r[0] for r in dung] == [1005, 1002], dung
-assert dung[0][2] == "quest The Restless Dead, Hall of Thanes (13-20)", dung
-assert dung[1][1] == 2 and dung[1][2] == "Faldrim Anvilmar, Hall of Thanes (13-20)", dung
-upg = L.eval("function(ns) local rows = ns.UI.BuildRows('upgrades') return #rows, rows[1].value, rows[2].sub end")(ns)
-assert upg[0] == 2 and upg[1].startswith("+") and "(+1 more)" in upg[2], upg
-# Gear tab: the head slot shows what you wear and its best known upgrade, the
-# quest reward 1005 (the cap with 40 Agility), with where it comes from.
+# Gear and wishlist ----------------------------------------------------------------
+# Crafted caps: 1005 (40 Agility) and 1002 (14 Agility, 20 AP), both upgrades
+# over the equipped 1001; nobody here has Leatherworking.
+L.eval("""function(ns) ns.Data.CRAFTED = { professions = { "Leatherworking" },
+  recipes = { { 1, 11, 1005, "Crafted Cap" }, { 1, 12, 1002, "Better Cap" } } } end""")(ns)
+# Gear tab: the head slot shows what you wear and its best known upgrade, with
+# where it comes from.
 head = L.eval("""function(ns) local rows = ns.UI.BuildRows('gear')
   return rows[1].title, rows[1].sub, rows[1].value, rows[1].link, rows[2].sub end""")(ns)
 print("gear head:", head)
-assert head[0] == "item:1001:0:0" and "Upgrade: item:1005" in head[1] and "quest The Restless Dead" in head[1], head
+assert head[0] == "item:1001:0:0" and "Upgrade: item:1005" in head[1] and "have it crafted (Leatherworking)" in head[1], head
 assert head[2].startswith("+") and head[3] == "item:1005" and "no known upgrade" in head[4], head
 # Wishlist: with nothing wished, the next goal is the best known upgrade.
-# Right-clicking a dungeon row wishes it (check mark); the Wishlist tab lists
+# Right-clicking a crafted row wishes it (check mark); the Wishlist tab lists
 # it, and right-clicking it there takes it off again.
-goal = L.eval("function(ns) local g = ns.Wishlist.NextGoal() return g.link, g.wished, ns.MinimapButton.ShortText() end")(ns)
+goal = L.eval("function(ns) local g = ns.Wishlist.NextGoal() return g.link, g.wished end")(ns)
 assert goal[0] == "item:1005" and not goal[1], goal
-L.eval("function(ns) local rows = ns.UI.BuildRows('upgrades') rows[2].onClick('RightButton') end")(ns)  # 1002
-wl = L.eval("""function(ns) local up = ns.UI.BuildRows('upgrades') local w = ns.UI.BuildRows('wishlist')
+L.eval("function(ns) local rows = ns.UI.BuildRows('crafting') rows[2].onClick('RightButton') end")(ns)  # 1002
+wl = L.eval("""function(ns) local up = ns.UI.BuildRows('crafting') local w = ns.UI.BuildRows('wishlist')
   return up[2].title, w[2].title, w[4].title, w[4].value, w[4].sub, #w end""")(ns)
 print("wishlist:", wl)
 assert wl[0].startswith("|TInterface") and wl[1] == "item:1002" and wl[2] == "item:1002", wl  # next goal = the wished one
-assert wl[3].startswith("+") and "available now" in wl[4] and "Faldrim Anvilmar" in wl[4] and wl[5] == 4, wl
+assert wl[3].startswith("+") and "available now" in wl[4] and "have it crafted" in wl[4] and wl[5] == 4, wl
 L.eval("function(ns) local w = ns.UI.BuildRows('wishlist') w[4].onClick('RightButton') end")(ns)
 assert L.eval("function(ns) return #ns.Wishlist.Items(), ns.UI.BuildRows('wishlist')[4].title end")(ns) == (0, "Empty")
 # The minimap button builds on the minimap and follows the setting.
@@ -886,20 +719,35 @@ mb = L.eval("""function(ns) ns.MinimapButton.Update() local shown = ns.MinimapBu
   ns.db.minimap = false ns.MinimapButton.Update() local hidden = not ns.MinimapButton.frame:IsShown()
   ns.db.minimap = true return shown, hidden end""")(ns)
 assert tuple(mb) == (True, True), tuple(mb)
-
-# Gearwright's own table (from probe loot logs) works without that addon.
-L.execute("ForeverDungeonJournal_NS = nil")
-L.execute('ns_own = { { itemID = 1002, name = "Better Cap", dungeon = "The Deadmines", from = "Rhahk\'Zor", count = 3 } }')
-own = L.eval("""function(ns) ns.Data.DUNGEON_LOOT = ns_own; ns.Sources.Reset()
-  local rows = ns.Advisor.DungeonReport() local s = ns.Sources.For(1002)[1]
-  ns.Data.DUNGEON_LOOT = {}; ns.Sources.Reset()
-  return #rows, ns.Sources.Describe(s) end""")(ns)
-assert own[0] == 1 and own[1] == "Rhahk'Zor, The Deadmines", own
-# Without the addon, Gearwright's copy of Forever Dungeon Journal's data (by
-# Exehn, used with permission) is used: Catacomb Cloak is a Hall of Thanes quest reward.
-bundled = L.eval("""function(ns) ns.Sources.Reset() local s = ns.Sources.For(279899)
-  return ns.Sources.Describe(s[1]), ns.Data.DUNGEON_JOURNAL.source end""")(ns)
-assert bundled[0] == "quest An Ancient Grudge, Hall of Thanes (13-20)" and "Exehn" in bundled[1], bundled
+# Its tooltip shows the next goal, worked out in the background a slice per
+# frame (it scores every crafted item: doing that on each mouse-over made the
+# game hitch). Hovering only reads what's been worked out.
+L.execute("""
+TIP = {}
+GameTooltip = { SetOwner = function() end, Show = function() end, Hide = function() end,
+  AddLine = function(_, t) TIP[#TIP + 1] = t end }
+""")
+hover = L.eval("""function(ns)
+  local b = ns.MinimapButton.frame
+  local calls, real = 0, ns.Wishlist.NextGoal
+  ns.Wishlist.NextGoal = function(...) calls = calls + 1 return real(...) end
+  ns.Data.CRAFTED.recipes = { { 1, 11, 1005, "Crafted Cap" }, { 1, 12, 1002, "Better Cap" } }
+  for i = 1, 200 do table.insert(ns.Data.CRAFTED.recipes, { 1, 100 + i, 7000 + i, "Unknown item" }) end
+  local function drain() local frames = 0
+    while ns.util.runner:IsShown() do ns.util.runner._OnUpdate(ns.util.runner); frames = frames + 1 end
+    return frames end
+  drain()                                    -- whatever login queued
+  fire("PLAYER_EQUIPMENT_CHANGED")           -- queues a fresh run
+  local frames = drain()
+  calls = 0; TIP = {}
+  b._OnEnter(b)
+  local tip = table.concat(TIP, " | ")
+  ns.Wishlist.NextGoal = real
+  return frames, calls, tip end""")(ns)
+print("minimap hover:", hover)
+assert hover[0] > 2 and hover[1] == 0 and "item:1005" in hover[2], hover
+L.execute("GameTooltip = nil")
+L.eval("function(ns) ns.Data.CRAFTED = SAVED_CRAFTED end")(ns)
 
 # Probe
 # Character sheet + stats, shaped like the Forever beta: no GetCritChanceFromAgility,
@@ -1142,26 +990,10 @@ for p in L.globals().printed.values(): print("  >", p)
 
 open(OUT/"export.json","w").write(L.globals().EXPORTTEXT)
 assert '"auction"' not in L.globals().EXPORTTEXT  # the big auction scan has its own export
-# The probe's loot log turns into Gearwright's own dungeon loot table.
-gen = OUT / "DungeonLoot.lua"
-subprocess.run([sys.executable, str(R / "tools" / "loot_from_probe.py"), str(OUT / "export.json"), "-o", str(gen)],
-               check=True, capture_output=True)
-loot_lua = gen.read_text()
-assert 'itemID = 5540, name = "Pearl-handled Dagger", dungeon = "The Deadmines", from = "Defias Squallshaper", npcID = 1732, count = 2' in loot_lua, loot_lua
-assert subprocess.run([sys.executable, str(R / "tools" / "loot_from_probe.py"), *map(str, sorted((R / "data" / "probe").glob("*.json"))),
-                       "-o", str(OUT / "check.lua")], capture_output=True).returncode == 0
-assert (OUT / "check.lua").read_text() == (R / "Gearwright" / "Data" / "DungeonLoot.lua").read_text(), "rerun tools/loot_from_probe.py"
 # Data/Crafted.lua is current with the saved probe scans.
 assert subprocess.run([sys.executable, str(R / "tools" / "crafted_from_probe.py"), *map(str, sorted((R / "data" / "probe").glob("*.json"))),
                        "-o", str(OUT / "crafted.lua")], check=True, capture_output=True).returncode == 0
 assert (OUT / "crafted.lua").read_text() == (R / "Gearwright" / "Data" / "Crafted.lua").read_text(), "rerun tools/crafted_from_probe.py"
-# Data/Rogue/Trainer.lua is current with the saved trainer captures.
-assert subprocess.run([sys.executable, str(R / "tools" / "trainer_from_probe.py"), "--class", "ROGUE",
-                       "--trainer", "Fenthwick", "--trainer", "Lord Tony Romano", "--city", "Lord Tony Romano=Stormwind",
-                       "--verified", str(R / "data" / "verified" / "rogue-trainer-low-levels.json"),
-                       *map(str, sorted((R / "data" / "probe").glob("*.json"))), "-o", str(OUT / "trainer.lua")],
-                      check=True, capture_output=True).returncode == 0
-assert (OUT / "trainer.lua").read_text() == (R / "Gearwright" / "Data" / "Rogue" / "Trainer.lua").read_text(), "rerun tools/trainer_from_probe.py"
 # also write a SavedVariables-style Lua file
 L.execute(r"""
 local function ser(v, ind)

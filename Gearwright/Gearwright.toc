@@ -1,11 +1,9 @@
 ## Interface: 16001
 ## Title: Gearwright
-## Notes: Gear, talent and enchant advice for your build in World of Warcraft: Forever.
+## Notes: Gear, enchant and consumable advice for your build in World of Warcraft: Forever.
 ## Author: Jeff
 ## Version: 0.1.0-dev
 ## SavedVariables: GearwrightDB
-## OptionalDeps: ForeverDungeonJournal
-## X-Credits: Dungeon loot and quest rewards from Forever Dungeon Journal by Exehn, used with permission
 ## IconTexture: Interface\Icons\INV_Misc_Gear_01
 
 # Interface 16001 confirmed on the Forever beta (client 1.60.1, build 70205)
@@ -18,32 +16,21 @@ Core\API.lua
 Data\Stats.lua
 Data\Enchants.lua
 Data\Consumables.lua
-Data\DungeonLoot.lua
-Data\DungeonJournal.lua
 Data\Crafted.lua
-Data\WeaponMasters.lua
 Data\Rogue\Specs.lua
 Data\Rogue\Weights.lua
-Data\Rogue\Talents.lua
-Data\Rogue\Trainer.lua
 Data\Priest\Specs.lua
 Data\Priest\Weights.lua
-Data\Priest\Talents.lua
 
 Engine\Spec.lua
 Engine\Weights.lua
 Engine\Scoring.lua
-Engine\Sources.lua
 Engine\Professions.lua
-Engine\Trainers.lua
-Engine\WeaponSkills.lua
-Engine\ClassTrainer.lua
 Engine\Consumables.lua
 Engine\Advisor.lua
 Engine\Wishlist.lua
 
 UI\Theme.lua
-UI\MapPins.lua
 UI\Tooltip.lua
 UI\MainFrame.lua
 UI\Notices.lua

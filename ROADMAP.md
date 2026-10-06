@@ -34,23 +34,14 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [x] Crafted upgrades from every scanned profession, yours or not: craft it, learn it, or have it
       crafted (`Data/Crafted.lua` from `tools/crafted_from_probe.py`; Crafting tab)
 - [x] Crafting knows your other characters' recipes ("Smithy can craft it")
-- [x] Weapon skills: untrained weapons say where to train them; weapon masters pinned on the map
-- [x] Weapon skill levels: warn while a trained skill is low (read from the sheet's weapon tooltips)
-- [ ] Score low-skill weapons lower (Classic miss chance from skill vs. target defense)
-- [ ] Check the weapon masters' positions on Forever (Gearwright saves them when you visit one)
-- [x] Train reminder: new class spells on level-up, untrained ones at login, /gearwright spells
-- [x] Trainer spells below level 20 (checked on Wowhead: `data/verified/rogue-trainer-low-levels.json`)
-- [ ] Trainer costs (the probe records them at the next trainer visit)
-- [x] Training tab (class spells, weapon skills)
 - [x] Gear tab overview: each slot with its best known upgrade and where to get it
-- [x] Settings tab (tooltip, chat messages, spec, look-ahead, map pins, debug) + AddOns settings entry
+- [x] Settings tab (tooltip, chat messages, spec, look-ahead, debug) + AddOns settings entry
 - [x] Next-goal button (minimap / LibDataBroker) and a per-character wishlist
 - [ ] Engineering recipes (needs a probe scan from an engineer)
 - [x] Probe: auction house full scan (`/gwp ah`) for gear stats and prices in bulk
 - [ ] Auction house upgrades in Gearwright itself: gear on the AH that beats yours, with prices
 - [x] Advice before level 10 (no talent points yet): scored as the leveling spec, Combat
 - [ ] Bag scan for upgrades you're carrying
-- [ ] One recommended build per spec (raid DPS)
 - [x] Enchant advice: best stat enchant per slot, scored with the spec weights
 - [ ] Score proc enchants (Crusader, Fiery Weapon)
 - [x] Consumables: weapon buffs (stones, oils, poisons), elixirs and potions for your level,
@@ -65,8 +56,6 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
       maces/staves/daggers/wands, orbs in the off hand, caster weights in healing / spell damage
 - [x] Spec groups worked out from the talent tree's layout when a class has none yet
 - [x] Priest talent capture: spec groups and talent names (`data/probe/2026-10-04-priest.json`)
-- [ ] One recommended build per Priest spec
-- [ ] Priest trainer capture -> `Data/Priest/Trainer.lua`
 - [x] Measure Intellect per spell crit (level 12: 9.6)
 - [ ] Check the caster weights in game
 
@@ -76,13 +65,7 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [x] Real UI: tabbed window with item rows, icons and tooltips (UI/Theme.lua, UI/MainFrame.lua)
 - [ ] "Why" breakdown per item (`Scoring.Breakdown`), talent tree view
 - [ ] Weapon logic: daggers for Mutilate/Hemorrhage, main-hand vs off-hand speed
-- [x] Dungeon upgrades: own loot table from the probe's loot log, plus Forever Dungeon Journal's
-      tables when installed (read at runtime, optional dependency)
-- [x] Ask Exehn (Forever Dungeon Journal) about using his data: yes, with credit (2026-10-04)
-- [ ] Offer Exehn Gearwright's probe findings (loot logs, quest rewards) for his addon
-- [ ] Raid and quest-hub sources
 - [ ] Raid gear + enchants for Barrow Deeps, Hyjal Summit, Onyxia's Lair (Dec 9)
-- [ ] Multiple builds per spec (raid, dungeon, PvP)
 - [ ] Localization groundwork (IDs instead of English names)
 
 ## Phase 3 - Grow (2027)
@@ -106,6 +89,7 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 | 2026-10-03 | Read Forever Dungeon Journal at runtime, don't copy it | It has no license file; its data stays its author's. Gearwright builds its own table from observed drops |
 | 2026-10-03 | Drop the Encounter Journal; log real drops | `LoadAddOn("Blizzard_EncounterJournal")` = WRONG_GAME_TYPE, no instance answers |
 | 2026-10-03 | Score enchants instead of listing them per spec | Recipe descriptions give exact amounts; one table serves every class and spec |
+| 2026-10-06 | Drop the Talents, Training and Dungeons features | Jeff's call: keep Gearwright to gear, enchants, consumables and crafting |
 
 ## Battlewright
 

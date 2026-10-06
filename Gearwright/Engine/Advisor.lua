@@ -1,4 +1,4 @@
--- Gearwright: the advisors (gear, talents, enchants, crafting).
+-- Gearwright: the advisors (gear, enchants, consumables, crafting).
 -- Each returns plain tables; the UI decides how to show them.
 local _, ns = ...
 
@@ -35,68 +35,11 @@ function Advisor.Context()
     specHow = how,
     proficiency = Advisor.Proficiency(classData),
     dualWield = Advisor.CanDualWield(classData),
-    weaponSkills = Advisor.KnownWeaponSkills(classData),
     weights = ns.Weights.Build(classData, spec, ns.API.CharacterSnapshot()),
   }
 end
 
 -- Gear ------------------------------------------------------------------------
-
--- Weapon subclasses whose skill you've trained: { [subclass] = true }, or nil
--- when the client doesn't answer (no skill known at all), so nothing is flagged.
-function Advisor.KnownWeaponSkills(classData)
-  if not classData.weaponSkills then return nil end
-  local known, any = {}, false
-  for sub, skill in pairs(classData.weaponSkills) do
-    if ns.API.KnowsSpell(skill.spell) then known[sub] = true; any = true end
-  end
-  if not any then return nil end
-  ns.WeaponSkills.Update(known) -- notices a skill that was just trained
-  return known
-end
-
--- "One-Handed Swords 1/95" when `link` is a weapon you've trained but whose
--- skill is still too low to fight well with (Engine/WeaponSkills.lua), else nil.
-function Advisor.SkillTooLow(link, ctx)
-  if not ctx then ctx = Advisor.Context() end
-  if not (ctx and ctx.class.weaponSkills) then return nil end
-  local _, _, classID, subclassID = ns.API.GetItemBasics(link)
-  local skill = classID == 2 and ctx.class.weaponSkills[subclassID]
-  if not skill or (ctx.weaponSkills and not ctx.weaponSkills[subclassID]) then return nil end
-  return ns.WeaponSkills.Warning(subclassID, skill.name)
-end
-
--- The weapon skill you'd have to train to use `link` ("One-Handed Swords"),
--- or nil when it's trained, not a weapon, or not known.
-function Advisor.TrainingNeeded(link, ctx)
-  if not ctx then ctx = Advisor.Context() end
-  if not (ctx and ctx.weaponSkills and ctx.class.weaponSkills) then return nil end
-  local _, _, classID, subclassID = ns.API.GetItemBasics(link)
-  local skill = classID == 2 and ctx.class.weaponSkills[subclassID]
-  if skill and not ctx.weaponSkills[subclassID] then return skill.name end
-end
-
--- Every weapon skill your class can use, for the Training tab:
---   { { sub, name, known, current, max, old, where }, ... } in the class's order
---   known: true / false / nil (the client doesn't say); current/max: skill level
---   when Gearwright has seen it; where: nearest trainer ("Woo Ping, Stormwind").
-function Advisor.WeaponSkillReport(ctx)
-  if not ctx then ctx = Advisor.Context() end
-  if not (ctx and ctx.class.weaponSkills) then return nil end
-  local prof = ctx.proficiency or ctx.class.proficiency or {}
-  local out = {}
-  for sub, skill in pairs(ctx.class.weaponSkills) do
-    if not prof[2] or prof[2][sub] then
-      local known
-      if ctx.weaponSkills then known = ctx.weaponSkills[sub] == true end
-      local cur, max, old = ns.WeaponSkills.Get(sub)
-      out[#out + 1] = { sub = sub, name = skill.name, known = known, current = cur, max = max, old = old,
-        where = known == false and ns.Trainers.Where(skill.name) or nil }
-    end
-  end
-  table.sort(out, function(a, b) return a.name < b.name end)
-  return out
-end
 
 -- Whether a weapon can go in the off hand yet: the class's Dual Wield level
 -- reached, or the spell known. Classes without a dualWield entry never can.
@@ -242,32 +185,6 @@ function Advisor.GearReport()
   return rows, ctx
 end
 
--- Talents ---------------------------------------------------------------------
-
--- Rows where your rank differs from the recommended build.
-function Advisor.TalentReport()
-  local ctx, reason = Advisor.Context()
-  if not ctx then return nil, reason end
-  local build = ctx.class.builds and ctx.class.builds[ctx.spec]
-  if not build or next(build.talents) == nil then return nil, "no-build-data" end
-
-  local talents, why = ns.API.ReadTalents(ctx.class.traitTabGroups)
-  if not talents then return nil, why end
-
-  local have = {}
-  for _, tab in ipairs(talents.tabs) do
-    for _, t in ipairs(tab.talents) do have[t.name] = t.rank end
-  end
-
-  local rows = {}
-  for name, want in pairs(build.talents) do
-    local cur = have[name] or 0
-    if cur ~= want then rows[#rows + 1] = { name = name, have = cur, want = want } end
-  end
-  table.sort(rows, function(a, b) return a.name < b.name end)
-  return rows, ctx
-end
-
 -- Enchants --------------------------------------------------------------------
 -- Enchant effects come from Data/Enchants.lua (read from the beta's recipes);
 -- each is scored with the same weights as gear.
@@ -378,7 +295,7 @@ end
 
 Advisor.CRAFT_LOOKAHEAD = 5 -- default: also show items up to this many levels above you
 
--- How many levels ahead the Dungeons and Crafting lists look (settings).
+-- How many levels ahead the Crafting list looks (settings).
 function Advisor.Lookahead()
   local n = ns.db and tonumber(ns.db.lookahead)
   return n or Advisor.CRAFT_LOOKAHEAD
@@ -435,6 +352,7 @@ function Advisor.CraftReport()
   local level = ns.API.clean(UnitLevel("player")) or 1
   local rows, pending, best = {}, 0, {}
   for _, r in ipairs(recipes) do
+    ns.util.Breathe() -- scoring every recipe is slow: let a background job pause here
     local item = "item:" .. r.itemID
     local reqLevel = ns.API.GetItemDetails(item)
     if not reqLevel then
@@ -460,8 +378,7 @@ function Advisor.CraftReport()
         local row = {
           recipeID = r.recipeID, name = r.name, itemID = r.itemID, link = ns.API.GetItemLink(item),
           delta = delta, slot = slot, reqLevel = reqLevel > level and reqLevel or nil,
-          profession = r.prof, status = status, alt = alt, train = Advisor.TrainingNeeded(item, ctx),
-          lowSkill = Advisor.SkillTooLow(item, ctx),
+          profession = r.prof, status = status, alt = alt,
         }
         -- An item several professions make: keep the one you can do most about.
         local prev = best[r.itemID]
@@ -513,63 +430,10 @@ function Advisor.CraftStatusText(row)
   return "have it crafted (" .. row.profession .. ")"
 end
 
--- Dungeons ---------------------------------------------------------------------
--- Upgrades among every dungeon boss drop, trash drop and dungeon quest reward
--- that a source addon knows about (Engine/Sources.lua), best first:
---   rows = { { itemID, name, link, delta, slot, reqLevel, sources = { ... } } }
--- Returns rows, ctx, pending  (pending = items not cached yet)   or nil, reason
-function Advisor.DungeonReport()
-  local ctx, reason = Advisor.Context()
-  if not ctx then return nil, reason end
-  local list = ns.Sources.All()
-  if not list then return nil, "no-dungeon-data" end
-
-  local level = ns.API.clean(UnitLevel("player")) or 1
-  local faction = ns.API.PlayerFaction()
-  local rows, byID, pending, checked = {}, {}, 0, {}
-  for _, s in ipairs(list) do
-    local otherFaction = s.faction and s.faction ~= "Both" and faction and s.faction ~= faction
-    local item = "item:" .. s.itemID
-    if not otherFaction and (byID[s.itemID] or not checked[s.itemID]) then
-      if byID[s.itemID] then
-        table.insert(byID[s.itemID].sources, s)
-      else
-        checked[s.itemID] = true
-        if ns.API.GetItemBasics(item) and Advisor.CandidateSlots(item, ctx) then
-          local reqLevel = ns.API.GetItemDetails(item)
-          if not reqLevel then
-            if ns.API.RequestItem(s.itemID) then pending = pending + 1 end
-          elseif reqLevel <= level + Advisor.Lookahead() then
-            local delta, slot = Advisor.CompareToEquipped(item, ctx)
-            if delta == nil and slot == "stats-unreadable" then
-              if ns.API.RequestItem(s.itemID) then pending = pending + 1 end
-            elseif type(delta) == "number" and delta > CRAFT_UPGRADE then
-              local row = {
-                itemID = s.itemID, name = s.name, link = ns.API.GetItemLink(item), delta = delta, slot = slot,
-                reqLevel = reqLevel > level and reqLevel or nil, sources = { s },
-                train = Advisor.TrainingNeeded(item, ctx), lowSkill = Advisor.SkillTooLow(item, ctx),
-              }
-              byID[s.itemID] = row
-              rows[#rows + 1] = row
-            end
-          end
-        end
-      end
-    end
-  end
-  table.sort(rows, function(a, b)
-    if a.delta ~= b.delta then return a.delta > b.delta end
-    return a.itemID < b.itemID
-  end)
-  return rows, ctx, pending
-end
-
 -- Gear overview ---------------------------------------------------------------
--- Every slot with what you wear and the best upgrade Gearwright knows for it,
--- from any source (dungeon drops and quest rewards, crafted items):
+-- Every slot with what you wear and the best crafted upgrade Gearwright knows for it:
 --   { { slot, name, link, score, best = { link, name, itemID, delta, reqLevel,
---       kind = "dungeon" | "crafted", from = "Faldrim Anvilmar, Hall of Thanes (13-20)",
---       train, lowSkill } }, ... }, pending
+--       kind = "crafted", from = "you can craft it (Leatherworking)" } }, ... }, pending
 function Advisor.GearOverview()
   local gear, reason = Advisor.GearReport()
   if not gear then return nil, reason end
@@ -580,17 +444,11 @@ function Advisor.GearOverview()
       best[slot] = cand
     end
   end
-  local dungeon, _, p1 = Advisor.DungeonReport()
-  pending = pending + (p1 or 0)
-  for _, r in ipairs(dungeon or {}) do
-    offer(r.slot, { link = r.link, name = r.name, itemID = r.itemID, delta = r.delta, reqLevel = r.reqLevel,
-      kind = "dungeon", from = ns.Sources.Describe(r.sources[1]), train = r.train, lowSkill = r.lowSkill })
-  end
   local crafted, _, p2 = Advisor.CraftReport()
   if type(p2) == "number" then pending = pending + p2 end
   for _, r in ipairs(type(crafted) == "table" and crafted or {}) do
     offer(r.slot, { link = r.link, name = r.name, itemID = r.itemID, delta = r.delta, reqLevel = r.reqLevel,
-      kind = "crafted", from = Advisor.CraftStatusText(r), train = r.train, lowSkill = r.lowSkill })
+      kind = "crafted", from = Advisor.CraftStatusText(r) })
   end
   for _, g in ipairs(gear) do g.best = best[g.slot] end
   return gear, pending

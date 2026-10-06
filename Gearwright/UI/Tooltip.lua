@@ -35,15 +35,6 @@ function Tooltip.Lines(link, list)
     local c = list[i]
     out[#out + 1] = ("|cffaaaaaa%s:|r %s|cffaaaaaa%s|r"):format(ns.Advisor.SLOT_NAMES[c.slot] or "?", colored(c.delta), over(c))
   end
-  local train = ns.Advisor.TrainingNeeded(link, ctx)
-  if train then
-    local where = ns.Trainers.Where(train)
-    out[#out + 1] = ("|cffff9900Train %s first%s|r"):format(train, where and (": " .. where) or " at a weapon master")
-  end
-  local low = ns.Advisor.SkillTooLow(link, ctx)
-  if low then
-    out[#out + 1] = ("|cffff9900%s: you'll miss a lot until it's levelled (fight with this weapon type)|r"):format(low)
-  end
   if ctx then
     local skip = ns.Stats.Unscored(ns.API.GetItemStats(link), ns.API.GetItemTooltipLines(link), ctx.weights)
     if #skip > 0 then out[#out + 1] = "|cffaaaaaaNot counted: " .. table.concat(skip, ", ") .. "|r" end
@@ -77,13 +68,4 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tool
   end
   if not list then return end
   for _, text in ipairs(Tooltip.Lines(link, list)) do tooltip:AddLine(text) end
-
-  local delta = list[1].delta
-  -- Where an upgrade comes from, when a dungeon data addon knows.
-  local itemID = delta > 0.05 and ns.API.GetItemBasics(link)
-  local sources = itemID and ns.Sources.For(itemID)
-  if sources then
-    local more = #sources > 1 and (" |cff999999+%d more|r"):format(#sources - 1) or ""
-    tooltip:AddLine(("|cffaaaaaa%s|r%s"):format(ns.Sources.Describe(sources[1]), more))
-  end
 end)

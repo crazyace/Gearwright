@@ -159,12 +159,6 @@ function API.PlayerFaction()
   return UnitFactionGroup and API.clean(UnitFactionGroup("player")) or nil
 end
 
--- Forever Dungeon Journal's dungeon table when that addon is loaded, else nil.
-function API.DungeonJournalDB()
-  local fdj = rawget(_G, "ForeverDungeonJournal_NS")
-  return type(fdj) == "table" and type(fdj.DB) == "table" and fdj.DB or nil
-end
-
 -- Ask the client to cache an item; GET_ITEM_INFO_RECEIVED follows.
 -- Ask the server for an item's data. Returns true while it's worth waiting
 -- for: an item the server says doesn't exist, or that still hasn't arrived
