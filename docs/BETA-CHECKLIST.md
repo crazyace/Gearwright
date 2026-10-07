@@ -63,10 +63,12 @@ See `docs/STAT-MODEL.md`. On any character with the probe loaded:
 
 - [ ] `/gwp talents` with points in Mental Strength, Meditation, Spiritual Guidance or
       Lethality: is each talent's text at rank 1 the per-rank amount or the whole talent?
-- [ ] Equip an item with crit rating, `/gwp sheet` before and after: does spell crit go
-      up as well as melee crit?
-- [ ] Priest: Spirit's mana per 5 s at a second Spirit value (47 Spirit = 58 so far)
-- [ ] Priest: equip a +spell damage item (not "damage and healing"): does healing go up?
+- [x] Does crit rating raise spell crit? Yes: one crit stat on Forever (Blizzard)
+- [x] Spell damage vs healing: "damage and healing" gives both; healing gear adds a third
+      as much damage, and the items list both numbers (Forever's rules)
+- [ ] Priest: Spirit's mana per 5 s at two or three more Spirit values, in and out of
+      combat (47 Spirit = 58 so far); beta reports disagree on the formula
+- [ ] Equip an item with hit rating, `/gwp sheet`: does spell hit go up too?
 - [ ] `/gwp sheet` at another level on any class: crit per Agility should match
       `Data/ClassStats.lua`
 

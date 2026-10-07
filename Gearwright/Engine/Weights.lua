@@ -67,6 +67,9 @@ function Weights.BuildCaster(classData, spec, char, talents)
   if intPerCrit and intPerCrit > 1 then w.int = w.int + w.spellCrit / intPerCrit end
   Weights.ApplyTalents(w, effects, "mult")
   Weights.ApplyTalents(w, effects, "from")
+  -- Forever has one crit stat for melee, ranged and spells (Blizzard's Forever
+  -- notes), so crit on gear is spell crit for a caster.
+  w.crit = w.spellCrit
   w.sp = w.healing + w.spellDamage -- "damage and healing done by magical spells"
   for _, school in ipairs(ns.Stats.SCHOOLS) do
     w[school .. "Damage"] = (base.schools and base.schools[school]) and w.spellDamage or 0

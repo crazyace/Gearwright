@@ -27,7 +27,8 @@ Checked = seen on the beta's character sheet or matched against it.
 | Stamina | 10 health per point (the table says 10 for every class at every level) | Checked |
 | Intellect | Spell crit (table below). Mana: 15 per point (the first 20 give 1 each) | Spell crit: checked on a level 12 Priest. Mana: Classic |
 | Spirit | Health and mana regeneration outside the five-second rule | Rogue: 29 Spirit = 35 health per 5 s. Priest: 47 Spirit = 58 mana per 5 s (Classic's 13 + Spirit/4 per 2 s gives 62). Needs more points |
-| Hit / crit rating | Fixed rates at every item level: 10 hit rating = 1%, 14 crit rating = 1% | From 40 Wowhead items; not yet seen on the sheet |
+| Hit / crit rating | Fixed rates at every item level: 10 hit rating = 1%, 14 crit rating = 1%. **Crit is one stat** for melee, ranged and spells, so crit on gear counts as spell crit for a caster | Rates: from 40 Wowhead items. One crit stat: Blizzard's Forever announcement |
+| Spell damage / healing | "Damage and healing done by magical spells" gives its amount to both. A damage-only bonus gives no healing. Healing gear also grants a third as much spell damage (90 healing = 30 damage); Forever's items list both numbers, so Gearwright scores each as written | Forever's published rules |
 | Attack power | Melee DPS = weapon DPS + AP / 14 | Rogue base AP = 2 x level + Str + Agi - 20: checked |
 
 ### Crit per Agility and spell crit per Intellect
@@ -52,11 +53,11 @@ line between two known points.
 
 ### Not known yet
 
-- Whether crit rating raises spell crit too (one "crit" for everything, as in later
-  expansions) or only melee and ranged crit.
-- How much of spell damage counts as healing.
-- Whether Spirit regenerates anything while casting without talents.
-- Spirit's formula for each class (one point per class so far).
+- Spirit's mana regeneration formula. Beta reports conflict (some say Classic's Spirit / 4
+  or / 5 per tick, some say it changed), so Classic's formula is not treated as Forever's.
+  Blizzard confirms casting regen is stronger through talents (Priest Meditation, Druid
+  Reflection) but gives no base equation. One point so far: Priest, 47 Spirit = 58 mana per 5 s.
+- Whether hit was merged the way crit was.
 
 These are on `docs/BETA-CHECKLIST.md` under "Stat model".
 

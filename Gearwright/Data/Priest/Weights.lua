@@ -11,8 +11,9 @@
 --   under a point of power each; Holy values Spirit most (Spiritual Guidance).
 -- Rating stats (spellHit, spellCrit, haste) say how much of your output 1% is
 -- worth, like the Rogue's: healers' crits heal for 150%, so 1% crit ~ 0.5%.
--- Melee crit and hit (the plain "critical strike" / "chance to hit" lines) do
--- nothing for spells in Classic, so they aren't scored.
+-- Crit is one stat on Forever (melee, ranged and spells, per Blizzard), so the
+-- plain "critical strike" line counts as spell crit. Melee hit still isn't
+-- scored: nothing says hit was merged too.
 local _, ns = ...
 ns.Data.PRIEST = ns.Data.PRIEST or {}
 
