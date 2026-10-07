@@ -479,6 +479,10 @@ assert abs(tw[0] - HOLY_INT) < 1e-9 and abs(tw[1] - 0.7) < 1e-9, tw
 assert abs(tw[2] - HOLY_INT * 1.15) < 1e-9, tw
 assert abs(tw[3] - (0.7 * 1.5 + 0.15 * (1 + 0.32 * 0.15))) < 1e-9, tw
 assert tw[4] == 3 and abs(tw[6] - 2 * tw[5]) < 1e-9, tw  # Holy Specialization changes no weight
+# One crit stat on Forever: crit on gear is spell crit for a Priest.
+cw = L.eval("""function(ns) local w = ns.Weights.Build(ns.Data.PRIEST, "holy", { level = 30, class = "PRIEST" })
+  return w.crit, w.spellCrit end""")(ns)
+assert cw[0] > 0 and cw[0] == cw[1], cw
 # Lethality 5/5: 30% more crit damage on abilities, about half a Rogue's damage.
 lw = L.eval("""function(ns)
   local c, char = ns.Data.ROGUE, { level = 30, class = "ROGUE", mainHandDps = 20 }
