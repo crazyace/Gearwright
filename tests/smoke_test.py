@@ -134,7 +134,10 @@ L.execute("SAVED_TABS = TABS; TABS = { {'Assassination', {}}, {'Combat', {}}, {'
 L.globals().fire("CHARACTER_POINTS_CHANGED")
 assert list(L.eval("function(ns) return {ns.Spec.Detect()} end")(ns).values()) == ["combat", "leveling"]
 txt = L.globals().SCREEN(ns)
-assert "Spec:|r Combat" in txt and "the first comes at level 10" in txt, txt
+assert "Spec:|r Leveling" in txt and "the first comes at level 10; scored like Combat" in txt, txt
+# The tooltip doesn't name a spec before there is one.
+lv = L.eval("""function(ns) return ns.Tooltip.Lines('item:1002:0:0', ns.Advisor.CompareSlots('item:1002:0:0'))[1] end""")(ns)
+assert "(leveling)" in lv and "Combat" not in lv, lv
 L.execute("TABS = SAVED_TABS")
 L.globals().fire("CHARACTER_POINTS_CHANGED")
 L.globals().SlashCmdList.GEARWRIGHT("")  # toggle closed

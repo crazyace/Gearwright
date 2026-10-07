@@ -335,7 +335,7 @@ end
 
 -- "Spec: Combat (talents)", plus warnings. Returns text or nil, reason.
 local HOW = {
-  leveling = "leveling: no talent points spent; the first comes at level 10",
+  leveling = "no talent points yet, the first comes at level 10; scored like %s",
 }
 
 function UI.HeaderText()
@@ -343,7 +343,9 @@ function UI.HeaderText()
   if not ctx then return nil, reason end
   local spec = ctx.class.specs[ctx.spec]
   local how = HOW[ctx.specHow] or ctx.specHow
-  local text = Theme.Hex("title") .. "Spec:|r " .. spec.label .. " " .. Theme.Hex("muted") .. "(" .. how .. ")|r"
+  local label = spec.label
+  if ctx.specHow == "leveling" then label, how = "Leveling", how:format(spec.label) end
+  local text = Theme.Hex("title") .. "Spec:|r " .. label .. " " .. Theme.Hex("muted") .. "(" .. how .. ")|r"
   if ctx.class.weights._status == "provisional" then
     text = text .. "   " .. Theme.Hex("warn") .. "Stat weights are provisional placeholders.|r"
   end

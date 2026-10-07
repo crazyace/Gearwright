@@ -19,6 +19,8 @@ end
 function Tooltip.Lines(link, list)
   local ctx = ns.Advisor.Context()
   local spec = ctx and ctx.class.specs[ctx.spec]
+  -- Before the first talent point there's no spec to name.
+  local specName = ctx and ctx.specHow == "leveling" and "leveling" or (spec and spec.label) or "?"
   local function over(c)
     local name = c.equipped and c.equipped:match("%[(.-)%]")
     return name and (" over " .. name) or (c.equipped and " over equipped" or " (empty slot)")
@@ -29,7 +31,7 @@ function Tooltip.Lines(link, list)
   local later = (reqLevel and level and reqLevel > level) and (" |cffff9900at level %d|r"):format(reqLevel) or ""
   local out = {
     ("|cff4fc3f7Gearwright|r %s in %s%s |cffaaaaaa(%s)|r%s"):format(colored(best.delta),
-      ns.Advisor.SLOT_NAMES[best.slot] or "?", over(best), spec and spec.label or "?", later),
+      ns.Advisor.SLOT_NAMES[best.slot] or "?", over(best), specName, later),
   }
   for i = 2, #list do
     local c = list[i]
