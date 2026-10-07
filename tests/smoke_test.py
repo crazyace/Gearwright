@@ -784,6 +784,30 @@ hover = L.eval("""function(ns)
   return frames, calls, tip end""")(ns)
 print("minimap hover:", hover)
 assert hover[0] > 2 and hover[1] == 0 and "item:1005" in hover[2], hover
+# Switching tabs doesn't score anything on the spot (that hitched the game too):
+# the Crafting tab says it's working, fills in over several frames, and shows
+# what it had at once the next time it's opened.
+tabs = L.eval("""function(ns)
+  local function drain() local frames = 0
+    while ns.util.runner:IsShown() do ns.util.runner._OnUpdate(ns.util.runner); frames = frames + 1 end
+    return frames end
+  ns.UI.Create():Show(); drain()
+  ns.UI.cache = {}
+  local calls, real = 0, ns.Advisor.CraftReport
+  ns.Advisor.CraftReport = function(...) calls = calls + 1 return real(...) end
+  ns.UI.Select("crafting")
+  local first, firstCalls = ns.UI.frame.message.text, calls
+  local frames = drain()
+  local filled = #ns.UI.shown.rows
+  ns.UI.Select("settings"); drain()
+  ns.UI.Select("crafting")
+  local again = #ns.UI.shown.rows
+  drain()
+  ns.Advisor.CraftReport = real
+  ns.UI.frame:Hide()
+  return first, firstCalls, frames, filled, again end""")(ns)
+print("tab switch:", tabs)
+assert tabs[0] == "Working it out..." and tabs[1] == 0 and tabs[2] > 2 and tabs[3] > 0 and tabs[4] == tabs[3], tabs
 L.execute("GameTooltip = nil")
 L.eval("function(ns) ns.Data.CRAFTED = SAVED_CRAFTED end")(ns)
 
