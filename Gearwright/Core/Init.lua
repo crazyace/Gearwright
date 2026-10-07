@@ -37,6 +37,7 @@ local DEFAULTS = {
   schema = 1,
   showTooltip = true,
   notices = true, -- chat lines for quest rewards, loot and rolls
+  questHighlight = true, -- mark the reward to take in the quest window
   specOverride = false, -- false = auto-detect from talents
   minimap = true, -- minimap button (UI/MinimapButton.lua)
   debug = false,

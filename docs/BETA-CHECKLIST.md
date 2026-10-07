@@ -29,6 +29,8 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 - [ ] Target another Rogue -> `/gwp inspect`
 - [ ] Hover items with **Gearwright** loaded: does the tooltip line appear?
 - [ ] Open `/gearwright`: does spec detection match what you specced?
+- [ ] Turn in a quest with reward choices: does the upgrade glow green with its score, sitting
+      on the right button? (With no upgrade, a coin marks the one that sells for the most.)
 
 ## Priest
 

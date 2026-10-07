@@ -40,9 +40,9 @@ end
 -- Picks the best upgrade among the reward choices. With no upgrade, points at
 -- the one that sells for the most.
 function Notices.QuestRewards(retried)
-  if not enabled() or not (GetNumQuestChoices and GetQuestItemLink) then return end
+  if not (GetNumQuestChoices and GetQuestItemLink) then return end
   local n = GetNumQuestChoices() or 0
-  if n < 1 then return end
+  if n < 1 then return ns.QuestHighlight.Hide() end
   local links = {}
   for i = 1, n do
     local link = ns.API.clean(GetQuestItemLink("choice", i))
@@ -66,17 +66,24 @@ function Notices.QuestRewards(retried)
       best.choice = i
     end
   end
+  local richest, price
+  if not best and n > 1 then
+    price = 0
+    for i, link in ipairs(links) do
+      local _, sell = ns.API.GetItemDetails(link)
+      if sell and sell > price then richest, price = i, sell end
+    end
+  end
+  -- The quest window draws its buttons after this event: mark them next frame.
+  local function highlight() ns.QuestHighlight.Show(rows, best and best.choice, richest, UPGRADE) end
+  if C_Timer then C_Timer.After(0, highlight) else highlight() end
+
+  if not enabled() then return best end
   if best then
     ns.util.print("take reward %d: %s", best.choice, describe(best))
     return best
   end
   if n < 2 then return end
-
-  local richest, price = nil, 0
-  for i, link in ipairs(links) do
-    local _, sell = ns.API.GetItemDetails(link)
-    if sell and sell > price then richest, price = i, sell end
-  end
   if richest then
     ns.util.print("no upgrade among the rewards; %s sells for the most (%s)", links[richest], money(price))
   else
