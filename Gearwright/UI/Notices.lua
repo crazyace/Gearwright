@@ -60,13 +60,21 @@ function Notices.QuestRewards(retried)
     return
   end
 
-  local best
+  -- The pick is the best upgrade you can use now; one the window tints red
+  -- (can't use it yet) is shown greyed, and named if it would have won.
+  local best, blocked
   for i, row in ipairs(rows) do
-    if row.delta and row.delta > UPGRADE and (not best or row.delta > best.delta) then
-      best = row
-      best.choice = i
+    row.usable = ns.API.QuestChoiceUsable(i)
+    if row.delta and row.delta > UPGRADE then
+      row.choice = i
+      if not row.usable then
+        if not blocked or row.delta > blocked.delta then blocked = row end
+      elseif not best or row.delta > best.delta then
+        best = row
+      end
     end
   end
+  if blocked and best and blocked.delta <= best.delta then blocked = nil end
   local richest, price
   if not best and n > 1 then
     price = 0
@@ -80,10 +88,14 @@ function Notices.QuestRewards(retried)
   if C_Timer then C_Timer.After(0, highlight) else highlight() end
 
   if not enabled() then return best end
+  if blocked then
+    ns.util.print("reward %d would be %s, but you can't use it yet", blocked.choice, describe(blocked))
+  end
   if best then
     ns.util.print("take reward %d: %s", best.choice, describe(best))
     return best
   end
+  if blocked then return end
   if n < 2 then return end
   if richest then
     ns.util.print("no upgrade among the rewards; %s sells for the most (%s)", links[richest], money(price))

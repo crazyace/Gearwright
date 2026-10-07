@@ -250,6 +250,16 @@ function API.GetEquippedLink(slot, unit)
   return API.clean(GetInventoryItemLink(unit or "player", slot))
 end
 
+-- Whether the quest window says you can use reward choice `i` (it tints it red
+-- if not: a weapon skill you haven't trained, say). True when it doesn't say.
+function API.QuestChoiceUsable(i)
+  local get = rawget(_G, "GetQuestItemInfo")
+  if not get then return true end
+  local r = { pcall(get, "choice", i) }
+  if r[1] and r[6] ~= nil then return API.clean(r[6]) and true or false end
+  return true
+end
+
 -- The item in a bag slot, or nil.
 function API.GetContainerItemLink(bag, slot)
   if not (bag and slot) then return nil end

@@ -256,13 +256,22 @@ QuestInfoFrame = { rewardsFrame = { RewardButtons = buttons } }
 def marks():
     return L.eval("""function(ns) local o = {}
       for i = 1, 3 do local m = ns.QuestHighlight.marks[ns.QuestHighlight.Button(i)]
-        o[i] = (m and m:IsShown()) and ((m.pick and "glow " or "") .. (m.sells and "coin " or "") .. m.label) or "-"
+        o[i] = (m and m:IsShown()) and ((m.pick and "glow " or "") .. (m.muted and "grey " or "") .. (m.sells and "coin " or "") .. m.label) or "-"
       end return table.concat(o, " | ") end""")(ns)
 L.globals().fire("QUEST_COMPLETE")
 assert "take reward 2: item:1002:0:0" in last_print(), last_print()
 # The pick glows and shows its score in the quest window.
 qm = marks()
 assert qm.startswith("-") and "glow" in qm.split(" | ")[1] and "+" in qm.split(" | ")[1], qm
+# A reward the window tints red (an untrained weapon skill) isn't the pick: its
+# score shows greyed and chat says it would have won.
+L.execute("function GetQuestItemInfo(_, i) return 'x', 1, 1, 2, i ~= 2, 1 end")
+L.globals().fire("QUEST_COMPLETE")
+p = list(L.globals().printed.values())
+assert any("reward 2 would be" in x and "can't use it yet" in x for x in p[-3:]), p[-3:]
+qm = marks().split(" | ")
+assert "glow" not in qm[1] and "grey" in qm[1], qm
+L.execute("GetQuestItemInfo = nil")
 # No upgrade: say which reward sells for the most, and put a coin on it.
 L.execute('QUEST = { "item:3001:0:0", "item:1001:0:0" }')
 L.globals().fire("QUEST_DETAIL")

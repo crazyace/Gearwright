@@ -92,7 +92,7 @@ function QuestHighlight.Show(rows, best, richest, minDelta)
       local button = QuestHighlight.Button(i)
       if button then
         QuestHighlight.Set(QuestHighlight.Mark(button, "quest"), i == best, i == richest,
-          upgrade and ns.Advisor.FormatScore(row.delta, true))
+          upgrade and ns.Advisor.FormatScore(row.delta, true), row.usable == false)
         shown = shown + 1
       end
     end
