@@ -357,6 +357,12 @@ ADDON_BTNS = {
   btn({ GetID = function() return 3 end }),
   btn({ bag = 0, GetID = function() return 2 end }),
 }
+-- EllesmereUI: an ItemButton from Blizzard's template inside a slot frame whose ID is the bag.
+local slotFrame = { IsShown = function() return true end, GetID = function() return 0 end }
+local ell = btn({ GetID = function() return 1 end, GetParent = function() return slotFrame end })
+function ell:GetObjectType() return "ItemButton" end
+slotFrame.GetChildren = function() return ell end
+ADDON_BTNS[#ADDON_BTNS + 1] = slotFrame
 local inner = { IsShown = function() return true end, GetChildren = function() return unpack(ADDON_BTNS) end }
 ADDON_BAGS = { shown = true, IsShown = function(self) return self.shown end, GetChildren = function() return inner end,
                HookScript = function(self, _, fn) self.onShow = fn end }
@@ -366,8 +372,8 @@ bags = L.eval("""function(ns)
   local n = ns.BagUpgrades.Refresh(true)
   local addon = #ns.BagUpgrades.AddonButtons(false)
   return n, addon end""")(ns)
-# Blizzard's Hand Blade (1) and the addon's two Hand Blades (by slot and by link).
-assert bags[0] == 3 and bags[1] == 3, bags
+# Blizzard's Hand Blade (1) and the addons' three Hand Blades (by slot, by link, by parent's bag).
+assert bags[0] == 4 and bags[1] == 4, bags
 L.execute("UIParent.GetChildren = nil")
 L.execute("ContainerFrame1 = nil; C_Container = nil")
 L.execute("QuestInfoFrame = nil")

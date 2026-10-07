@@ -32,14 +32,24 @@ end
 
 local arrows = {} -- item button -> our arrow texture
 
-local function arrowFor(button)
+-- addon: a bag addon's button. Those often show the item level top left and
+-- lay their own frames over the icon, so the arrow sits bottom right (where
+-- they put Pawn's) on a frame of its own above them.
+local function arrowFor(button, addon)
   local a = arrows[button]
   if a then return a end
-  a = button:CreateTexture(nil, "OVERLAY", nil, 2)
+  local host = button
+  if addon and CreateFrame then
+    host = CreateFrame("Frame", nil, button)
+    host:SetAllPoints(button)
+    local lvl = tonumber(button.GetFrameLevel and button:GetFrameLevel())
+    if lvl and host.SetFrameLevel then host:SetFrameLevel(lvl + 10) end
+  end
+  a = host:CreateTexture(nil, "OVERLAY", nil, 2)
   local ct = rawget(_G, "C_Texture")
   if a.SetAtlas and ct and ct.GetAtlasInfo and ct.GetAtlasInfo(ARROW_ATLAS) then a:SetAtlas(ARROW_ATLAS) else a:SetTexture(ARROW) end
   a:SetSize(16, 16)
-  a:SetPoint("TOPLEFT", -2, 2)
+  if addon then a:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1) else a:SetPoint("TOPLEFT", -2, 2) end
   arrows[button] = a
   return a
 end
@@ -91,15 +101,21 @@ local function call(obj, key)
 end
 
 -- The item an addon's button shows: its link, or its bag and slot.
-local function itemOf(b)
+local function itemOf(b, itemButton)
   local bgr = type(b.BGR) == "table" and b.BGR -- Baganator
   local link = (bgr and bgr.itemLink) or b.itemLink or b.link
-  if type(link) == "string" and link:find("item:", 1, true) then return { button = b, link = link } end
+  if type(link) == "string" and link:find("item:", 1, true) then return { button = b, link = link, addon = true } end
   local bag = num(call(b, "GetBagID")) or num(call(b, "GetBag")) or num(b.bagID) or num(b.bagId) or num(b.bag)
+  -- Buttons made from ContainerFrameItemButtonTemplate (EllesmereUI's) take
+  -- their bag from the parent's ID, like Blizzard's own.
+  if not bag and itemButton then
+    local p = call(b, "GetParent")
+    bag = p and num(call(p, "GetID"))
+  end
   if not bag then return nil end
   local slot = num(b.slotID) or num(b.slotId) or num(b.slot) or num(call(b, "GetID"))
   if not slot or slot < 1 then return nil end
-  return { button = b, bag = bag, slot = slot }
+  return { button = b, bag = bag, slot = slot, addon = true }
 end
 
 local function shown(f) return type(f.IsShown) == "function" and f:IsShown() end
@@ -108,7 +124,9 @@ local function walk(f, depth, out)
   if depth > MAX_DEPTH or type(f.GetChildren) ~= "function" then return end
   for _, c in ipairs({ f:GetChildren() }) do
     if type(c) == "table" and shown(c) and not blizzard[c] then
-      local it = type(c.GetObjectType) == "function" and c:GetObjectType() == "Button" and itemOf(c)
+      -- Blizzard's bag template makes an "ItemButton"; older addons a plain Button.
+      local kind = type(c.GetObjectType) == "function" and c:GetObjectType()
+      local it = (kind == "Button" or kind == "ItemButton") and itemOf(c, kind == "ItemButton")
       if it then out[#out + 1] = it else walk(c, depth + 1, out) end
     end
   end
@@ -161,7 +179,7 @@ function Bags.Refresh(full)
     seen[it.button] = true
     local up = on and Bags.IsUpgrade(linkOf(it))
     if up then
-      arrowFor(it.button):Show()
+      arrowFor(it.button, it.addon):Show()
       shown_ = shown_ + 1
     elseif arrows[it.button] then
       arrows[it.button]:Hide()
