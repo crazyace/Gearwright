@@ -250,19 +250,20 @@ def last_print():
 # The quest window's reward buttons (Mainline keeps them on rewardsFrame).
 L.execute("""
 local buttons = {}
-for i = 1, 3 do local b = CreateFrame("Button"); b.type = "choice"; b.GetID = function() return i end; b.Name = CreateFrame("Frame"); buttons[i] = b end
+for i = 1, 3 do local b = CreateFrame("Button"); b.type = "choice"; b.GetID = function() return i end; b.Name = CreateFrame("Frame"); b.Name:SetText("Reward " .. i); b.Name.GetText = function(self) return self.text end; buttons[i] = b end
 QuestInfoFrame = { rewardsFrame = { RewardButtons = buttons } }
 """)
 def marks():
     return L.eval("""function(ns) local o = {}
-      for i = 1, 3 do local m = ns.QuestHighlight.marks[ns.QuestHighlight.Button(i)]
-        o[i] = (m and m:IsShown()) and ((m.pick and "glow " or "") .. (m.muted and "grey " or "") .. (m.sells and "coin " or "") .. m.label) or "-"
+      for i = 1, 3 do local m = ns.QuestHighlight.decor[ns.QuestHighlight.Button(i)]
+        o[i] = m and ((m.pick and "glow " or "") .. (m.muted and "grey " or "") .. (m.sells and "coin " or "") .. m.label) or "-"
       end return table.concat(o, " | ") end""")(ns)
 L.globals().fire("QUEST_COMPLETE")
 assert "take reward 2: item:1002:0:0" in last_print(), last_print()
-# Quest marks sit under the reward's name (so a coin can't look like it's the
-# next reward's); vendor marks sit in the entry's corner.
-assert L.eval("function(ns) return ns.QuestHighlight.marks[ns.QuestHighlight.Button(2)].left end")(ns) is True
+# Quest marks go at the end of the reward's own name (so they can't be read as
+# the next reward's), and come off again when the marks are redone.
+qn = L.eval("function(ns) return ns.QuestHighlight.Button(2).Name.text, ns.QuestHighlight.Button(1).Name.text end")(ns)
+assert qn[0].startswith("Reward 2 ") and "|cff40ff40+" in qn[0] and qn[1] == "Reward 1", qn
 # The pick glows and shows its score in the quest window.
 qm = marks()
 assert qm.startswith("-") and "glow" in qm.split(" | ")[1] and "+" in qm.split(" | ")[1], qm
@@ -284,6 +285,7 @@ assert qm.split(" | ")[0].strip() == "coin" and qm.split(" | ")[1] == "-", qm
 # Leaving the quest window clears the marks; with chat messages off they still show.
 L.globals().fire("QUEST_FINISHED")
 assert marks() == "- | - | -", marks()
+assert L.eval("function(ns) return ns.QuestHighlight.Button(2).Name.text end")(ns) == "Reward 2"
 L.eval("function(ns) ns.db.notices = false end")(ns)
 L.execute('QUEST = { "item:3001:0:0", "item:1002:0:0" }')
 L.globals().fire("QUEST_COMPLETE")

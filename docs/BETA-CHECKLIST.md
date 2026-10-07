@@ -29,7 +29,7 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 - [ ] Target another Rogue -> `/gwp inspect`
 - [ ] Hover items with **Gearwright** loaded: does the tooltip line appear?
 - [ ] Open `/gearwright`: does spec detection match what you specced?
-- [ ] Turn in a quest with reward choices: is each upgrade's score in the entry's bottom-right corner, with an arrow on the best, sitting
+- [ ] Turn in a quest with reward choices: is each upgrade's score at the end of its name, with an arrow on the best, sitting
       on the right button? (With no upgrade, a coin marks the one that sells for the most.)
 - [ ] Carry an upgrade in your bags: does it get the green arrow (Blizzard's bags and
       Baganator), and lose it once equipped?
