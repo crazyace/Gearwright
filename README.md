@@ -11,7 +11,8 @@ for your class, level and talents (see [docs/STAT-MODEL.md](docs/STAT-MODEL.md))
   info bar, via LibDataBroker) shows the next one you can wear
 - **Settings** - in the window's Settings tab (also reachable from the game's AddOns settings)
 - **Quest rewards and loot** - which reward to take (highlighted in the quest window, with each
-  upgrade's score), and which drops or rolls are upgrades (chat messages; `/gearwright notices`
+  upgrade's score), which drops or rolls are upgrades, and which items a vendor sells are
+  upgrades (marked in the vendor's window) (chat messages; `/gearwright notices`
   turns them off)
 - **Enchants** - the best stat enchant for each slot, and what it adds over the one you have
 - **Consumables** - the best weapon buff for each hand (sharpening stone, weightstone, wizard or
