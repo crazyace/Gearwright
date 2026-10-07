@@ -34,6 +34,7 @@ Engine\Wishlist.lua
 UI\Theme.lua
 UI\Tooltip.lua
 UI\MainFrame.lua
+UI\QuestHighlight.lua
 UI\Notices.lua
 UI\Options.lua
 UI\MinimapButton.lua

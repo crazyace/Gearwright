@@ -243,12 +243,37 @@ function GetQuestItemLink(kind, i) return QUEST[i] end
 def last_print():
     p = L.globals().printed
     return p[len(p)]
+# The quest window's reward buttons (Mainline keeps them on rewardsFrame).
+L.execute("""
+local buttons = {}
+for i = 1, 3 do local b = CreateFrame("Button"); b.type = "choice"; b.GetID = function() return i end; buttons[i] = b end
+QuestInfoFrame = { rewardsFrame = { RewardButtons = buttons } }
+""")
+def marks():
+    return L.eval("""function(ns) local o = {}
+      for i = 1, 3 do local m = ns.QuestHighlight.marks[ns.QuestHighlight.Button(i)]
+        o[i] = (m and m:IsShown()) and ((m.pick and "glow " or "") .. (m.sells and "coin " or "") .. m.label) or "-"
+      end return table.concat(o, " | ") end""")(ns)
 L.globals().fire("QUEST_COMPLETE")
 assert "take reward 2: item:1002:0:0" in last_print(), last_print()
-# No upgrade: say which reward sells for the most.
+# The pick glows and shows its score in the quest window.
+qm = marks()
+assert qm.startswith("-") and "glow" in qm.split(" | ")[1] and "+" in qm.split(" | ")[1], qm
+# No upgrade: say which reward sells for the most, and put a coin on it.
 L.execute('QUEST = { "item:3001:0:0", "item:1001:0:0" }')
 L.globals().fire("QUEST_DETAIL")
 assert "no upgrade among the rewards; item:3001:0:0 sells for the most (0g 9s 0c)" in last_print(), last_print()
+qm = marks()
+assert qm.split(" | ")[0].strip() == "coin" and qm.split(" | ")[1] == "-", qm
+# Leaving the quest window clears the marks; with chat messages off they still show.
+L.globals().fire("QUEST_FINISHED")
+assert marks() == "- | - | -", marks()
+L.eval("function(ns) ns.db.notices = false end")(ns)
+L.execute('QUEST = { "item:3001:0:0", "item:1002:0:0" }')
+L.globals().fire("QUEST_COMPLETE")
+assert "glow" in marks().split(" | ")[1], marks()
+L.eval("function(ns) ns.db.notices = true end")(ns)
+L.execute("QuestInfoFrame = nil")
 # Loot window and need/greed rolls.
 L.execute("""
 LOOT = { "item:1001:0:0", "item:1002:0:0", "item:1002:0:0" }
