@@ -29,7 +29,7 @@ sys.path.insert(0, str(R / "tools"))
 from probe_to_json import load  # noqa: E402
 
 ADDON = R / "Gearwright"
-FILES = ["Data/Stats.lua", "Data/{cls}/Specs.lua", "Data/{cls}/Weights.lua", "Engine/Weights.lua", "Engine/Scoring.lua"]
+FILES = ["Data/Stats.lua", "Data/ClassStats.lua", "Data/{cls}/Specs.lua", "Data/{cls}/Weights.lua", "Engine/Weights.lua", "Engine/Scoring.lua"]
 
 # INVTYPE -> (slot group shown, slot ID used for scoring)
 SLOTS = {
@@ -90,7 +90,7 @@ def main():
     rules = spec.weapons
     caster = cls.weights.model == "caster"
     prof = cls.proficiency
-    weights = ns.Weights.Build(cls, args.spec, L.table_from({"level": args.level, "mainHandDps": args.mh_dps}))
+    weights = ns.Weights.Build(cls, args.spec, L.table_from({"level": args.level, "class": args.cls, "mainHandDps": args.mh_dps}))
     score = L.eval("""function(ns, raw, lines, weights, slot)
       local s = ns.Stats.AddTooltipEffects(ns.Stats.FromRaw(raw), lines)
       return ns.Scoring.ScoreStats(s, weights, slot) end""")

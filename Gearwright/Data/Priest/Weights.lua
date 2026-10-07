@@ -35,9 +35,24 @@ ns.Data.PRIEST.weights = {
 -- Mind Blast (~540) is ~12.
 ns.Data.PRIEST.powerPerPercent = { { 20, 3 }, { 60, 12 } }
 
--- Intellect per 1% spell crit, by level. Linear between known points.
--- 12: measured on the beta (2026-10-04 character sheet: 48 Intellect = 5.0%;
---     in a later snapshot 43 Intellect gave 5.31% spell crit, which with
---     Classic's 0.8% base is 9.5 per 1%).
--- 60: Classic's Priest value, unconfirmed on Forever.
-ns.Data.PRIEST.intPerSpellCrit = { { 12, 9.6 }, { 60, 59.5 } }
+-- Intellect per 1% spell crit comes from Forever's own per-level table
+-- (Data/ClassStats.lua): 9.5 at level 12, as the beta's character sheet showed.
+
+-- Talents that change what a stat is worth (Engine/Weights.lua, TalentEffects).
+-- Amounts are Wowhead Forever's talent text (2026-10-06), taken as the value at
+-- max rank unless perRank. Not checked in game yet: `/gwp talents` records each
+-- talent's text at rank 1, your rank and max rank, which settles it.
+-- Talents that add hit (Holy Precision, Shadow Focus) aren't here: the weights
+-- don't model the hit cap yet.
+ns.Data.PRIEST.talentEffects = {
+  -- "Increases your total Intellect by 15%." (Classic: +2% mana per rank)
+  { name = "Mental Strength", stat = "int", kind = "mult", amount = 0.15, note = "Intellect +15%" },
+  -- "Allows 50% of your Mana regeneration to continue while casting."
+  { name = "Meditation", stat = "spi", kind = "scale", amount = 0.5, note = "Spirit regen while casting" },
+  -- "Increases your spell healing by up to 25% of your total Spirit and your
+  -- spell damage by up to 8% of your total Spirit."
+  { name = "Spiritual Guidance", stat = "spi", kind = "from", amount = 0.25, into = { healing = 1, spellDamage = 0.32 },
+    note = "Spirit adds healing and spell damage" },
+  -- "...increasing the critical strike damage bonus of your Shadow spells by 100%"
+  { name = "Shadowform", stat = "spellCrit", kind = "scale", amount = 1.0, note = "Shadow crits hit harder" },
+}

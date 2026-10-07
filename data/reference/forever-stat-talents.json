@@ -1,0 +1,1772 @@
+[
+ {
+  "cls": "HUNTER",
+  "tree": "Beast Mastery",
+  "name": "Deadly Aspects",
+  "max": 5,
+  "row": 1,
+  "node": 104960,
+  "spell": 19552,
+  "text": "While Aspect of the Hawk is active, Auto Shot has a 10% chance of increasing ranged attack speed by 30% for 12 sec. While Aspect of the Beast is active, all melee auto attacks have a 10% chance of increasing melee attack speed by 30% for 12 sec."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Beast Mastery",
+  "name": "Endurance Training",
+  "max": 5,
+  "row": 1,
+  "node": 104976,
+  "spell": 19583,
+  "text": "Increases the Health and Armor of your pets by 15%."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Beast Mastery",
+  "name": "Improved Aspect of the Monkey",
+  "max": 3,
+  "row": 2,
+  "node": 104974,
+  "spell": 19549,
+  "text": "Increases the Dodge bonus of your Aspect of the Monkey by 4%. Additionally, your pet gains 50% of the effect of your Aspect of the Monkey ability."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Beast Mastery",
+  "name": "Ferocity",
+  "max": 5,
+  "row": 4,
+  "node": 104967,
+  "spell": 19598,
+  "text": "Increases the critical strike chance of your pets and hawks by 16%."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Beast Mastery",
+  "name": "Summon Hawk",
+  "max": 1,
+  "row": 4,
+  "node": 104966,
+  "spell": 1293241,
+  "text": "Command a hawk to dive-bomb your targeted enemy, dealing [32 / Ferocity : 48 / Unleashed Fury : 38 + (Ranged Attack Power * (0.05))] Physical damage and continuing its assault for 18 sec. Only 2 hawks can be active at once. Summon Hawk shares its cooldown with Arcane Shot."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Beast Mastery",
+  "name": "Spirit Bond",
+  "max": 2,
+  "row": 5,
+  "node": 104965,
+  "spell": 19578,
+  "text": "While your pet is active, you and your pet will regenerate 1% of total health every 5 sec."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Beast Mastery",
+  "name": "Intimidation",
+  "max": 1,
+  "row": 5,
+  "node": 104964,
+  "spell": 19577,
+  "text": "Command your pet to Stun the target for 3 sec on its next successful attack, which also gains 100% increased critical strike chance. Generates high threat."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Beast Mastery",
+  "name": "Bestial Discipline",
+  "max": 2,
+  "row": 5,
+  "node": 104963,
+  "spell": 19590,
+  "text": "Increases the Focus regeneration of your pets by 100% and allows 50% of your Mana regeneration to continue while casting."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Beast Mastery",
+  "name": "Frenzy",
+  "max": 5,
+  "row": 6,
+  "node": 104962,
+  "spell": 19621,
+  "text": "Gives your pet a 20% chance to gain a 30% attack speed increase for 8 sec after dealing a critical strike."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Marksmanship",
+  "name": "Lethal Attacks",
+  "max": 5,
+  "row": 1,
+  "node": 105011,
+  "spell": 19426,
+  "text": "Increases your critical strike chance with all attacks by 1%."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Marksmanship",
+  "name": "Careful Aim",
+  "max": 5,
+  "row": 2,
+  "node": 105008,
+  "spell": 1223984,
+  "text": "Increases your Attack Power by 100% of your Intellect."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Marksmanship",
+  "name": "Trueshot Aura",
+  "max": 1,
+  "row": 4,
+  "node": 105004,
+  "spell": 1299346,
+  "text": "Increases the Ranged Attack Power of party members within 45 yds by 30."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Marksmanship",
+  "name": "Mortal Shots",
+  "max": 5,
+  "row": 4,
+  "node": 105002,
+  "spell": 19485,
+  "text": "Increases the critical strike damage bonus on all ranged abilities by 30%."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Marksmanship",
+  "name": "Rapid Recuperation",
+  "max": 2,
+  "row": 5,
+  "node": 104999,
+  "spell": 1223987,
+  "text": "Hitting a target with your Serpent Sting ability grants you 50% and consuming Rapid Killing grants you 100% of your Mana regeneration while casting for the next 15 sec."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Survival",
+  "name": "Deflection",
+  "max": 5,
+  "row": 1,
+  "node": 104995,
+  "spell": 19295,
+  "text": "Increases your Parry chance by 5%."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Survival",
+  "name": "Savage Strikes",
+  "max": 2,
+  "row": 2,
+  "node": 104993,
+  "spell": 19159,
+  "text": "Increases the critical strike chance of all your melee abilities by 20%."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Survival",
+  "name": "Survivalist",
+  "max": 5,
+  "row": 2,
+  "node": 104992,
+  "spell": 19255,
+  "text": "Increases your total Health by 10%."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Survival",
+  "name": "Surefooted",
+  "max": 3,
+  "row": 3,
+  "node": 104987,
+  "spell": 19290,
+  "text": "Increases your hit chance by 3% and reduces the duration of movement impairing effects on you by 30%."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Survival",
+  "name": "Deterrence",
+  "max": 1,
+  "row": 3,
+  "node": 104986,
+  "spell": 19263,
+  "text": "When activated, increases your Dodge and Parry chance by 25% for 10 sec."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Survival",
+  "name": "Survival Tactics",
+  "max": 2,
+  "row": 4,
+  "node": 104988,
+  "spell": 19376,
+  "text": "Increases your chance to hit with your Trap and Feign Death abilities by 17%."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Survival",
+  "name": "Predator's Edge",
+  "max": 5,
+  "row": 4,
+  "node": 110861,
+  "spell": 1310627,
+  "text": "Increases your melee critical strike damage by 30% and your Off Hand weapon damage by 50%."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Survival",
+  "name": "Resourcefulness",
+  "max": 2,
+  "row": 5,
+  "node": 104983,
+  "spell": 440529,
+  "text": "Reduces the mana cost of your Trap abilities and melee abilities by 60%. In addition, your critical strikes have a 60% chance to allow 50% of your Mana regeneration to continue while casting for 30 sec."
+ },
+ {
+  "cls": "HUNTER",
+  "tree": "Survival",
+  "name": "Lightning Reflexes",
+  "max": 5,
+  "row": 6,
+  "node": 110859,
+  "spell": 19168,
+  "text": "Increases your Agility by 15%."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Arms",
+  "name": "Deflection",
+  "max": 5,
+  "row": 1,
+  "node": 105957,
+  "spell": 16462,
+  "text": "Increases your Parry chance by 1%."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Arms",
+  "name": "Improved Overpower",
+  "max": 2,
+  "row": 2,
+  "node": 105952,
+  "spell": 12290,
+  "text": "Increases the critical strike chance of your Overpower ability by 25%."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Arms",
+  "name": "Deep Wounds",
+  "max": 3,
+  "row": 3,
+  "node": 105950,
+  "spell": 12834,
+  "text": "Your critical strikes cause your opponent to Bleed, dealing 0% of your melee weapon's average damage over 12 sec."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Arms",
+  "name": "Impale",
+  "max": 2,
+  "row": 4,
+  "node": 105947,
+  "spell": 16493,
+  "text": "Increases the critical strike damage bonus of your abilities by 10%."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Arms",
+  "name": "Weaponmaster",
+  "max": 5,
+  "row": 5,
+  "node": 105944,
+  "spell": 1290261,
+  "text": "Gives your melee weapon attacks a benefit depending on the weapon. Axe/Polearm: Increases your critical strike chance by 5%. Mace/Staff: Your attacks ignore 15% of your target's armor. Sword: Your successful melee attacks have a 5% chance to trigger an extra attack on the target."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Fury",
+  "name": "Cruelty",
+  "max": 5,
+  "row": 1,
+  "node": 105939,
+  "spell": 12320,
+  "text": "Improves your chance to get a critical strike with melee attacks by 5%."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Fury",
+  "name": "Furious Precision",
+  "max": 3,
+  "row": 3,
+  "node": 113565,
+  "spell": 1323963,
+  "text": "Increases your chance to hit with off-hand attacks by 10%."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Fury",
+  "name": "Blood Craze",
+  "max": 3,
+  "row": 3,
+  "node": 105934,
+  "spell": 16487,
+  "text": "Regenerates 3% of your total Health over 6 sec after being the victim of a critical strike, dealing damage with Bloodthirst, or suffering more than 20% of your maximum Health from a single attack."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Fury",
+  "name": "Dual Wield Specialization",
+  "max": 5,
+  "row": 4,
+  "node": 105933,
+  "spell": 23584,
+  "text": "Increases your off-hand weapon damage by 5% and chance to hit with off-hand attacks by 10%."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Fury",
+  "name": "Flurry",
+  "max": 5,
+  "row": 6,
+  "node": 105928,
+  "spell": 12319,
+  "text": "Increases your melee attack speed by 1% for your next 3 swings after dealing a melee critical strike."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Fury",
+  "name": "Gore Drinker",
+  "max": 2,
+  "row": 6,
+  "node": 113566,
+  "spell": 1323967,
+  "text": "Your Enrage, Berserker Rage, Bloodrage, Death Wish, and Bloodthirst abilities cause your next 3 melee attacks to restore 1.0% of your maximum Health."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Fury",
+  "name": "Bloodthirst",
+  "max": 1,
+  "row": 7,
+  "node": 105930,
+  "spell": 23881,
+  "text": "Instantly attack the target causing damage equal to 35% of your Attack Power plus 30 and increasing your movement speed by 10% for 10 sec."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Protection",
+  "name": "Shield Specialization",
+  "max": 5,
+  "row": 1,
+  "node": 105976,
+  "spell": 12298,
+  "text": "Increases your chance to Block attacks with your shield by 5% and grants you a 100% chance to generate 5 Rage when you Block."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Protection",
+  "name": "Last Stand",
+  "max": 1,
+  "row": 3,
+  "node": 105970,
+  "spell": 12975,
+  "text": "When activated, this ability temporarily grants you 30% of your maximum health for 20 sec. After the effect expires, the health is lost."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Protection",
+  "name": "Master of Defense",
+  "max": 2,
+  "row": 3,
+  "node": 105971,
+  "spell": 1310316,
+  "text": "Grants you a 0% chance to generate 5 Rage when you Dodge or Parry while a shield is equipped."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Protection",
+  "name": "Improved Sunder Armor",
+  "max": 3,
+  "row": 4,
+  "node": 105968,
+  "spell": 12308,
+  "text": "Reduces the Rage cost of your Sunder Armor ability by 3."
+ },
+ {
+  "cls": "WARRIOR",
+  "tree": "Protection",
+  "name": "Shield Slam",
+  "max": 1,
+  "row": 7,
+  "node": 105959,
+  "spell": 23922,
+  "text": "Slam the target with your shield, causing 421 to 439 damage, increased by your Block Value, and has a 50% chance of dispelling 1 magic effect on the target. Causes a very high amount of threat."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Holy",
+  "name": "Divine Strength",
+  "max": 5,
+  "row": 1,
+  "node": 105639,
+  "spell": 20262,
+  "text": "Increases your Strength by 2%."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Holy",
+  "name": "Divine Intellect",
+  "max": 5,
+  "row": 1,
+  "node": 105332,
+  "spell": 20257,
+  "text": "Increases your total Intellect by 2%."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Holy",
+  "name": "Reverence",
+  "max": 3,
+  "row": 3,
+  "node": 110871,
+  "spell": 1310899,
+  "text": "Allows 30% of your Mana regeneration to continue while casting."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Holy",
+  "name": "Infusion of Light",
+  "max": 2,
+  "row": 4,
+  "node": 110873,
+  "spell": 426065,
+  "text": "Your Holy Shock and Flash of Light critical hits reduce the cast time of your next Holy Light cast within 15 sec by 1.0 sec."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Holy",
+  "name": "Illumination",
+  "max": 5,
+  "row": 4,
+  "node": 105329,
+  "spell": 20210,
+  "text": "After getting a critical effect from your Flash of Light, Holy Light, Light's Vigil, or Holy Shock heal spell you have a 0% chance to gain Mana equal to 50% of the base cost of the spell."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Holy",
+  "name": "Divine Favor",
+  "max": 1,
+  "row": 4,
+  "node": 105325,
+  "spell": 20216,
+  "text": "When activated, gives your next Flash of Light, Holy Light, or Holy Shock spell a 100% critical effect chance."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Holy",
+  "name": "Divine Precision",
+  "max": 3,
+  "row": 5,
+  "node": 105324,
+  "spell": 1310904,
+  "text": "Improves your chance to hit with Holy spells by 18%."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Holy",
+  "name": "Holy Power",
+  "max": 5,
+  "row": 6,
+  "node": 105321,
+  "spell": 5923,
+  "text": "Increases the critical strike chance of your Holy Shock and Holy Strike spells by 15%, and all other spells by 5%."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Protection",
+  "name": "Toughness",
+  "max": 5,
+  "row": 1,
+  "node": 105630,
+  "spell": 20143,
+  "text": "Increases your armor value from items by 2%."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Protection",
+  "name": "Redoubt",
+  "max": 5,
+  "row": 1,
+  "node": 105626,
+  "spell": 20127,
+  "text": "Damaging melee attacks against you have a 10% chance to increase your chance to block by 0%. Lasts 10 sec or 5 blocks."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Protection",
+  "name": "Precision",
+  "max": 3,
+  "row": 2,
+  "node": 105638,
+  "spell": 20189,
+  "text": "Improves your chance to hit by 1%."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Protection",
+  "name": "Shield Specialization",
+  "max": 3,
+  "row": 3,
+  "node": 110874,
+  "spell": 20150,
+  "text": "Increases the amount of damage absorbed by your shield by 30%, and gives your blocks a 100% chance to restore 6% of your maximum Mana. May only occur once every 3 sec."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Protection",
+  "name": "Sacred Duty",
+  "max": 2,
+  "row": 3,
+  "node": 105632,
+  "spell": 1224697,
+  "text": "Increases your total Stamina by 4% and reduces the cooldown of your Divine Shield, Divine Protection, and Templar's Bulwark spells by 60 sec."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Protection",
+  "name": "Templar's Bulwark",
+  "max": 1,
+  "row": 5,
+  "node": 105625,
+  "spell": 1311015,
+  "text": "When activated, this ability grants you an absorb shield equal to 100% of your maximum health for 8 sec. Applies Forbearance for 1 min. Cannot be cast while Forbearance is active."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Protection",
+  "name": "Reckoning",
+  "max": 5,
+  "row": 5,
+  "node": 105627,
+  "spell": 20177,
+  "text": "Gives you a 0% chance to gain an extra attack after Blocking a melee attack and a 0% chance to gain an extra attack after being the victim of a non-periodic critical strike."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Protection",
+  "name": "Holy Shield",
+  "max": 1,
+  "row": 7,
+  "node": 105628,
+  "spell": 20925,
+  "text": "Increases chance to block by 30% for 10 sec, and deals 110 Holy damage for each attack blocked while active. Damage caused by Holy Shield causes 20% additional threat. Each block expends a charge. 4 charges."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Retribution",
+  "name": "Deflection",
+  "max": 5,
+  "row": 1,
+  "node": 105707,
+  "spell": 20060,
+  "text": "Increases your Parry chance by 1%."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Retribution",
+  "name": "Conviction",
+  "max": 5,
+  "row": 2,
+  "node": 105703,
+  "spell": 20117,
+  "text": "Improves your chance to get a critical strike with melee attacks by 5%."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Retribution",
+  "name": "Vindication",
+  "max": 3,
+  "row": 3,
+  "node": 105702,
+  "spell": 9452,
+  "text": "Gives your damaging melee attacks a chance to reduce the target's Attack Power by (0 /- 3 * - 204), and increase your Attack Power by 0% for 30 sec."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Retribution",
+  "name": "Eye for an Eye",
+  "max": 2,
+  "row": 4,
+  "node": 105698,
+  "spell": 9799,
+  "text": "All critical strikes against you cause 15% of the damage taken to the attacker as well. The damage caused by Eye for an Eye will not exceed 50% of the Paladin's total health."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Retribution",
+  "name": "Vengeance",
+  "max": 3,
+  "row": 5,
+  "node": 105693,
+  "spell": 20049,
+  "text": "Increases your Physical and Holy damage dealt by 5% for 30 sec after landing a non-periodic critical strike. Stacks up to 3 times."
+ },
+ {
+  "cls": "PALADIN",
+  "tree": "Retribution",
+  "name": "Champion of the Light",
+  "max": 3,
+  "row": 6,
+  "node": 110882,
+  "spell": 1311084,
+  "text": "Increases your spell damage by up to 100% of your Intellect."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Arcane",
+  "name": "Arcane Focus",
+  "max": 5,
+  "row": 1,
+  "node": 105814,
+  "spell": 11222,
+  "text": "Improves your chance to hit with Arcane spells by 2%."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Arcane",
+  "name": "Magic Absorption",
+  "max": 2,
+  "row": 2,
+  "node": 105811,
+  "spell": 29441,
+  "text": "Increases all your resistances by 2 and causes all spells you fully resist to restore 1% of your total mana. Cannot trigger more often than 1 time per sec."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Arcane",
+  "name": "Arcane Resilience",
+  "max": 2,
+  "row": 2,
+  "node": 105809,
+  "spell": 28574,
+  "text": "Increases your Armor by an amount equal to 50% of your Intellect."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Arcane",
+  "name": "Arcane Impact",
+  "max": 3,
+  "row": 3,
+  "node": 105807,
+  "spell": 11242,
+  "text": "Increases the critical strike chance of your Arcane spells by 6%."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Arcane",
+  "name": "Arcane Shielding",
+  "max": 2,
+  "row": 4,
+  "node": 105805,
+  "spell": 11252,
+  "text": "Decreases the Mana lost per point of damage taken when your Mana Shield spell is active by 33% and increases the resistances granted by your Mage Armor spell by 50%."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Arcane",
+  "name": "Arcane Meditation",
+  "max": 3,
+  "row": 4,
+  "node": 105803,
+  "spell": 18462,
+  "text": "Allows 50% of your Mana regeneration to continue while casting."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Arcane",
+  "name": "Arcane Mind",
+  "max": 5,
+  "row": 5,
+  "node": 105800,
+  "spell": 11232,
+  "text": "Increases your Intellect by 10% and increases the critical strike damage bonus of your Arcane spells by 100%."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Arcane",
+  "name": "Arcane Instability",
+  "max": 3,
+  "row": 6,
+  "node": 105799,
+  "spell": 15058,
+  "text": "Increases the damage done by your spells by 1% and your critical strike chance by 1%."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Fire",
+  "name": "Wake of Fire",
+  "max": 2,
+  "row": 1,
+  "node": 105797,
+  "spell": 11078,
+  "text": "Reduces the cooldown of your Fire Blast spell by 2 sec. Killing a non-trivial target increases the critical strike chance of your next Fire Blast cast within 30 sec by 50%."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Fire",
+  "name": "Incineration",
+  "max": 3,
+  "row": 1,
+  "node": 105796,
+  "spell": 18459,
+  "text": "Increases the critical strike chance of your Fire Blast, Ice Lance, Arcane Blast, and Scorch spells by 6%."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Fire",
+  "name": "Ignite",
+  "max": 5,
+  "row": 2,
+  "node": 105794,
+  "spell": 11119,
+  "text": "Your critical strikes from Fire damage spells cause the target to burn for an additional 40% of your spell's damage over 4 sec."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Fire",
+  "name": "Improved Flamestrike",
+  "max": 3,
+  "row": 3,
+  "node": 105791,
+  "spell": 11108,
+  "text": "Increases the critical strike chance of your Flamestrike spell by 15%."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Fire",
+  "name": "Heating Up",
+  "max": 1,
+  "row": 4,
+  "node": 105786,
+  "spell": 400624,
+  "text": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within 20 sec by 25%, stacking up to 3 times."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Fire",
+  "name": "Master of Elements",
+  "max": 3,
+  "row": 4,
+  "node": 105785,
+  "spell": 29074,
+  "text": "Your Fire and Frost critical strikes will refund 10% of their base mana cost."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Fire",
+  "name": "Critical Mass",
+  "max": 3,
+  "row": 5,
+  "node": 105784,
+  "spell": 11115,
+  "text": "Increases the critical strike chance of your Fire spells by 2%."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Fire",
+  "name": "Combustion",
+  "max": 1,
+  "row": 7,
+  "node": 105781,
+  "spell": 11129,
+  "text": "When activated, this spell causes each of your Fire damage spell hits to increase your critical strike chance with Fire damage spells by 10%. This effect lasts until you have caused 3 non-periodic critical strikes with Fire spells."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Frost",
+  "name": "Frost Warding",
+  "max": 2,
+  "row": 1,
+  "node": 105780,
+  "spell": 11189,
+  "text": "Increases the Armor and resistance given by your Frost Armor and Ice Armor spells by 15%. In addition, gives your Frost Ward a 10% chance to reflect Frost spells and effects while active."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Frost",
+  "name": "Elemental Precision",
+  "max": 5,
+  "row": 1,
+  "node": 105778,
+  "spell": 29438,
+  "text": "Improves your chance to hit with Frost and Fire spells by 6%."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Frost",
+  "name": "Ice Shards",
+  "max": 5,
+  "row": 2,
+  "node": 105777,
+  "spell": 11207,
+  "text": "Increases the critical strike damage bonus of your Frost spells by 100%."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Frost",
+  "name": "Ice Block",
+  "max": 1,
+  "row": 4,
+  "node": 105769,
+  "spell": 11958,
+  "text": "You become encased in a block of ice, protecting you from all physical attacks and spells for 10 sec, but during that time you cannot attack, move, or cast spells."
+ },
+ {
+  "cls": "MAGE",
+  "tree": "Frost",
+  "name": "Shatter",
+  "max": 3,
+  "row": 4,
+  "node": 105768,
+  "spell": 11170,
+  "text": "Increases the critical strike chance of all your spells against Frozen targets by 1%."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Discipline",
+  "name": "Twin Disciplines",
+  "max": 5,
+  "row": 1,
+  "node": 105849,
+  "spell": 1225132,
+  "text": "Increases the damage and healing of your instant cast spells by 5%."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Discipline",
+  "name": "Holy Precision",
+  "max": 3,
+  "row": 2,
+  "node": 110852,
+  "spell": 1309957,
+  "text": "Improves your chance to hit with Holy spells by 18%."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Discipline",
+  "name": "Martyrdom",
+  "max": 2,
+  "row": 2,
+  "node": 105845,
+  "spell": 14531,
+  "text": "Gives you a 0% chance to gain Focused Casting for 6 sec after being the victim of a melee or ranged critical strike. The Focused Casting effect prevents you from losing casting time when taking damage and increases your resistance to Interrupt effects by 20%."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Discipline",
+  "name": "Inner Focus",
+  "max": 1,
+  "row": 3,
+  "node": 105844,
+  "spell": 14751,
+  "text": "When activated, reduces the Mana cost of your next spell by 100% and increases its critical effect chance by 25% if it is a non-periodic spell and capable of a critical effect."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Discipline",
+  "name": "Meditation",
+  "max": 3,
+  "row": 3,
+  "node": 105843,
+  "spell": 14521,
+  "text": "Allows 50% of your Mana regeneration to continue while casting."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Discipline",
+  "name": "Improved Inner Fire",
+  "max": 3,
+  "row": 4,
+  "node": 105841,
+  "spell": 14747,
+  "text": "Increases the Armor bonus of your Inner Fire spell by 45% and increases its total charges by 12."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Discipline",
+  "name": "Mental Strength",
+  "max": 5,
+  "row": 4,
+  "node": 105837,
+  "spell": 18551,
+  "text": "Increases your total Intellect by 15%."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Discipline",
+  "name": "Renewed Hope",
+  "max": 5,
+  "row": 5,
+  "node": 105835,
+  "spell": 425280,
+  "text": "Your heals from Flash Heal, Binding Heal, Lesser Heal, Heal, Greater Heal, and Penance gain 10% increased critical strike chance when cast on targets with Weakened Soul, and reduce the remaining duration of Weakened Soul on their target by 5 sec."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Discipline",
+  "name": "Divine Aegis",
+  "max": 3,
+  "row": 6,
+  "node": 105840,
+  "spell": 431622,
+  "text": "Your critical heals create a protective shield on the target, absorbing 15% of the amount healed. Lasts 12 sec."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Discipline",
+  "name": "Power Infusion",
+  "max": 1,
+  "row": 7,
+  "node": 105836,
+  "spell": 10060,
+  "text": "Infuses the target with power, increasing their spell damage and healing done by 20% for 15 sec."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Holy",
+  "name": "Holy Specialization",
+  "max": 5,
+  "row": 1,
+  "node": 110855,
+  "spell": 14889,
+  "text": "Increases the critical effect chance of your Holy spells by 1%."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Holy",
+  "name": "Spell Warding",
+  "max": 5,
+  "row": 2,
+  "node": 105864,
+  "spell": 27900,
+  "text": "Reduces all spell damage taken by 10%."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Holy",
+  "name": "Blessed Recovery",
+  "max": 3,
+  "row": 3,
+  "node": 105861,
+  "spell": 27811,
+  "text": "After being struck by a melee or ranged critical hit, or suffering more than 30% of your maximum Health from a single attack, heal 8% of the damage taken over 6 sec. Refreshing this effect carries over any remaining healing."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Holy",
+  "name": "Inspiration",
+  "max": 3,
+  "row": 3,
+  "node": 105860,
+  "spell": 14892,
+  "text": "Your non-periodic critical heals increase your target's Armor by 0% for 15 sec."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Holy",
+  "name": "Spirit of Redemption",
+  "max": 1,
+  "row": 5,
+  "node": 105854,
+  "spell": 20711,
+  "text": "Upon death, the priest becomes the Spirit of Redemption for 15 sec. The Spirit of Redemption cannot move, attack, be attacked or targeted by any spells or effects. While in this form the priest can cast any healing spell free of cost. When the effect ends, the priest dies."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Holy",
+  "name": "Spiritual Guidance",
+  "max": 5,
+  "row": 5,
+  "node": 105853,
+  "spell": 14901,
+  "text": "Increases your spell healing by up to 25% of your total Spirit and your spell damage by up to 8% of your total Spirit."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Shadow",
+  "name": "Shadow Focus",
+  "max": 5,
+  "row": 1,
+  "node": 110851,
+  "spell": 15260,
+  "text": "Improves your chance to hit with Shadow spells by 5%."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Shadow",
+  "name": "Spirit Tap",
+  "max": 5,
+  "row": 1,
+  "node": 105833,
+  "spell": 15270,
+  "text": "Gives you a 0% chance to increase your Spirit by 100% for 15 sec after killing a non-trivial target or when an enemy afflicted by your Vampiric Embrace dies. For the duration, 50% of your Mana regeneration will continue while casting."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Shadow",
+  "name": "Vampiric Embrace",
+  "max": 1,
+  "row": 4,
+  "node": 105820,
+  "spell": 15286,
+  "text": "Afflicts your target with Shadow energy that causes all party members to be healed for 20% of any Shadow spell damage you deal for 30 sec."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Shadow",
+  "name": "Early Demise",
+  "max": 2,
+  "row": 6,
+  "node": 110854,
+  "spell": 1310076,
+  "text": "Increases Shadow Word: Death's critical strike chance on targets at or below 20% health by 30%."
+ },
+ {
+  "cls": "PRIEST",
+  "tree": "Shadow",
+  "name": "Shadowform",
+  "max": 1,
+  "row": 7,
+  "node": 105817,
+  "spell": 15473,
+  "text": "Assume Shadowform, increasing your Shadow damage by 10%, reducing the Mana cost of all Shadow spells by 50%, increasing the critical strike damage bonus of your Shadow spells by 100%, and reducing Physical damage taken by you by 15%. However, you may not cast healing spells while in this form."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Affliction",
+  "name": "Suppression",
+  "max": 5,
+  "row": 1,
+  "node": 105925,
+  "spell": 18174,
+  "text": "Improves your chance to hit by 5% and reduces all threat you generate by 20%."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Affliction",
+  "name": "Soul Harvest",
+  "max": 2,
+  "row": 2,
+  "node": 105922,
+  "spell": 437032,
+  "text": "Killing a non-trivial target afflicted by your Drain Soul increases your Mana regeneration by 100% for 10 sec and allows 100% of normal Mana regeneration to continue while casting."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Affliction",
+  "name": "Pandemic",
+  "max": 3,
+  "row": 3,
+  "node": 105917,
+  "spell": 427712,
+  "text": "Increases the critical strike damage bonus of your Corruption, Bane of Agony, Bane of Doom, Drain Soul, Drain Life, Siphon Life, and Wrack spells by 100%."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Affliction",
+  "name": "Malevolence",
+  "max": 5,
+  "row": 4,
+  "node": 110876,
+  "spell": 1310949,
+  "text": "Increases the critical effect chance of your Shadow spells by 5%."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Demonology",
+  "name": "Demonic Embrace",
+  "max": 5,
+  "row": 1,
+  "node": 105907,
+  "spell": 18697,
+  "text": "Increases your total Stamina by 15%."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Demonology",
+  "name": "Demonic Aegis",
+  "max": 2,
+  "row": 2,
+  "node": 105902,
+  "spell": 1235316,
+  "text": "Increases the effectiveness of your Demon Skin and Demon Armor spells by 30%."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Demonology",
+  "name": "Fel Vitality",
+  "max": 3,
+  "row": 2,
+  "node": 105903,
+  "spell": 18731,
+  "text": "Increases the maximum health and Mana of your Imp, Voidwalker, Succubus, Incubus, and Felhunter by 15%, and increases your maximum Mana by 15%."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Demonology",
+  "name": "Demonic Energies",
+  "max": 2,
+  "row": 2,
+  "node": 105899,
+  "spell": 1225214,
+  "text": "You heal your pet for 15% of all spell damage you deal. When you gain Mana from Life Tap, your summoned demon gains 100% of the Mana you gain."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Demonology",
+  "name": "Demonic Sacrifice",
+  "max": 1,
+  "row": 3,
+  "node": 105900,
+  "spell": 18788,
+  "text": "When activated, sacrifices your summoned Demon to enhance the opposing aspect of your power, granting you an effect that lasts 2 hrs. The effect is canceled if any Demon is summoned. Imp: Increases your Shadow damage by 15%. Voidwalker: Restores 2% of your total Mana every 4 sec. Succubus/Incubus: Increases your Fire damage by 15%. Felhunter: Restores 3% of your total Health every 4 sec."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Demonology",
+  "name": "Demonic Brand",
+  "max": 3,
+  "row": 4,
+  "node": 105896,
+  "spell": 1293695,
+  "text": "Your Searing Pain generates 50% less threat and brands the target for 10 sec. Your pet's next 3 attacks against the target generate high threat and deal [((( 60 - 26) * 1.5) + 14 + (0.078 * ((Shadow spell power)))) * ( 1 * 1 * 1 )] to [((( 60 - 26) * 1.5) + 17 + (0.078 * ((Shadow spell power)))) * ( 1 * 1 * 1 )] Fire or Shadow damage based on the pet."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Demonology",
+  "name": "Improved Felhunter",
+  "max": 3,
+  "row": 5,
+  "node": 105894,
+  "spell": 1225217,
+  "text": "Increases the Attack Power reduction of your Felhunter's Tainted Blood, the healing of its Devour Magic, and the detection level of its Paranoia by 30%, and reduces the cooldown of its Spell Lock by 6 sec."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Demonology",
+  "name": "Demonic Knowledge",
+  "max": 3,
+  "row": 5,
+  "node": 105893,
+  "spell": 412732,
+  "text": "Increases your spell damage and your Demon pet's spell damage by up to 100% of your level while you have a summoned Demon pet active."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Destruction",
+  "name": "Improved Shadow Bolt",
+  "max": 5,
+  "row": 1,
+  "node": 105889,
+  "spell": 17793,
+  "text": "Your Shadow Bolt critical strikes increase Shadow damage taken by the target from your attacks by 0% for 12 sec."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Destruction",
+  "name": "Ruin",
+  "max": 5,
+  "row": 3,
+  "node": 105883,
+  "spell": 17959,
+  "text": "Increases the critical strike damage bonus of your Destruction spells by 100%."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Destruction",
+  "name": "Agonizing Flames",
+  "max": 3,
+  "row": 4,
+  "node": 105879,
+  "spell": 17927,
+  "text": "Increases the critical strike chance of your Searing Pain spell by 10% and the damage done by all your Destruction spells by 10%."
+ },
+ {
+  "cls": "WARLOCK",
+  "tree": "Destruction",
+  "name": "Fire and Brimstone",
+  "max": 3,
+  "row": 5,
+  "node": 105877,
+  "spell": 412751,
+  "text": "Increases the critical strike chance of your Conflagrate spell by 25%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Balance",
+  "name": "Genesis",
+  "max": 5,
+  "row": 1,
+  "node": 104924,
+  "spell": 1223081,
+  "text": "Increases the periodic damage and healing done by your spells and abilities by 1%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Balance",
+  "name": "Improved Moonfire",
+  "max": 2,
+  "row": 2,
+  "node": 104931,
+  "spell": 16821,
+  "text": "Increases the damage and critical strike chance of your Moonfire spell by 2%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Balance",
+  "name": "Nature's Majesty",
+  "max": 2,
+  "row": 2,
+  "node": 104927,
+  "spell": 1223082,
+  "text": "Increases your critical strike chance with spells and melee attacks by 1%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Balance",
+  "name": "Nature's Reach",
+  "max": 2,
+  "row": 2,
+  "node": 104929,
+  "spell": 16819,
+  "text": "Increases the range of your offensive Balance spells by 20% and improves your chance to hit by 4%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Balance",
+  "name": "Insect Swarm",
+  "max": 1,
+  "row": 4,
+  "node": 104930,
+  "spell": 5570,
+  "text": "The enemy target is swarmed by insects, decreasing their chance to hit with attacks by 2% and causing 48 Nature damage over 12 sec ."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Balance",
+  "name": "Vengeance",
+  "max": 5,
+  "row": 4,
+  "node": 104932,
+  "spell": 16909,
+  "text": "Increases the critical strike damage bonus of your Arcane and Nature spells by 20%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Balance",
+  "name": "Moonkin Form",
+  "max": 1,
+  "row": 7,
+  "node": 104937,
+  "spell": 24858,
+  "text": "Shapeshift into Moonkin Form, increasing Omen of Clarity's chance to trigger by 100%, Armor contribution from items by 360%, and all party members within 45 yards have their Critical Strike chance increased by 3%, exclusive with Leader of the Pack. Also protects the caster from Polymorph effects and prevents the use of healing spells. The act of shapeshifting frees the caster of Polymorph and Movement Impairing effects."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Feral Combat",
+  "name": "Heart of the Wild",
+  "max": 5,
+  "row": 1,
+  "node": 104939,
+  "spell": 17003,
+  "text": "Increases your Intellect by 10%. In addition, while in Bear Form or Dire Bear Form your Stamina is increased by 20% and while in Cat Form your Strength is increased by 10%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Feral Combat",
+  "name": "Feral Swiftness",
+  "max": 2,
+  "row": 2,
+  "node": 104943,
+  "spell": 17002,
+  "text": "Increases your movement speed while in Cat Form by 30%, and increases your chance to Dodge by 4%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Feral Combat",
+  "name": "Thick Hide",
+  "max": 3,
+  "row": 2,
+  "node": 104942,
+  "spell": 16929,
+  "text": "While in Bear Form, Cat Form, Dire Bear Form, or Moonkin Form, you gain 3 additional base Armor per level and another 1.00 base Armor for each point of defense skill beyond five times your level. This amount can be further increased by multipliers from those forms."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Feral Combat",
+  "name": "Sharpened Claws",
+  "max": 2,
+  "row": 3,
+  "node": 104946,
+  "spell": 16942,
+  "text": "Increases your critical strike chance while in Bear Form, Dire Bear Form, or Cat Form by 2%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Feral Combat",
+  "name": "Predatory Strikes",
+  "max": 3,
+  "row": 4,
+  "node": 104952,
+  "spell": 16972,
+  "text": "Increases your melee Attack Power in Cat Form, Bear Form, and Dire Bear Form by 50% of your level."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Feral Combat",
+  "name": "Blood Frenzy",
+  "max": 2,
+  "row": 4,
+  "node": 104947,
+  "spell": 16958,
+  "text": "Gives you a 100% chance to gain an additional 5 Rage any time you get a critical strike while in Bear Form or Dire Bear Form. In addition, your non-periodic critical strikes from Cat Form abilities that generate Combo Points have a 0% chance to add an additional Combo Point."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Feral Combat",
+  "name": "Leader of the Pack",
+  "max": 1,
+  "row": 5,
+  "node": 104955,
+  "spell": 17007,
+  "text": "While in Cat Form, Bear Form, or Dire Bear Form, the Leader of the Pack increases the critical strike chance of all party members within 45 yards by 3%, exclusive with Moonkin Aura."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Feral Combat",
+  "name": "Predatory Instincts",
+  "max": 2,
+  "row": 5,
+  "node": 104950,
+  "spell": 1223242,
+  "text": "Increases the critical strike damage bonus of your melee abilities by 20%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Feral Combat",
+  "name": "Natural Reaction",
+  "max": 5,
+  "row": 6,
+  "node": 104954,
+  "spell": 417051,
+  "text": "Increases your dodge chance by 0%, and gives you a 3% chance to gain 5 Rage each time you dodge."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Feral Combat",
+  "name": "Berserk",
+  "max": 1,
+  "row": 7,
+  "node": 104956,
+  "spell": 417141,
+  "text": "Requires Cat Form, Bear Form, Dire Bear Form Causes your Primal Bite ability to strike up to 3 targets, removes its cooldown, and increases the critical strike chance of your Combo Point-generating abilities by 100%. Clears and grants immunity to Fear effects for the duration. Lasts 15 sec."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Restoration",
+  "name": "Reflection",
+  "max": 3,
+  "row": 3,
+  "node": 104917,
+  "spell": 17106,
+  "text": "Allows 50% of your Mana regeneration to continue while casting."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Restoration",
+  "name": "Gift of Nature",
+  "max": 5,
+  "row": 3,
+  "node": 104916,
+  "spell": 17104,
+  "text": "Increases the effect of all your healing spells by 2%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Restoration",
+  "name": "Living Spirit",
+  "max": 3,
+  "row": 5,
+  "node": 104911,
+  "spell": 1309631,
+  "text": "Increases your Spirit by 15%."
+ },
+ {
+  "cls": "DRUID",
+  "tree": "Restoration",
+  "name": "Improved Regrowth",
+  "max": 5,
+  "row": 6,
+  "node": 104913,
+  "spell": 17074,
+  "text": "Increases the critical effect chance of your Regrowth spell by 10%."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Elemental",
+  "name": "Elemental Devastation",
+  "max": 3,
+  "row": 2,
+  "node": 104769,
+  "spell": 30160,
+  "text": "Your offensive spell critical strikes will increase your chance to get a critical strike with melee attacks by 0% for 10 sec."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Elemental",
+  "name": "Call of Thunder",
+  "max": 1,
+  "row": 4,
+  "node": 104762,
+  "spell": 16120,
+  "text": "Increases the critical strike chance of your Lightning Bolt and Chain Lightning spells by 3%."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Elemental",
+  "name": "Elemental Fury",
+  "max": 5,
+  "row": 6,
+  "node": 104766,
+  "spell": 16089,
+  "text": "Increases the critical strike damage bonus of your Searing and Magma Totems and your Fire, Frost, and Nature spells by 100%."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Enhancement",
+  "name": "Thundering Strikes",
+  "max": 5,
+  "row": 1,
+  "node": 104753,
+  "spell": 16255,
+  "text": "Improves your chance to get a critical strike with all spells and attacks by 1%."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Enhancement",
+  "name": "Ancestral Knowledge",
+  "max": 5,
+  "row": 1,
+  "node": 104756,
+  "spell": 17485,
+  "text": "Increases your Intellect by 10%."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Enhancement",
+  "name": "Mental Dexterity",
+  "max": 3,
+  "row": 2,
+  "node": 104755,
+  "spell": 415140,
+  "text": "Increases your Attack Power by an amount equal to 100% of your Intellect."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Enhancement",
+  "name": "Elemental Weapons",
+  "max": 3,
+  "row": 3,
+  "node": 104750,
+  "spell": 16266,
+  "text": "Increases the melee attack power bonus of your Rockbiter Weapon by 7%, your Windfury Weapon effect by 13% and increases the damage caused by your Flametongue Weapon and Frostbrand Weapon by 5%."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Enhancement",
+  "name": "Anticipation",
+  "max": 3,
+  "row": 3,
+  "node": 104748,
+  "spell": 16254,
+  "text": "Increases your chance to dodge by an additional 1%."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Enhancement",
+  "name": "Toughness",
+  "max": 5,
+  "row": 4,
+  "node": 104746,
+  "spell": 16252,
+  "text": "Increases your Stamina by 2%."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Enhancement",
+  "name": "Flurry",
+  "max": 5,
+  "row": 4,
+  "node": 104747,
+  "spell": 16256,
+  "text": "Increases your attack speed by 1% for your next 3 swings after dealing a melee critical strike."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Enhancement",
+  "name": "Spirit Weapons",
+  "max": 1,
+  "row": 5,
+  "node": 104745,
+  "spell": 16268,
+  "text": "Gives a chance to parry enemy melee attacks, reduces all threat generated by your attacks by 30% while Rockbiter Weapon is not active, and increases all threat generated by 30% while Rockbiter Weapon is active."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Enhancement",
+  "name": "Mental Quickness",
+  "max": 2,
+  "row": 5,
+  "node": 104744,
+  "spell": 30812,
+  "text": "Increases your spell damage and healing by up to 30% of your Intellect."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Enhancement",
+  "name": "Improved Stormstrike",
+  "max": 2,
+  "row": 5,
+  "node": 104742,
+  "spell": 1223031,
+  "text": "When you Stormstrike, you have a 20% chance to gain 50% mana regeneration while casting spells for 15 sec, and Stormstrike's cooldown has a 20% chance to reset each time you Dodge or Parry."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Enhancement",
+  "name": "Rage of the Farseer",
+  "max": 1,
+  "row": 7,
+  "node": 104740,
+  "spell": 425336,
+  "text": "Increases your attack speed by 30% for 25 sec."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Restoration",
+  "name": "Mindfulness",
+  "max": 3,
+  "row": 2,
+  "node": 104734,
+  "spell": 1223033,
+  "text": "Allows 5% of your Mana regeneration to continue while casting."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Restoration",
+  "name": "Tidal Focus",
+  "max": 5,
+  "row": 2,
+  "node": 104735,
+  "spell": 16179,
+  "text": "Reduces the Mana cost of your healing spells by 5% and improves your chance to hit by 5%."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Restoration",
+  "name": "Improved Reincarnation",
+  "max": 2,
+  "row": 2,
+  "node": 104737,
+  "spell": 16184,
+  "text": "Reduces the cooldown of your Reincarnation spell by 10 min, increases your maximum health by 4%, and increases the amount of health and Mana you reincarnate with by an additional 10%."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Restoration",
+  "name": "Ancestral Healing",
+  "max": 3,
+  "row": 3,
+  "node": 104731,
+  "spell": 16176,
+  "text": "Increases your target's armor value by 0% for 15 sec after getting a critical effect from one of your healing spells."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Restoration",
+  "name": "Water Shield",
+  "max": 1,
+  "row": 3,
+  "node": 104732,
+  "spell": 408510,
+  "text": "The caster is surrounded by 3 globes of water. When a spell, melee, or ranged attack hits the caster or when one of the caster's healing spells gets a critical result, 2% of maximum mana is restored to the caster, expending one water globe. Only one globe will activate every few seconds. Lasts 10 min. Only one Elemental Shield can be active on the Shaman at any one time."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Restoration",
+  "name": "Tidal Mastery",
+  "max": 5,
+  "row": 4,
+  "node": 104738,
+  "spell": 16194,
+  "text": "Increases the critical effect chance of your healing spells by 1%."
+ },
+ {
+  "cls": "SHAMAN",
+  "tree": "Restoration",
+  "name": "Purification",
+  "max": 5,
+  "row": 6,
+  "node": 104725,
+  "spell": 16178,
+  "text": "Increases the effectiveness of your healing spells by 10%."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Assassination",
+  "name": "Remorseless Attacks",
+  "max": 2,
+  "row": 1,
+  "node": 105723,
+  "spell": 14144,
+  "text": "After killing a non-trivial enemy, gives you a 0% increased critical strike chance on your next Sinister Strike, Backstab, Ambush, Mutilate, or Ghostly Strike. Lasts 20 sec."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Assassination",
+  "name": "Malice",
+  "max": 5,
+  "row": 1,
+  "node": 105722,
+  "spell": 14138,
+  "text": "Increases your critical strike chance with all attacks and Poisons by 5%."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Assassination",
+  "name": "Improved Expose Armor",
+  "max": 2,
+  "row": 3,
+  "node": 105717,
+  "spell": 14168,
+  "text": "Reduces the Energy cost of your Expose Armor ability by 10, and refunds 2 Combo Points when cast with 5 Combo Points."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Assassination",
+  "name": "Lethality",
+  "max": 5,
+  "row": 3,
+  "node": 105716,
+  "spell": 14128,
+  "text": "Increases the critical strike damage bonus of your Sinister Strike, Gouge, Backstab, Mutilate, Ghostly Strike, and Hemorrhage abilities by 6%."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Assassination",
+  "name": "Cold Blood",
+  "max": 1,
+  "row": 4,
+  "node": 105715,
+  "spell": 14177,
+  "text": "When activated, increases the critical strike chance of your next Sinister Strike, Backstab, Ambush, Eviscerate, or Mutilate by 100%."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Assassination",
+  "name": "Seal Fate",
+  "max": 5,
+  "row": 6,
+  "node": 105710,
+  "spell": 14186,
+  "text": "Your critical strikes from abilities that add Combo Points have a 0% chance to add an additional Combo Point."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Combat",
+  "name": "Lightning Reflexes",
+  "max": 5,
+  "row": 1,
+  "node": 113398,
+  "spell": 13712,
+  "text": "Increases your Dodge chance by 5%."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Combat",
+  "name": "Puncturing Wounds",
+  "max": 3,
+  "row": 2,
+  "node": 105719,
+  "spell": 1224716,
+  "text": "Increases the critical strike chance of your Backstab by 30% and your Mutilate by 15%, and gives Backstab a 45% chance to add an additional Combo Point."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Combat",
+  "name": "Deflection",
+  "max": 3,
+  "row": 2,
+  "node": 105738,
+  "spell": 13713,
+  "text": "Increases your Parry chance by 1%."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Combat",
+  "name": "Precision",
+  "max": 3,
+  "row": 2,
+  "node": 105737,
+  "spell": 13705,
+  "text": "Improves your chance to hit by 1%."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Combat",
+  "name": "Blade Flurry",
+  "max": 1,
+  "row": 5,
+  "node": 105728,
+  "spell": 13877,
+  "text": "Increases your melee attack speed by 20% and your melee attacks strike an additional nearby opponent. Lasts 15 sec."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Combat",
+  "name": "Hack and Slash",
+  "max": 5,
+  "row": 5,
+  "node": 105727,
+  "spell": 13960,
+  "text": "Gives your melee weapon attacks a benefit depending on the weapon. Axe/Sword: Your successful melee attacks have a 5% chance to trigger an extra attack on the target. Dagger/Fist: Increases your critical strike chance by 5%. Mace: Your attacks ignore 15% of your target's armor."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Subtlety",
+  "name": "Improved Ambush",
+  "max": 3,
+  "row": 2,
+  "node": 105749,
+  "spell": 14079,
+  "text": "Increases the critical strike chance of your Ambush ability by 45%."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Subtlety",
+  "name": "Ghostly Strike",
+  "max": 1,
+  "row": 3,
+  "node": 105754,
+  "spell": 14278,
+  "text": "A strike that deals 125% (180% if a Dagger is equipped in your Main Hand) weapon damage and increases your chance to dodge by 15% for 7 sec. Awards 1 combo point."
+ },
+ {
+  "cls": "ROGUE",
+  "tree": "Subtlety",
+  "name": "Serrated Blades",
+  "max": 3,
+  "row": 4,
+  "node": 105752,
+  "spell": 14171,
+  "text": "Causes your attacks to ignore 9% of your target's Armor and increases the damage dealt by your Rupture ability by 30%."
+ }
+]

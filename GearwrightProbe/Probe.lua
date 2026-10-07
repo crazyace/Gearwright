@@ -95,6 +95,7 @@ local API_PATHS = {
   "GetNumTalentTabs", "GetTalentTabInfo", "GetNumTalents", "GetTalentInfo",
   "C_ClassTalents.GetActiveConfigID", "C_Traits.GetConfigInfo", "C_Traits.GetTreeNodes",
   "C_Traits.GetNodeInfo", "C_Traits.GetEntryInfo", "C_Traits.GetDefinitionInfo",
+  "C_Traits.GetTraitDescription", "C_Spell.GetSpellDescription",
   "GetSpecialization", "C_SpecializationInfo.GetSpecialization", "GetInspectSpecialization",
   -- items
   "C_Item.GetItemStats", "GetItemStats", "C_Item.GetItemInfoInstant", "GetItemInfoInstant",
@@ -189,6 +190,18 @@ local function talentsTraits()
           if type(dv) == "table" and dv.spellID then
             entry.spellID = dv.spellID
             entry.spellName = capture("C_Spell.GetSpellName", dv.spellID)
+            entry.spellText = capture("C_Spell.GetSpellDescription", dv.spellID)
+          end
+          -- The talent's text at rank 1, the rank you have and max rank: says
+          -- whether Wowhead's numbers are per rank or for the whole talent.
+          local maxRank = tonumber(info.maxRanks) or 1
+          local have = tonumber(info.activeRank or info.ranksPurchased) or 0
+          entry.text = {}
+          for _, rank in ipairs({ 1, have, maxRank }) do
+            if rank > 0 and not entry.text[rank] then
+              local t = capture("C_Traits.GetTraitDescription", info.entryIDs[1], rank)
+              entry.text[rank] = (t.values and t.values[1]) or t.status
+            end
           end
         end
       end

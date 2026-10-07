@@ -44,6 +44,11 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [ ] Bag scan for upgrades you're carrying
 - [x] Enchant advice: best stat enchant per slot, scored with the spec weights
 - [ ] Score proc enchants (Crusader, Fiery Weapon)
+- [x] Crit per Agility and spell crit per Intellect for every class and level, from Forever's
+      own table (`Data/ClassStats.lua`; checked on Rogue 19 and Priest 12)
+- [x] Weights follow talents that change a stat's worth (Mental Strength, Spiritual Guidance,
+      Meditation, Shadowform, Lethality; `docs/STAT-MODEL.md`)
+- [ ] Hit cap in the weights (then hit talents can count too)
 - [x] Consumables: weapon buffs (stones, oils, poisons), elixirs and potions for your level,
       scored with the spec weights (`Data/Consumables.lua`; effects are Classic's until checked)
 - [ ] Tooltip upgrade line verified on weapons, rings, trinkets
@@ -90,6 +95,8 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 | 2026-10-03 | Drop the Encounter Journal; log real drops | `LoadAddOn("Blizzard_EncounterJournal")` = WRONG_GAME_TYPE, no instance answers |
 | 2026-10-03 | Score enchants instead of listing them per spec | Recipe descriptions give exact amounts; one table serves every class and spec |
 | 2026-10-06 | Drop the Talents, Training and Dungeons features | Jeff's call: keep Gearwright to gear, enchants, consumables and crafting |
+| 2026-10-07 | Stat conversions from Forever's `PlayerExpectedStat` table | The game's own data; matches every beta measurement so far |
+| 2026-10-07 | Talents adjust weights; Settings keeps one "Score gear for" row | Weights should follow the build you have, not a fixed per-spec table |
 
 ## Battlewright
 

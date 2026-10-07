@@ -284,21 +284,26 @@ TABS.settings = {
         ns.MinimapButton.Update)
     end
 
-    rows[#rows + 1] = { header = true, title = "Spec" }
+    -- Weights follow your talents on their own; the one setting left is
+    -- scoring for another spec than the one your talents say.
+    rows[#rows + 1] = { header = true, title = "Stat weights" }
     local classData = ns.Spec.ClassData()
+    local order = { false }
+    for _, key in ipairs(classData and classData.tabToSpec or {}) do order[#order + 1] = key end
+    local current = ns.db.specOverride or false
+    local spec = current and classData and classData.specs[current]
     local leveling = classData and classData.specs[classData.levelingSpec or ""]
-    local choices = { { key = false, label = "Automatic", sub = "From your talents"
-      .. (leveling and (" (" .. leveling.label .. " before level 10)") or "") } }
-    for _, key in ipairs(classData and classData.tabToSpec or {}) do
-      local spec = classData and classData.specs[key]
-      if spec then choices[#choices + 1] = { key = key, label = spec.label, sub = spec.summary, icon = spec.icon } end
-    end
-    for _, c in ipairs(choices) do
-      local on = (ns.db.specOverride or false) == c.key
-      rows[#rows + 1] = { icon = c.icon or "Interface\\Icons\\Ability_Stealth", title = c.label, sub = c.sub,
-        value = on and "selected" or "", valueColor = "good", hint = on and nil or "Click to score gear for this",
-        onClick = function() ns.db.specOverride = c.key end }
-    end
+    local auto = "From your talents" .. (leveling and (" (" .. leveling.label .. " before level 10)") or "")
+    rows[#rows + 1] = { icon = (spec and spec.icon) or "Interface\\Icons\\Ability_Stealth", title = "Score gear for",
+      sub = spec and "Ignoring your talents' spec; click through to Automatic to go back" or auto,
+      value = spec and spec.label or "Automatic", valueColor = spec and "warn" or "good",
+      hint = { "Left-click: next spec", "Right-click: back to Automatic" },
+      onClick = function(button)
+        if button == "RightButton" then ns.db.specOverride = false; return end
+        local i = 1
+        for n, key in ipairs(order) do if key == current then i = n end end
+        ns.db.specOverride = order[i % #order + 1]
+      end }
 
     rows[#rows + 1] = { header = true, title = "Upgrade lists" }
     local n = ns.Advisor.Lookahead()
@@ -339,7 +344,14 @@ function UI.HeaderText()
   if ctx.class.weights._status == "provisional" then
     text = text .. "   " .. Theme.Hex("warn") .. "Stat weights are provisional placeholders.|r"
   end
-  return text .. "\n" .. Theme.Hex("muted") .. "Scores are in attack-power equivalents.|r"
+  local unit = ctx.class.weights.model == "caster" and "points of your main spell power" or "attack-power equivalents"
+  local line = "Scores are in " .. unit .. "."
+  local counted = {}
+  for _, t in ipairs(ctx.weights.talents or {}) do
+    counted[#counted + 1] = ("%s %d/%d"):format(t.name, t.rank, t.max)
+  end
+  if #counted > 0 then line = line .. " Weights include " .. table.concat(counted, ", ") .. "." end
+  return text .. "\n" .. Theme.Hex("muted") .. line .. "|r"
 end
 
 -- Frame ----------------------------------------------------------------------------

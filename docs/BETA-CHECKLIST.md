@@ -57,6 +57,19 @@ Gearwright's Priest data (`Data/Priest/`) is Classic's, untested on Forever. On 
       "applied, N min left"?
 - [ ] Rogue: is Instant Poison's proc chance still 20% and Deadly Poison's 30%?
 
+## Stat model
+
+See `docs/STAT-MODEL.md`. On any character with the probe loaded:
+
+- [ ] `/gwp talents` with points in Mental Strength, Meditation, Spiritual Guidance or
+      Lethality: is each talent's text at rank 1 the per-rank amount or the whole talent?
+- [ ] Equip an item with crit rating, `/gwp sheet` before and after: does spell crit go
+      up as well as melee crit?
+- [ ] Priest: Spirit's mana per 5 s at a second Spirit value (47 Spirit = 58 so far)
+- [ ] Priest: equip a +spell damage item (not "damage and healing"): does healing go up?
+- [ ] `/gwp sheet` at another level on any class: crit per Agility should match
+      `Data/ClassStats.lua`
+
 ## Questions to answer in `docs/BETA-FINDINGS.md`
 
 | Question | Answer | Capture |

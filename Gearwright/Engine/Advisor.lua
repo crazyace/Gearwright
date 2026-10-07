@@ -35,7 +35,7 @@ function Advisor.Context()
     specHow = how,
     proficiency = Advisor.Proficiency(classData),
     dualWield = Advisor.CanDualWield(classData),
-    weights = ns.Weights.Build(classData, spec, ns.API.CharacterSnapshot()),
+    weights = ns.Weights.Build(classData, spec, ns.API.CharacterSnapshot(), ns.Spec.Talents()),
   }
 end
 

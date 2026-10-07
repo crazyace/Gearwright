@@ -14,6 +14,7 @@ Core\Util.lua
 Core\API.lua
 
 Data\Stats.lua
+Data\ClassStats.lua
 Data\Enchants.lua
 Data\Consumables.lua
 Data\Crafted.lua

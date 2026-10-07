@@ -99,7 +99,7 @@ print("compare better cap:", cmp)
 assert spec == "combat" and how == "talents"
 # Combat at level 30, 20 main-hand DPS. Scores are in attack-power equivalents.
 PCT = 0.14 * 20                                   # AP worth 1% of damage
-AGI_PER_CRIT = 7.59 + (29.0 - 7.59) * (30 - 19) / (60 - 19)
+AGI_PER_CRIT = 13.0                               # Forever's table, Rogue level 30 (Data/ClassStats.lua)
 AGI = 1 + 1.0 * PCT / AGI_PER_CRIT                # 1 AP + its share of crit
 CAP = 10 * AGI + 8 * 0.2 + 1 * 1.2 * PCT          # agi, sta, 1% hit
 BETTER_CAP = 14 * AGI + 20
@@ -229,9 +229,10 @@ assert compare("item:1002:0:0")[4] is None
 # Weights follow level: agility is worth more crit per point at 19 than at 60.
 lo, hi = L.eval("""function(ns)
   local c = ns.Data.ROGUE
-  return ns.Weights.Build(c, "combat", {level = 19, mainHandDps = 20}).agi,
-         ns.Weights.Build(c, "combat", {level = 60, mainHandDps = 20}).agi end""")(ns)
-assert abs(lo - (1 + PCT / 7.59)) < 1e-9 and abs(hi - (1 + PCT / 29.0)) < 1e-9, (lo, hi)
+  return ns.Weights.Build(c, "combat", {level = 19, class = "ROGUE", mainHandDps = 20}).agi,
+         ns.Weights.Build(c, "combat", {level = 60, class = "ROGUE", mainHandDps = 20}).agi end""")(ns)
+# 7.6 Agility per 1% at 19 is what the beta's sheet showed (66 Agility = 8.7%).
+assert abs(lo - (1 + PCT / 7.6)) < 1e-9 and abs(hi - (1 + PCT / 28.99)) < 1e-9, (lo, hi)
 
 # Quest rewards: the upgrade is picked, the plate helm is ignored.
 L.execute("""
@@ -410,7 +411,7 @@ ptabs = L.eval("""function(ns)
 # tree) is dropped in favour of the real one. The layout finds the same groups.
 assert tuple(ptabs) == ("2/18 1/17 0/18", "2/18 1/17 0/18", 110855), tuple(ptabs)
 PPP = 3 + (12 - 3) * (30 - 20) / (60 - 20)        # power per 1% of output at level 30
-INT_PER_CRIT = 9.6 + (59.5 - 9.6) * (30 - 12) / (60 - 12)
+INT_PER_CRIT = 26.88                              # Forever's table, Priest level 30
 DISC_INT = 0.6 + 0.5 * PPP / INT_PER_CRIT         # mana + its share of spell crit
 KILT = 2 * (1 + 0.4) + 3 * 0.15                   # spell power = healing + damage
 REVENANT = 48 + 16 * 0.4
@@ -461,10 +462,38 @@ con = L.eval("function(ns) local w = ns.Advisor.ConsumableReport().weapon[1] ret
 assert con[0] == "Minor Mana Oil" and abs(con[1] - 8) < 1e-9, con
 L.eval("function(ns) ns.db.specOverride = 'shadow' end")(ns)
 L.eval("function(ns) ns.db.specOverride = false end")(ns)
+# Talents change what a stat is worth. Holy at level 30 with Mental Strength
+# 5/5 (+15% Intellect), Meditation 3/3 (50% regen while casting) and Spiritual
+# Guidance 3/5 (Spirit adds 15% of itself as healing, 4.8% as spell damage).
+tw = L.eval("""function(ns)
+  local c = ns.Data.PRIEST
+  local char = { level = 30, class = "PRIEST" }
+  local plain = ns.Weights.Build(c, "holy", char)
+  local t = ns.Weights.Build(c, "holy", char, { ["Mental Strength"] = { rank = 5, max = 5 },
+    ["Meditation"] = { rank = 3, max = 3 }, ["Spiritual Guidance"] = { rank = 3, max = 5 },
+    ["Holy Specialization"] = { rank = 2, max = 5 } })
+  local sf = ns.Weights.Build(c, "shadow", char, { Shadowform = { rank = 1, max = 1 } })
+  return plain.int, plain.spi, t.int, t.spi, #t.talents, ns.Weights.Build(c, "shadow", char).spellCrit, sf.spellCrit end""")(ns)
+HOLY_INT = 0.6 + 0.5 * PPP / INT_PER_CRIT
+assert abs(tw[0] - HOLY_INT) < 1e-9 and abs(tw[1] - 0.7) < 1e-9, tw
+assert abs(tw[2] - HOLY_INT * 1.15) < 1e-9, tw
+assert abs(tw[3] - (0.7 * 1.5 + 0.15 * (1 + 0.32 * 0.15))) < 1e-9, tw
+assert tw[4] == 3 and abs(tw[6] - 2 * tw[5]) < 1e-9, tw  # Holy Specialization changes no weight
+# Lethality 5/5: 30% more crit damage on abilities, about half a Rogue's damage.
+lw = L.eval("""function(ns)
+  local c, char = ns.Data.ROGUE, { level = 30, class = "ROGUE", mainHandDps = 20 }
+  return ns.Weights.Build(c, "combat", char).crit,
+         ns.Weights.Build(c, "combat", char, { Lethality = { rank = 5, max = 5 } }).crit end""")(ns)
+assert abs(lw[1] - lw[0] * 1.15) < 1e-9, lw
+# The header says which talents the weights count.
+h = L.eval("""function(ns) local real = ns.Spec.Talents
+  ns.Spec.Talents = function() return { ["Mental Strength"] = { rank = 2, max = 5 } } end
+  local h = ns.UI.HeaderText(); ns.Spec.Talents = real; return h end""")(ns)
+assert "points of your main spell power. Weights include Mental Strength 2/5." in h, h
 # The window and the help name the Priest's specs.
 L.globals().SlashCmdList.GEARWRIGHT("")
 txt = L.globals().SCREEN(ns)
-assert "Spec:|r Discipline" in txt and "From your talents (Shadow before level 10)" in txt and "Holy" in txt, txt
+assert "Spec:|r Discipline" in txt and "Score gear for" in txt and "From your talents (Shadow before level 10)" in txt, txt
 L.globals().SlashCmdList.GEARWRIGHT("")
 L.execute("printed = {}")
 L.globals().SlashCmdList.GEARWRIGHT("help")
@@ -674,19 +703,28 @@ assert tuple(forgot) == (40, 40), tuple(forgot)
 
 # Settings tab: rows are controls. Turning the tooltip line off, picking a
 # spec, and changing the look-ahead all go through the rows' click handlers.
+# The spec is one row: left-click steps through Automatic and each spec,
+# right-click goes back to Automatic.
 def settings_rows():
     rows = L.eval("function(ns) return (ns.UI.BuildRows('settings')) end")(ns)
     return {r["title"]: r for r in rows.values()}
 L.eval("function(ns) ns.UI.Create() end")(ns)
 st = settings_rows()
-assert st["Tooltip line"]["value"] == "On" and st["Automatic"]["value"] == "selected" and st["Look ahead"]["value"] == "5 levels"
-st["Tooltip line"]["onClick"]("LeftButton"); st["Subtlety"]["onClick"]("LeftButton")
+assert st["Tooltip line"]["value"] == "On" and st["Score gear for"]["value"] == "Automatic" and st["Look ahead"]["value"] == "5 levels"
+st["Tooltip line"]["onClick"]("LeftButton")
+for _ in range(3):  # Automatic -> Assassination -> Combat -> Subtlety
+    settings_rows()["Score gear for"]["onClick"]("LeftButton")
 st["Look ahead"]["onClick"]("LeftButton"); settings_rows()["Look ahead"]["onClick"]("LeftButton")
 settings_rows()["Look ahead"]["onClick"]("RightButton")
 st = settings_rows()
-assert st["Tooltip line"]["value"] == "Off" and st["Subtlety"]["value"] == "selected" and st["Look ahead"]["value"] == "6 levels", \
-    (st["Tooltip line"]["value"], st["Subtlety"]["value"], st["Look ahead"]["value"])
+assert st["Tooltip line"]["value"] == "Off" and st["Score gear for"]["value"] == "Subtlety" and st["Look ahead"]["value"] == "6 levels", \
+    (st["Tooltip line"]["value"], st["Score gear for"]["value"], st["Look ahead"]["value"])
 assert L.eval("function(ns) return ns.Spec.Detect() end")(ns) == ("subtlety", "override")
+st["Score gear for"]["onClick"]("LeftButton")  # wraps around to Automatic
+assert settings_rows()["Score gear for"]["value"] == "Automatic"
+L.eval("function(ns) ns.db.specOverride = 'combat' end")(ns)
+settings_rows()["Score gear for"]["onClick"]("RightButton")
+assert settings_rows()["Score gear for"]["value"] == "Automatic"
 L.eval("function(ns) ns.db.showTooltip = true; ns.db.specOverride = false; ns.db.lookahead = nil end")(ns)
 # Gear and wishlist ----------------------------------------------------------------
 # Crafted caps: 1005 (40 Agility) and 1002 (14 Agility, 20 AP), both upgrades
@@ -1020,4 +1058,11 @@ for f in ("export.json", "GearwrightProbe.lua"):
         r = subprocess.run([sys.executable, str(R/"tools"/"ah_report.py"), str(OUT/f), "--level", "30"],
                            capture_output=True, text=True)
         assert r.returncode == 0 and "One-hand\n" in r.stdout and "(level 1, 40s, 2 listed)" in r.stdout, r.stdout + r.stderr
+
+# Data/ClassStats.lua is generated from Forever's table: it must match the tool's output.
+r = subprocess.run([sys.executable, str(R/"tools"/"classstats_from_wago.py"),
+                    str(R/"data"/"reference"/"PlayerExpectedStat-1.60.1.70245.csv"), "--check"],
+                   capture_output=True, text=True)
+assert r.returncode == 0, r.stdout + r.stderr
+
 print("\nALL SMOKE TESTS PASSED")
