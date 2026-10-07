@@ -285,11 +285,18 @@ for i = 1, 10 do CreateFrame("Button", "MerchantItem" .. i .. "ItemButton") end
 def vendor():
     return L.eval("""function(ns) local o = {}
       for i = 1, 3 do local m = ns.QuestHighlight.marks[_G["MerchantItem" .. i .. "ItemButton"]]
-        o[i] = (m and m:IsShown()) and ((m.pick and "glow " or "") .. m.label) or "-"
+        o[i] = (m and m:IsShown()) and ((m.pick and "glow " or "") .. (m.muted and "grey " or "") .. m.label) or "-"
       end return table.concat(o, " | ") end""")(ns)
 L.globals().fire("MERCHANT_SHOW")
 vm = vendor().split(" | ")
 assert vm[0] == "-" and vm[1].startswith("glow +") and (vm[2] == "-" or vm[2].startswith("+")), vm
+# One the window tints red (can't use it yet) shows a grey score; the badge
+# goes to the best one you can use.
+L.execute("C_MerchantFrame = { GetItemInfo = function(i) return { isUsable = i ~= 2 } end }")
+L.globals().fire("MERCHANT_UPDATE")
+vm = vendor().split(" | ")
+assert vm[1].startswith("grey +") and vm[2].startswith("glow +"), vm
+L.execute("C_MerchantFrame = nil")
 L.execute("MerchantFrame.selectedTab = 2")
 L.globals().fire("MERCHANT_UPDATE")
 assert vendor() == "- | - | -", vendor()
