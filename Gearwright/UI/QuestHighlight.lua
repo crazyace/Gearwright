@@ -12,6 +12,14 @@ ns.QuestHighlight = QuestHighlight
 local ARROW = "Interface\\Buttons\\Arrow-Up-Up"
 local ARROW_ATLAS = "bags-greenarrow"
 local COIN = "Interface\\MoneyFrame\\UI-GoldIcon"
+-- The bags' own "upgrade" arrow, where the client has it.
+local function arrowAtlas()
+  local ct = rawget(_G, "C_Texture")
+  return ct and ct.GetAtlasInfo and ct.GetAtlasInfo(ARROW_ATLAS) and true or false
+end
+
+local undecorate -- below: takes the quest marks off the rewards' names
+
 local marks = {} -- one overlay per reward button, reused
 QuestHighlight.marks = marks
 
@@ -27,44 +35,29 @@ function QuestHighlight.Button(i)
   return rawget(_G, "QuestInfoRewardsFrameQuestInfoItem" .. i) or rawget(_G, "QuestRewardItem" .. i)
 end
 
--- The mark for `button` (made once), shared with UI/VendorHighlight.lua:
--- "+1.8", with an up arrow on the pick. group: who shows it ("quest",
--- "vendor"), so each hides only its own. Placed clear of the icon:
---   under = a font string (the reward's name): just below it, left-aligned, so
---     it can't be read as belonging to the reward beside it;
---   else: the bottom-right corner of `row` (the vendor entry, beside its price).
-function QuestHighlight.Mark(button, group, row, under)
+-- The mark for `button` (made once), shared with UI/VendorHighlight.lua: in
+-- the bottom-right corner of `row` (the vendor entry, beside its price),
+-- "+1.8" with an up arrow on the pick. group: who shows it ("quest",
+-- "vendor"), so each hides only its own.
+function QuestHighlight.Mark(button, group, row)
   local m = marks[button]
   if m then m.group = group; return m end
   row = row or button
   m = CreateFrame("Frame", nil, row)
   m:SetSize(70, 16)
-  m.left = under ~= nil
-  if m.left then
-    m:SetPoint("TOPLEFT", under, "BOTTOMLEFT", 0, -1)
-  else
-    m:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", -6, 4)
-  end
+  m:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", -6, 4)
   m:SetFrameLevel((row.GetFrameLevel and tonumber(row:GetFrameLevel()) or 0) + 5)
   m.score = m:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-  m.score:SetJustifyH(m.left and "LEFT" or "RIGHT")
-  -- The bags' own "upgrade" arrow where the client has it.
+  m.score:SetPoint("RIGHT")
+  m.score:SetJustifyH("RIGHT")
   m.arrow = m:CreateTexture(nil, "OVERLAY")
-  local ct = rawget(_G, "C_Texture")
-  local atlas = m.arrow.SetAtlas and ct and ct.GetAtlasInfo and ct.GetAtlasInfo(ARROW_ATLAS)
-  if atlas then m.arrow:SetAtlas(ARROW_ATLAS) else m.arrow:SetTexture(ARROW) end
+  if arrowAtlas() then m.arrow:SetAtlas(ARROW_ATLAS) else m.arrow:SetTexture(ARROW) end
   m.arrow:SetSize(14, 14)
+  m.arrow:SetPoint("RIGHT", m.score, "LEFT", -2, 0)
   m.coin = m:CreateTexture(nil, "OVERLAY")
   m.coin:SetTexture(COIN)
   m.coin:SetSize(12, 12)
-  if m.left then
-    m.arrow:SetPoint("LEFT")
-    m.coin:SetPoint("LEFT")
-  else
-    m.score:SetPoint("RIGHT")
-    m.arrow:SetPoint("RIGHT", m.score, "LEFT", -2, 0)
-    m.coin:SetPoint("RIGHT")
-  end
+  m.coin:SetPoint("RIGHT")
   m.group = group
   marks[button] = m
   return m
@@ -77,16 +70,13 @@ function QuestHighlight.Set(m, pick, sells, label, muted)
   m.arrow:SetShown(m.pick)
   m.coin:SetShown(sells)
   m.score:SetText(m.label)
-  if m.left then
-    m.score:ClearAllPoints()
-    m.score:SetPoint("LEFT", (m.pick or sells) and 16 or 0, 0)
-  end
   if muted then m.score:SetTextColor(0.6, 0.6, 0.6) else m.score:SetTextColor(0.25, 1, 0.25) end
   m:Show()
 end
 
 function QuestHighlight.Hide(group)
   group = type(group) == "string" and group or "quest"
+  if group == "quest" then undecorate() end
   for _, m in pairs(marks) do
     if m.group == group then m:Hide() end
   end
@@ -104,6 +94,44 @@ function QuestHighlight.Enabled() return ns.db and ns.db.questHighlight end
 -- rows: Notices.Evaluate's rows, by choice. best: the choice to take, or nil.
 -- richest: with no upgrade, the choice that sells for the most.
 -- Returns how many buttons were marked.
+-- Quest rewards carry their mark at the end of the reward's own name
+-- ("Primitive Hatchet +1.6", arrow on the pick), so it can't be read as the
+-- neighbouring reward's. decor[button] = { text = what we set, orig = the
+-- name before, pick, sells, label, muted }.
+local decor = {}
+QuestHighlight.decor = decor
+
+function undecorate()
+  for button, d in pairs(decor) do
+    local fs = QuestHighlight.NameOf(button)
+    -- Only put back what we changed: the window may have drawn a new name since.
+    if fs and fs:GetText() == d.text then fs:SetText(d.orig) end
+    decor[button] = nil
+  end
+end
+
+function QuestHighlight.Decorate(button, pick, sells, label, muted)
+  local fs = QuestHighlight.NameOf(button)
+  if not fs then
+    QuestHighlight.Set(QuestHighlight.Mark(button, "quest"), pick, sells, label, muted)
+    return
+  end
+  pick = pick and not muted
+  local orig = fs:GetText() or ""
+  local parts = {}
+  if pick then
+    parts[#parts + 1] = arrowAtlas() and ("|A:%s:14:14|a"):format(ARROW_ATLAS) or ("|T%s:14:14|t"):format(ARROW)
+  end
+  if label and label ~= "" then parts[#parts + 1] = (muted and "|cff999999" or "|cff40ff40") .. label .. "|r" end
+  if sells then parts[#parts + 1] = ("|T%s:12:12|t"):format(COIN) end
+  local text = orig .. " " .. table.concat(parts, "")
+  fs:SetText(text)
+  decor[button] = { text = text, orig = orig, pick = pick, sells = sells, label = label or "", muted = muted }
+end
+
+-- rows: Notices.Evaluate's rows, by choice. best: the choice to take, or nil.
+-- richest: with no upgrade, the choice that sells for the most.
+-- Returns how many buttons were marked.
 function QuestHighlight.Show(rows, best, richest, minDelta)
   QuestHighlight.Hide()
   if not QuestHighlight.Enabled() then return 0 end
@@ -113,7 +141,7 @@ function QuestHighlight.Show(rows, best, richest, minDelta)
     if upgrade or i == richest then
       local button = QuestHighlight.Button(i)
       if button then
-        QuestHighlight.Set(QuestHighlight.Mark(button, "quest", button, QuestHighlight.NameOf(button)), i == best, i == richest,
+        QuestHighlight.Decorate(button, i == best, i == richest,
           upgrade and ns.Advisor.FormatScore(row.delta, true), row.usable == false)
         shown = shown + 1
       end
