@@ -22,8 +22,9 @@ end
 -- Poison damage per second on a weapon of `speed`. A DoT stops adding once it
 -- has all its stacks: `capLeft` is how much of that is still free (the other
 -- hand may have used some).
-function Consumables.PoisonDps(p, speed, capLeft)
-  local dps = p.chance * p.damage / (speed or 2.0)
+-- extraHits: weapon hits a second from abilities (main hand), which can proc it too.
+function Consumables.PoisonDps(p, speed, capLeft, extraHits)
+  local dps = p.chance * p.damage * (1 / (speed or 2.0) + (extraHits or 0))
   if p.duration then
     local cap = capLeft or (p.stacks or 1) * p.damage / p.duration
     dps = math.min(dps, cap)
@@ -67,7 +68,8 @@ local function weaponCandidates(data, input, slot, hand, deadlyUsed)
       if p.duration then
         capLeft = math.max(0, (p.stacks or 1) * p.damage / p.duration - (deadlyUsed[p.id] or 0))
       end
-      local dps = Consumables.PoisonDps(p, hand.speed, capLeft)
+      local extra = slot == 16 and input.weights.abilityHits or 0
+      local dps = Consumables.PoisonDps(p, hand.speed, capLeft, extra)
       out[#out + 1] = { item = p, score = dps * perDps, dps = dps, poison = true }
     end
   end

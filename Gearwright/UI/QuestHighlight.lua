@@ -27,33 +27,44 @@ function QuestHighlight.Button(i)
   return rawget(_G, "QuestInfoRewardsFrameQuestInfoItem" .. i) or rawget(_G, "QuestRewardItem" .. i)
 end
 
--- The mark for `button` (made once), shared with UI/VendorHighlight.lua. It
--- sits in the empty corner at the bottom right of `row` (the whole reward or
--- vendor entry; default the button), clear of the icon, the name and the
--- price: "+24.5" with an up arrow on the pick. group: who shows it ("quest",
--- "vendor"), so each hides only its own.
-function QuestHighlight.Mark(button, group, row)
+-- The mark for `button` (made once), shared with UI/VendorHighlight.lua:
+-- "+1.8", with an up arrow on the pick. group: who shows it ("quest",
+-- "vendor"), so each hides only its own. Placed clear of the icon:
+--   under = a font string (the reward's name): just below it, left-aligned, so
+--     it can't be read as belonging to the reward beside it;
+--   else: the bottom-right corner of `row` (the vendor entry, beside its price).
+function QuestHighlight.Mark(button, group, row, under)
   local m = marks[button]
   if m then m.group = group; return m end
   row = row or button
   m = CreateFrame("Frame", nil, row)
   m:SetSize(70, 16)
-  m:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", -6, 4)
+  m.left = under ~= nil
+  if m.left then
+    m:SetPoint("TOPLEFT", under, "BOTTOMLEFT", 0, -1)
+  else
+    m:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", -6, 4)
+  end
   m:SetFrameLevel((row.GetFrameLevel and tonumber(row:GetFrameLevel()) or 0) + 5)
   m.score = m:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-  m.score:SetPoint("RIGHT")
-  m.score:SetJustifyH("RIGHT")
+  m.score:SetJustifyH(m.left and "LEFT" or "RIGHT")
   -- The bags' own "upgrade" arrow where the client has it.
   m.arrow = m:CreateTexture(nil, "OVERLAY")
   local ct = rawget(_G, "C_Texture")
   local atlas = m.arrow.SetAtlas and ct and ct.GetAtlasInfo and ct.GetAtlasInfo(ARROW_ATLAS)
   if atlas then m.arrow:SetAtlas(ARROW_ATLAS) else m.arrow:SetTexture(ARROW) end
   m.arrow:SetSize(14, 14)
-  m.arrow:SetPoint("RIGHT", m.score, "LEFT", -2, 0)
   m.coin = m:CreateTexture(nil, "OVERLAY")
   m.coin:SetTexture(COIN)
   m.coin:SetSize(12, 12)
-  m.coin:SetPoint("RIGHT")
+  if m.left then
+    m.arrow:SetPoint("LEFT")
+    m.coin:SetPoint("LEFT")
+  else
+    m.score:SetPoint("RIGHT")
+    m.arrow:SetPoint("RIGHT", m.score, "LEFT", -2, 0)
+    m.coin:SetPoint("RIGHT")
+  end
   m.group = group
   marks[button] = m
   return m
@@ -66,6 +77,10 @@ function QuestHighlight.Set(m, pick, sells, label, muted)
   m.arrow:SetShown(m.pick)
   m.coin:SetShown(sells)
   m.score:SetText(m.label)
+  if m.left then
+    m.score:ClearAllPoints()
+    m.score:SetPoint("LEFT", (m.pick or sells) and 16 or 0, 0)
+  end
   if muted then m.score:SetTextColor(0.6, 0.6, 0.6) else m.score:SetTextColor(0.25, 1, 0.25) end
   m:Show()
 end
@@ -75,6 +90,13 @@ function QuestHighlight.Hide(group)
   for _, m in pairs(marks) do
     if m.group == group then m:Hide() end
   end
+end
+
+-- The reward's name text: Mainline's button.Name, or <ButtonName>Name.
+function QuestHighlight.NameOf(button)
+  if type(button.Name) == "table" then return button.Name end
+  local name = button.GetName and button:GetName()
+  return type(name) == "string" and rawget(_G, name .. "Name") or nil
 end
 
 function QuestHighlight.Enabled() return ns.db and ns.db.questHighlight end
@@ -91,8 +113,8 @@ function QuestHighlight.Show(rows, best, richest, minDelta)
     if upgrade or i == richest then
       local button = QuestHighlight.Button(i)
       if button then
-        QuestHighlight.Set(QuestHighlight.Mark(button, "quest"), i == best, i == richest,
-          upgrade and ("+%.1f"):format(row.delta))
+        QuestHighlight.Set(QuestHighlight.Mark(button, "quest", button, QuestHighlight.NameOf(button)), i == best, i == richest,
+          upgrade and ns.Advisor.FormatScore(row.delta, true), row.usable == false)
         shown = shown + 1
       end
     end

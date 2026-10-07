@@ -31,6 +31,8 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 - [ ] Open `/gearwright`: does spec detection match what you specced?
 - [ ] Turn in a quest with reward choices: is each upgrade's score in the entry's bottom-right corner, with an arrow on the best, sitting
       on the right button? (With no upgrade, a coin marks the one that sells for the most.)
+- [ ] Carry an upgrade in your bags: does it get the green arrow (Blizzard's bags and
+      Baganator), and lose it once equipped?
 - [ ] Open a vendor that sells gear: are upgrades marked with their score, on page 2 as
       well, and gone on the Buyback tab? Red-tinted items: grey score, no arrow
 

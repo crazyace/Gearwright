@@ -23,8 +23,8 @@ local REASONS = {
 local function why(reason) return REASONS[reason] or ("Unavailable (" .. tostring(reason) .. ")") end
 UI.why = why
 
-local function num(v) return ("%.1f"):format(v) end
-local function plus(v) return (v >= 0 and "+" or "") .. num(v) end
+local function num(v) return ns.Advisor.FormatScore(v) end
+local function plus(v) return ns.Advisor.FormatScore(v, true) end
 local function slotName(slot) return ns.Advisor.SLOT_NAMES[slot] or "?" end
 
 -- Wishlist: right-click any upgrade row to add it (or take it off again);
@@ -280,8 +280,8 @@ TABS.settings = {
     rows[#rows + 1] = { header = true, title = "Display" }
     rows[#rows + 1] = toggleRow("Tooltip line", "Gearwright's score on item tooltips", "showTooltip")
     rows[#rows + 1] = toggleRow("Chat messages", "Quest rewards, loot and rolls", "notices")
-    rows[#rows + 1] = toggleRow("Upgrade marks", "Highlight upgrades in quest rewards and vendors' windows", "questHighlight",
-      function() ns.QuestHighlight.Hide("quest"); ns.VendorHighlight.Refresh() end)
+    rows[#rows + 1] = toggleRow("Upgrade marks", "Mark upgrades in your bags, quest rewards and vendors' windows",
+      "questHighlight", function() ns.QuestHighlight.Hide("quest"); ns.VendorHighlight.Refresh(); ns.BagUpgrades.Changed() end)
     if ns.MinimapButton then
       rows[#rows + 1] = toggleRow("Minimap button", "Your next goal; click it to open this window", "minimap",
         ns.MinimapButton.Update)
@@ -347,7 +347,8 @@ function UI.HeaderText()
   if ctx.class.weights._status == "provisional" then
     text = text .. "   " .. Theme.Hex("warn") .. "Stat weights are provisional placeholders.|r"
   end
-  local unit = ctx.class.weights.model == "caster" and "points of your main spell power" or "attack-power equivalents"
+  local unit = ctx.class.weights.model == "caster" and "points of your main spell power"
+    or "damage per second, like the game's own comparison"
   local line = "Scores are in " .. unit .. "."
   local counted = {}
   for _, t in ipairs(ctx.weights.talents or {}) do
@@ -421,6 +422,7 @@ local function makeRow(parent)
       self.onClick(button)
       UI.Refresh()
       ns.MinimapButton.Refresh() -- the wishlist or spec may have changed the next goal
+      ns.BagUpgrades.Changed(true) -- and which bag items are upgrades
     end
   end)
   return row

@@ -97,6 +97,7 @@ function Weights.Build(classData, spec, char, talents)
   Weights.ApplyTalents(w, effects, "mult")
   Weights.ApplyTalents(w, effects, "from")
   w.apPerPercent = pct
+  w.abilityHits = base.abilityHits or 0
   w.mainHandSpeed = (char and char.mainHandSpeed) or DEFAULT_SPEED
   w.offHandSpeed = (char and char.offHandSpeed) or w.mainHandSpeed
   w.talents = effects
@@ -159,10 +160,24 @@ end
 -- weaponDamage (flat damage per swing, from enchants) is DPS divided by speed.
 function Weights.For(weights, key, slot)
   if key == "dps" then return dpsWeight(weights, slot) end
+  if key == "speed" then return nil end -- Weights.WeaponHit uses it
   if key == "weaponDamage" then
     local speed = (slot == 17 and weights.offHandSpeed) or weights.mainHandSpeed or DEFAULT_SPEED
     local w = dpsWeight(weights, slot)
+    -- Flat damage per swing also lands on every ability that hits for weapon damage.
+    if w and (slot or 16) == 16 then w = w + (weights.abilityHits or 0) * weights.mainHandDps * speed end
     return w and w / speed
   end
   return weights[key]
+end
+
+-- Abilities that hit for main-hand weapon damage (Sinister Strike, Backstab)
+-- deal one weapon hit each, however fast the weapon swings, so a slow weapon's
+-- bigger hits are worth more than its DPS says. abilityHits (Data/<CLASS>/
+-- Weights.lua, per spec) is weapon hits per second from abilities; each is
+-- worth its average damage (DPS x speed), in DPS, x mainHandDps attack power.
+function Weights.WeaponHit(weights, stats, slot)
+  local hits = weights.abilityHits or 0
+  if hits == 0 or (slot or 16) ~= 16 or not (stats and stats.dps and stats.speed) then return 0 end
+  return stats.dps * stats.speed * hits * weights.mainHandDps
 end

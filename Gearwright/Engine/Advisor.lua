@@ -39,6 +39,27 @@ function Advisor.Context()
   }
 end
 
+-- Scores are worked out in attack power (melee) or points of spell power
+-- (casters). Melee scores are shown as damage per second, the unit of the
+-- game's own "+1.8 damage per second" comparison: 1 DPS = 14 attack power.
+Advisor.AP_PER_DPS = 14
+
+function Advisor.ScoreUnit()
+  local classData = ns.Spec.ClassData()
+  if classData and classData.weights.model ~= "caster" then return Advisor.AP_PER_DPS, "DPS" end
+  return 1, nil
+end
+
+-- A score as shown: signed, one decimal (two under 1 DPS so small upgrades
+-- don't read as +0.0).
+function Advisor.FormatScore(v, signed)
+  local per, unit = Advisor.ScoreUnit()
+  v = v / per
+  local s = ((unit and math.abs(v) < 1 and v ~= 0) and "%.2f" or "%.1f"):format(v)
+  if signed and v >= 0 then s = "+" .. s end
+  return s
+end
+
 -- Gear ------------------------------------------------------------------------
 
 -- Whether a weapon can go in the off hand yet: the class's Dual Wield level

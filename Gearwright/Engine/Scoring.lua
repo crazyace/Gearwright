@@ -12,7 +12,7 @@ function Scoring.ScoreStats(stats, weights, slot)
     local w = ns.Weights.For(weights, key, slot)
     if w then total = total + value * w end
   end
-  return total
+  return total + ns.Weights.WeaponHit(weights, stats, slot)
 end
 
 -- Per-stat contribution, largest first. Used to explain WHY an item scores well.

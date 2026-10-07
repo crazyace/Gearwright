@@ -4,7 +4,7 @@ local _, ns = ...
 local Notices = {}
 ns.Notices = Notices
 
-local UPGRADE = 0.5 -- attack-power equivalents; below this it's noise
+local UPGRADE = 0.5 -- attack power (or spell power) points; below this it's noise
 local RETRY_REASONS = { ["stats-unreadable"] = true, ["equipped-unreadable"] = true }
 
 local function enabled() return ns.db and ns.db.notices end
@@ -31,7 +31,8 @@ function Notices.Evaluate(links)
 end
 
 local function describe(row)
-  local s = ("%s |cff40ff40+%.1f|r vs %s"):format(row.link, row.delta, ns.Advisor.SLOT_NAMES[row.slot] or "equipped")
+  local s = ("%s |cff40ff40%s|r vs %s"):format(row.link, ns.Advisor.FormatScore(row.delta, true),
+    ns.Advisor.SLOT_NAMES[row.slot] or "equipped")
   if row.reqLevel then s = s .. (" |cffff9900(at level %d)|r"):format(row.reqLevel) end
   return s
 end
@@ -59,13 +60,21 @@ function Notices.QuestRewards(retried)
     return
   end
 
-  local best
+  -- The pick is the best upgrade you can use now; one the window tints red
+  -- (can't use it yet) is shown greyed, and named if it would have won.
+  local best, blocked
   for i, row in ipairs(rows) do
-    if row.delta and row.delta > UPGRADE and (not best or row.delta > best.delta) then
-      best = row
-      best.choice = i
+    row.usable = ns.API.QuestChoiceUsable(i)
+    if row.delta and row.delta > UPGRADE then
+      row.choice = i
+      if not row.usable then
+        if not blocked or row.delta > blocked.delta then blocked = row end
+      elseif not best or row.delta > best.delta then
+        best = row
+      end
     end
   end
+  if blocked and best and blocked.delta <= best.delta then blocked = nil end
   local richest, price
   if not best and n > 1 then
     price = 0
@@ -79,10 +88,14 @@ function Notices.QuestRewards(retried)
   if C_Timer then C_Timer.After(0, highlight) else highlight() end
 
   if not enabled() then return best end
+  if blocked then
+    ns.util.print("reward %d would be %s, but you can't use it yet", blocked.choice, describe(blocked))
+  end
   if best then
     ns.util.print("take reward %d: %s", best.choice, describe(best))
     return best
   end
+  if blocked then return end
   if n < 2 then return end
   if richest then
     ns.util.print("no upgrade among the rewards; %s sells for the most (%s)", links[richest], money(price))
@@ -132,7 +145,7 @@ function Notices.WishlistLevelUp(level)
   local ready = {}
   for _, w in ipairs(ns.Wishlist.Report()) do
     if not w.equipped and w.reqLevel == level and w.delta and w.delta > 0.05 then
-      ready[#ready + 1] = ("%s (|cff40ff40+%.1f|r)"):format(w.link or w.entry.name or "?", w.delta)
+      ready[#ready + 1] = ("%s (|cff40ff40%s|r)"):format(w.link or w.entry.name or "?", ns.Advisor.FormatScore(w.delta, true))
     end
   end
   if #ready > 0 then ns.util.print("wishlist: you can wear %s now", table.concat(ready, ", ")) end

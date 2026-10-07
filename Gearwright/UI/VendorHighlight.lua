@@ -69,7 +69,7 @@ function VendorHighlight.Refresh()
     end
   end
   for _, m in ipairs(marked) do
-    ns.QuestHighlight.Set(ns.QuestHighlight.Mark(m.it.button, "vendor", m.it.row), m == best, false, ("+%.1f"):format(m.delta),
+    ns.QuestHighlight.Set(ns.QuestHighlight.Mark(m.it.button, "vendor", m.it.row), m == best, false, ns.Advisor.FormatScore(m.delta, true),
       not m.usable)
   end
   return #marked

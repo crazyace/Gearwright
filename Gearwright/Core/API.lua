@@ -250,6 +250,26 @@ function API.GetEquippedLink(slot, unit)
   return API.clean(GetInventoryItemLink(unit or "player", slot))
 end
 
+-- Whether the quest window says you can use reward choice `i` (it tints it red
+-- if not: a weapon skill you haven't trained, say). True when it doesn't say.
+function API.QuestChoiceUsable(i)
+  local get = rawget(_G, "GetQuestItemInfo")
+  if not get then return true end
+  local r = { pcall(get, "choice", i) }
+  if r[1] and r[6] ~= nil then return API.clean(r[6]) and true or false end
+  return true
+end
+
+-- The item in a bag slot, or nil.
+function API.GetContainerItemLink(bag, slot)
+  if not (bag and slot) then return nil end
+  local cc = rawget(_G, "C_Container")
+  local get = (cc and cc.GetContainerItemLink) or rawget(_G, "GetContainerItemLink")
+  if not get then return nil end
+  local ok, link = pcall(get, bag, slot)
+  return ok and API.clean(link) or nil
+end
+
 -- Temporary weapon buffs (stones, oils, poisons): { [16] = minutes left or
 -- false, [17] = ... }, or nil when the client has no GetWeaponEnchantInfo.
 function API.GetWeaponBuffs()
@@ -274,10 +294,14 @@ function API.GetItemTooltipLines(link)
   if not link or not (C_TooltipInfo and C_TooltipInfo.GetHyperlink) then return nil end
   local ok, data = pcall(C_TooltipInfo.GetHyperlink, link)
   if not ok or type(data) ~= "table" or type(data.lines) ~= "table" then return remember("tooltip", link, nil) end
+  -- Left text, then any right-hand text as a line of its own ("Speed 2.20",
+  -- "Dagger"), so patterns anchored at ^ still see a line's start.
   local lines = {}
   for _, line in ipairs(data.lines) do
-    local text = API.clean(line.leftText)
-    if type(text) == "string" and text ~= "" then lines[#lines + 1] = text end
+    for _, side in ipairs({ line.leftText, line.rightText }) do
+      local text = API.clean(side)
+      if type(text) == "string" and text ~= "" then lines[#lines + 1] = text end
+    end
   end
   -- An item not loaded yet shows "Retrieving item information": don't keep that.
   if #lines == 0 or (RETRIEVING_ITEM_INFO and lines[1] == RETRIEVING_ITEM_INFO) then

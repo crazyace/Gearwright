@@ -46,7 +46,9 @@ Each file gets the shared addon namespace `ns` via `local _, ns = ...`.
 
 ## Scoring model (v1)
 
-`score = sum(stat_value x weight)`, in **attack-power equivalents** ("worth N AP").
+`score = sum(stat_value x weight)`, in **attack-power equivalents** ("worth N AP"). Melee
+scores are shown divided by 14, as damage per second, the unit of the game's own "+1.8 damage
+per second" comparison (`Advisor.FormatScore`).
 `Engine/Weights.lua` builds the weights for your level and current damage:
 
 - Strength and AP are 1 (confirmed on the beta); Agility is 1 + its share of crit,
