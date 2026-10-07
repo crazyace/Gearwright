@@ -134,7 +134,10 @@ L.execute("SAVED_TABS = TABS; TABS = { {'Assassination', {}}, {'Combat', {}}, {'
 L.globals().fire("CHARACTER_POINTS_CHANGED")
 assert list(L.eval("function(ns) return {ns.Spec.Detect()} end")(ns).values()) == ["combat", "leveling"]
 txt = L.globals().SCREEN(ns)
-assert "Spec:|r Combat" in txt and "the first comes at level 10" in txt, txt
+assert "Spec:|r Leveling" in txt and "the first comes at level 10; scored like Combat" in txt, txt
+# The tooltip doesn't name a spec before there is one.
+lv = L.eval("""function(ns) return ns.Tooltip.Lines('item:1002:0:0', ns.Advisor.CompareSlots('item:1002:0:0'))[1] end""")(ns)
+assert "(" not in lv and "Combat" not in lv and "leveling" not in lv, lv
 L.execute("TABS = SAVED_TABS")
 L.globals().fire("CHARACTER_POINTS_CHANGED")
 L.globals().SlashCmdList.GEARWRIGHT("")  # toggle closed
@@ -325,7 +328,7 @@ L.globals().fire("MERCHANT_CLOSED")
 assert vendor() == "- | - | -", vendor()
 L.execute("MerchantFrame = nil")
 # Bags: gear you can wear now that beats yours gets an arrow; the plate helm
-# doesn't. Baganator gets the same answer through its upgrade plugin.
+# doesn't. Bag addons' buttons are found under UIParent.
 L.execute("""
 BAG = { "item:1002:0:0", "item:3001:0:0", "item:1003:0:0" }
 C_Container = { GetContainerItemLink = function(bag, slot) return bag == 0 and BAG[slot] or nil end }
@@ -338,15 +341,41 @@ for j = 1, 3 do
   b.GetID = function() return j end; b.GetParent = function() return ContainerFrame1 end; b.GetBagID = false
   b.CreateTexture = function() local t = CreateFrame("Frame"); return t end
 end
-BAGANATOR_CHECK = nil
-Baganator = { API = { RegisterUpgradePlugin = function(_, _, fn) BAGANATOR_CHECK = fn end, RequestItemButtonsRefresh = function() end } }
+-- A bag addon's frame under UIParent: one button knows its bag and slot, one
+-- (like Baganator's) its link, one is an action button with neither.
+local function btn(fields)
+  local b = { shown = true }
+  function b:IsShown() return self.shown end
+  function b:GetObjectType() return "Button" end
+  function b:CreateTexture() return CreateFrame("Frame") end
+  for k, v in pairs(fields) do b[k] = v end
+  return b
+end
+ADDON_BTNS = {
+  btn({ bag = 0, GetID = function() return 1 end }),
+  btn({ BGR = { itemLink = "item:1002:0:0" } }),
+  btn({ GetID = function() return 3 end }),
+  btn({ bag = 0, GetID = function() return 2 end }),
+}
+-- EllesmereUI: an ItemButton from Blizzard's template inside a slot frame whose ID is the bag.
+local slotFrame = { IsShown = function() return true end, GetID = function() return 0 end }
+local ell = btn({ GetID = function() return 1 end, GetParent = function() return slotFrame end })
+function ell:GetObjectType() return "ItemButton" end
+slotFrame.GetChildren = function() return ell end
+ADDON_BTNS[#ADDON_BTNS + 1] = slotFrame
+local inner = { IsShown = function() return true end, GetChildren = function() return unpack(ADDON_BTNS) end }
+ADDON_BAGS = { shown = true, IsShown = function(self) return self.shown end, GetChildren = function() return inner end,
+               HookScript = function(self, _, fn) self.onShow = fn end }
+UIParent.GetChildren = function() return ContainerFrame1, ADDON_BAGS end
 """)
-L.globals().fire("ADDON_LOADED", "Baganator")
 bags = L.eval("""function(ns)
-  local n = ns.BagUpgrades.Refresh()
-  return n, BAGANATOR_CHECK("item:1002:0:0"), BAGANATOR_CHECK("item:3001:0:0") end""")(ns)
-assert bags[0] >= 1 and bags[1] is True and bags[2] is False, bags
-L.execute("ContainerFrame1 = nil; C_Container = nil; Baganator = nil")
+  local n = ns.BagUpgrades.Refresh(true)
+  local addon = #ns.BagUpgrades.AddonButtons(false)
+  return n, addon end""")(ns)
+# Blizzard's Hand Blade (1) and the addons' three Hand Blades (by slot, by link, by parent's bag).
+assert bags[0] == 4 and bags[1] == 4, bags
+L.execute("UIParent.GetChildren = nil")
+L.execute("ContainerFrame1 = nil; C_Container = nil")
 L.execute("QuestInfoFrame = nil")
 # Loot window and need/greed rolls.
 L.execute("""
