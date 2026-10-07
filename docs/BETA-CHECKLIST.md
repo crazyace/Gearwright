@@ -31,6 +31,8 @@ Run on a **Rogue** in the Forever beta. Commit every capture to `data/probe/`.
 - [ ] Open `/gearwright`: does spec detection match what you specced?
 - [ ] Turn in a quest with reward choices: does the upgrade glow green with its score, sitting
       on the right button? (With no upgrade, a coin marks the one that sells for the most.)
+- [ ] Open a vendor that sells gear: are upgrades marked with their score, on page 2 as
+      well, and gone on the Buyback tab?
 
 ## Priest
 

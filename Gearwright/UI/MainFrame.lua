@@ -280,8 +280,8 @@ TABS.settings = {
     rows[#rows + 1] = { header = true, title = "Display" }
     rows[#rows + 1] = toggleRow("Tooltip line", "Gearwright's score on item tooltips", "showTooltip")
     rows[#rows + 1] = toggleRow("Chat messages", "Quest rewards, loot and rolls", "notices")
-    rows[#rows + 1] = toggleRow("Quest reward marks", "Highlight the reward to take in the quest window", "questHighlight",
-      ns.QuestHighlight.Hide)
+    rows[#rows + 1] = toggleRow("Upgrade marks", "Highlight upgrades in quest rewards and vendors' windows", "questHighlight",
+      function() ns.QuestHighlight.Hide("quest"); ns.VendorHighlight.Refresh() end)
     if ns.MinimapButton then
       rows[#rows + 1] = toggleRow("Minimap button", "Your next goal; click it to open this window", "minimap",
         ns.MinimapButton.Update)

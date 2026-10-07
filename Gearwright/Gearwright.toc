@@ -35,6 +35,7 @@ UI\Theme.lua
 UI\Tooltip.lua
 UI\MainFrame.lua
 UI\QuestHighlight.lua
+UI\VendorHighlight.lua
 UI\Notices.lua
 UI\Options.lua
 UI\MinimapButton.lua

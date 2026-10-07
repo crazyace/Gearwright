@@ -273,6 +273,32 @@ L.execute('QUEST = { "item:3001:0:0", "item:1002:0:0" }')
 L.globals().fire("QUEST_COMPLETE")
 assert "glow" in marks().split(" | ")[1], marks()
 L.eval("function(ns) ns.db.notices = true end")(ns)
+# A vendor's window: upgrades on the page get their score, the best glows; the
+# plate helm isn't one. Page 2 shows other items; the Buyback tab, none.
+L.execute("""
+MERCHANT = { "item:3001:0:0", "item:1002:0:0", "item:1003:0:0" }
+function GetMerchantNumItems() return #MERCHANT end
+function GetMerchantItemLink(i) return MERCHANT[i] end
+MerchantFrame = CreateFrame("Frame"); MerchantFrame:Show(); MerchantFrame.page = 1; MerchantFrame.selectedTab = 1
+for i = 1, 10 do CreateFrame("Button", "MerchantItem" .. i .. "ItemButton") end
+""")
+def vendor():
+    return L.eval("""function(ns) local o = {}
+      for i = 1, 3 do local m = ns.QuestHighlight.marks[_G["MerchantItem" .. i .. "ItemButton"]]
+        o[i] = (m and m:IsShown()) and ((m.pick and "glow " or "") .. m.label) or "-"
+      end return table.concat(o, " | ") end""")(ns)
+L.globals().fire("MERCHANT_SHOW")
+vm = vendor().split(" | ")
+assert vm[0] == "-" and vm[1].startswith("glow +") and (vm[2] == "-" or vm[2].startswith("+")), vm
+L.execute("MerchantFrame.selectedTab = 2")
+L.globals().fire("MERCHANT_UPDATE")
+assert vendor() == "- | - | -", vendor()
+L.execute("MerchantFrame.selectedTab = 1")
+L.globals().fire("MERCHANT_UPDATE")
+assert vendor() != "- | - | -"
+L.globals().fire("MERCHANT_CLOSED")
+assert vendor() == "- | - | -", vendor()
+L.execute("MerchantFrame = nil")
 L.execute("QuestInfoFrame = nil")
 # Loot window and need/greed rolls.
 L.execute("""

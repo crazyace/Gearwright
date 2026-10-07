@@ -24,9 +24,11 @@ function QuestHighlight.Button(i)
   return rawget(_G, "QuestInfoRewardsFrameQuestInfoItem" .. i) or rawget(_G, "QuestRewardItem" .. i)
 end
 
-local function mark(button)
+-- The overlay on `button` (made once), shared with UI/VendorHighlight.lua.
+-- group: who shows it ("quest", "vendor"), so each hides only its own.
+function QuestHighlight.Mark(button, group)
   local m = marks[button]
-  if m then return m end
+  if m then m.group = group; return m end
   m = CreateFrame("Frame", nil, button)
   local icon = button.Icon or rawget(_G, (button.GetName and button:GetName() or "") .. "IconTexture") or button
   m:SetAllPoints(icon)
@@ -44,33 +46,43 @@ local function mark(button)
   m.score = m:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall")
   m.score:SetPoint("BOTTOM", 0, 1)
   m.score:SetTextColor(0.25, 1, 0.25)
+  m.group = group
   marks[button] = m
   return m
 end
 
-function QuestHighlight.Hide()
-  for _, m in pairs(marks) do m:Hide() end
+-- Sets what a mark shows: a glow (the pick), a coin (sells for the most), a score.
+function QuestHighlight.Set(m, pick, sells, label)
+  m.pick, m.sells, m.label = pick, sells, label or ""
+  m.glow:SetShown(pick)
+  m.coin:SetShown(sells)
+  m.score:SetText(m.label)
+  m:Show()
 end
+
+function QuestHighlight.Hide(group)
+  group = type(group) == "string" and group or "quest"
+  for _, m in pairs(marks) do
+    if m.group == group then m:Hide() end
+  end
+end
+
+function QuestHighlight.Enabled() return ns.db and ns.db.questHighlight end
 
 -- rows: Notices.Evaluate's rows, by choice. best: the choice to take, or nil.
 -- richest: with no upgrade, the choice that sells for the most.
 -- Returns how many buttons were marked.
 function QuestHighlight.Show(rows, best, richest, minDelta)
   QuestHighlight.Hide()
-  if not (ns.db and ns.db.questHighlight) then return 0 end
+  if not QuestHighlight.Enabled() then return 0 end
   local shown = 0
   for i, row in ipairs(rows) do
     local upgrade = row.delta and row.delta > minDelta
     if upgrade or i == richest then
       local button = QuestHighlight.Button(i)
       if button then
-        local m = mark(button)
-        m.pick, m.sells = i == best, i == richest
-        m.label = upgrade and ("+%.1f"):format(row.delta) or ""
-        m.glow:SetShown(m.pick)
-        m.coin:SetShown(m.sells)
-        m.score:SetText(m.label)
-        m:Show()
+        QuestHighlight.Set(QuestHighlight.Mark(button, "quest"), i == best, i == richest,
+          upgrade and ("+%.1f"):format(row.delta))
         shown = shown + 1
       end
     end
@@ -78,4 +90,4 @@ function QuestHighlight.Show(rows, best, richest, minDelta)
   return shown
 end
 
-ns:On("QUEST_FINISHED", QuestHighlight.Hide)
+ns:On("QUEST_FINISHED", function() QuestHighlight.Hide("quest") end)
