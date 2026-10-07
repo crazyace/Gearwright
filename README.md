@@ -2,8 +2,8 @@
 
 Gear, enchant and consumable advice for your build in **World of Warcraft: Forever**.
 
-Gearwright reads your talents to work out your spec, scores items with spec-specific
-stat weights, and tells you:
+Gearwright reads your talents to work out your spec, scores items with stat weights built
+for your class, level and talents (see [docs/STAT-MODEL.md](docs/STAT-MODEL.md)), and tells you:
 
 - **Gear** - is this item an upgrade, and by how much? (tooltip line), and for every slot the best
   known crafted upgrade and who can make it
@@ -43,9 +43,11 @@ tools/                 probe_to_json.py - turns probe output into JSON + a summa
                        enchants_from_probe.py - builds Data/Enchants.lua from a recipe scan
                        crafted_from_probe.py - builds Data/Crafted.lua from profession scans
                        ah_report.py - ranks auction house gear with Gearwright's scoring
+                       classstats_from_wago.py - builds Data/ClassStats.lua from Forever's stat table
 tests/                 smoke_test.py - runs both addons against a mocked WoW API
-docs/                  Architecture, beta checklist
+docs/                  Architecture, stat model, beta checklist
 data/probe/            Probe captures you commit (raw research data)
+data/reference/        Copies of Forever game data the tools read (stat table, talent text)
 ```
 
 ## Development setup

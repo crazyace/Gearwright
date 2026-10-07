@@ -9,6 +9,20 @@ function Spec.ClassData()
   return ns.Data[classToken], classToken
 end
 
+-- The talents the player has points in: { [name] = { rank = n, max = n } }.
+-- Empty when the tree can't be read.
+function Spec.Talents()
+  local classData = Spec.ClassData()
+  local talents = classData and ns.API.ReadTalents(classData.traitTabGroups)
+  local out = {}
+  for _, tab in ipairs(talents and talents.tabs or {}) do
+    for _, t in ipairs(tab.talents) do
+      if (t.rank or 0) > 0 then out[t.name] = { rank = t.rank, max = t.max } end
+    end
+  end
+  return out
+end
+
 -- Returns specKey, how, or nil, reason.
 -- how: "override" (/gearwright spec), "talents" (most points spent), or
 -- "leveling" (no points spent yet: the class's leveling spec). The first

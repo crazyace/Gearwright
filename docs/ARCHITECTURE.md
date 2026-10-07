@@ -39,7 +39,9 @@ Each file gets the shared addon namespace `ns` via `local _, ns = ...`.
    out from the tree's layout (the largest non-overlapping groups, numbered left to right).
    Copy them in from probe output once you have it (`tools/probe_to_json.py` lists every
    talent node; `docs/BETA-FINDINGS.md` shows how the Rogue groups were found).
-4. A caster sets `model = "caster"` in `Weights.lua` (see below); a class that holds orbs and
+4. Crit and mana conversions need nothing: `Data/ClassStats.lua` covers all nine classes.
+   List the talents that change a stat's worth in `talentEffects` (see `docs/STAT-MODEL.md`).
+5. A caster sets `model = "caster"` in `Weights.lua` (see below); a class that holds orbs and
    tomes in the off hand sets `holdables = true` in `Specs.lua`.
 
 ## Scoring model (v1)
@@ -48,7 +50,8 @@ Each file gets the shared addon namespace `ns` via `local _, ns = ...`.
 `Engine/Weights.lua` builds the weights for your level and current damage:
 
 - Strength and AP are 1 (confirmed on the beta); Agility is 1 + its share of crit,
-  using Agility-per-crit for your level (`Data/<CLASS>/Weights.lua: agiPerCrit`).
+  using Agility-per-crit for your class and level (`Data/ClassStats.lua`, generated from
+  Forever's own table by `tools/classstats_from_wago.py`).
 - Weapon DPS is 14 on the main hand, 7 on the off hand (Classic: DPS = weapon DPS + AP/14).
 - Rating stats are per 1%, valued as a share of your damage: 1% is worth 0.14 x main-hand DPS in AP.
 
@@ -56,7 +59,11 @@ Casters (`model = "caster"`, the Priest) score in points of their spec's main po
 bonus healing for a healer, spell damage for Shadow. Spell power is worth healing + spell
 damage; school damage counts for the schools the spec casts; spell hit, spell crit and haste
 are a share of output (`powerPerPercent` by level); Intellect adds its share of spell crit
-(`intPerSpellCrit`). Melee weapon DPS is worth nothing, a wand's DPS is.
+(`Data/ClassStats.lua`). Melee weapon DPS is worth nothing, a wand's DPS is.
+
+Talents that change what a stat is worth (`talentEffects` in `Data/<CLASS>/Weights.lua`)
+adjust the table after that, from the ranks `Spec.Talents()` reads. `docs/STAT-MODEL.md`
+has the formulas, their sources and the talent list.
 
 A two-hander is compared against both hands, and an off-hand item against an equipped two-hander.
 

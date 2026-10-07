@@ -25,7 +25,18 @@ ns.Data.ROGUE.weights = {
   subtlety      = { crit = 1.0, hit = 1.0, haste = 0.8, expertise = 0.8, sta = 0.2, rangedDps = 1 },
 }
 
--- Agility per 1% crit, by level. Linear between known points.
--- 19: measured on the beta (66 Agility = 8.7% on the sheet).
--- 60: Classic's Rogue value, unconfirmed on Forever.
-ns.Data.ROGUE.agiPerCrit = { { 19, 7.59 }, { 60, 29.0 } }
+-- Agility per 1% crit comes from Forever's own per-level table
+-- (Data/ClassStats.lua): 7.6 at level 19, as the beta's character sheet showed.
+
+-- Talents that change what a stat is worth (Engine/Weights.lua, TalentEffects).
+-- Amounts are Wowhead Forever's talent text (2026-10-06). Not checked in game
+-- yet: `/gwp talents` records each talent's text at rank 1, your rank and max
+-- rank. Talents that add crit or hit chance (Malice, Precision) don't change
+-- what one more point is worth, so they aren't here.
+ns.Data.ROGUE.talentEffects = {
+  -- "Increases the critical strike damage bonus of your Sinister Strike, Gouge,
+  -- Backstab, Mutilate, Ghostly Strike, and Hemorrhage abilities by 6%."
+  -- Classic's is 6% per rank too. Those abilities are about half your damage.
+  { name = "Lethality", stat = "crit", kind = "scale", amount = 0.06, perRank = true, share = 0.5,
+    note = "crits hit harder" },
+}

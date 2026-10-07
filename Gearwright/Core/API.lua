@@ -126,7 +126,8 @@ end
 -- What weights depend on: level, current main-hand DPS (buffs included) and
 -- weapon speeds (flat weapon damage from an enchant is worth more on a slow weapon).
 function API.CharacterSnapshot()
-  local char = { level = API.clean(UnitLevel("player")) }
+  local _, classToken = UnitClass("player")
+  local char = { level = API.clean(UnitLevel("player")), class = API.clean(classToken) }
   if UnitDamage and UnitAttackSpeed then
     local okD, low, high = pcall(UnitDamage, "player")
     local okS, speed, offSpeed = pcall(UnitAttackSpeed, "player")

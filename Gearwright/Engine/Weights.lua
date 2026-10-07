@@ -30,6 +30,19 @@ function Weights.Interpolate(points, level)
   return a[2] + (b[2] - a[2]) * (level - a[1]) / (b[1] - a[1])
 end
 
+-- The class's per-level value from Data/ClassStats.lua (Forever's own table),
+-- else the class data's {level, value} points. nil when neither knows.
+function Weights.ClassStat(classData, char, key)
+  local level = char and char.level
+  local stats = char and char.class and ns.Data.CLASS_STATS and ns.Data.CLASS_STATS[char.class]
+  local series = stats and stats[key]
+  if series and level and #series > 0 then
+    local v = series[math.max(1, math.min(level, #series))]
+    if v and v > 0 then return v end
+  end
+  return Weights.Interpolate(classData[key], level)
+end
+
 local DEFAULT_SPEED = 2.0 -- when the snapshot has no weapon speed
 
 -- Casters (Data/<CLASS>/Weights.lua: model = "caster") score in points of their
@@ -37,7 +50,7 @@ local DEFAULT_SPEED = 2.0 -- when the snapshot has no weapon speed
 -- damage for a damage spec. Ratings are valued like the melee ones, as a share
 -- of your output: 1% is worth powerPerPercent (by level) points of power.
 -- Melee weapon DPS counts for nothing; a wand's DPS (ranged slot) does.
-function Weights.BuildCaster(classData, spec, char)
+function Weights.BuildCaster(classData, spec, char, talents)
   local base = classData.weights[spec]
   local level = char and char.level
   local pct = Weights.Interpolate(classData.powerPerPercent, level) or 1
@@ -48,19 +61,25 @@ function Weights.BuildCaster(classData, spec, char)
     spellHit = (base.spellHit or 0) * pct, spellCrit = (base.spellCrit or 0) * pct,
     haste = (base.haste or 0) * pct,
   }
+  local effects = Weights.TalentEffects(classData, talents)
+  Weights.ApplyTalents(w, effects, "scale")
+  local intPerCrit = Weights.ClassStat(classData, char, "intPerSpellCrit")
+  if intPerCrit and intPerCrit > 1 then w.int = w.int + w.spellCrit / intPerCrit end
+  Weights.ApplyTalents(w, effects, "mult")
+  Weights.ApplyTalents(w, effects, "from")
   w.sp = w.healing + w.spellDamage -- "damage and healing done by magical spells"
   for _, school in ipairs(ns.Stats.SCHOOLS) do
     w[school .. "Damage"] = (base.schools and base.schools[school]) and w.spellDamage or 0
   end
-  local intPerCrit = Weights.Interpolate(classData.intPerSpellCrit, level)
-  if intPerCrit and intPerCrit > 1 then w.int = w.int + w.spellCrit / intPerCrit end
   w.powerPerPercent = pct
+  w.talents = effects
   return w
 end
 
--- char: { level = n, mainHandDps = n, mainHandSpeed = n, offHandSpeed = n }  (any may be nil)
-function Weights.Build(classData, spec, char)
-  if classData.weights.model == "caster" then return Weights.BuildCaster(classData, spec, char) end
+-- char: { level = n, class = "ROGUE", mainHandDps = n, mainHandSpeed = n, offHandSpeed = n }  (any may be nil)
+-- talents: { [name] = { rank = n, max = n } } from Spec.Talents(), or nil.
+function Weights.Build(classData, spec, char, talents)
+  if classData.weights.model == "caster" then return Weights.BuildCaster(classData, spec, char, talents) end
   local base = classData.weights[spec]
   local pct = Weights.APPerPercent(char)
   local w = {
@@ -68,12 +87,63 @@ function Weights.Build(classData, spec, char)
     mainHandDps = 14, offHandDps = 7, rangedDps = base.rangedDps or 0,
   }
   for _, key in ipairs(Weights.RATINGS) do w[key] = (base[key] or 0) * pct end
-  local agiPerCrit = Weights.Interpolate(classData.agiPerCrit, char and char.level)
+  local effects = Weights.TalentEffects(classData, talents)
+  Weights.ApplyTalents(w, effects, "scale")
+  local agiPerCrit = Weights.ClassStat(classData, char, "agiPerCrit")
   w.agi = 1 + ((agiPerCrit and agiPerCrit > 1) and w.crit / agiPerCrit or 0)
+  Weights.ApplyTalents(w, effects, "mult")
+  Weights.ApplyTalents(w, effects, "from")
   w.apPerPercent = pct
   w.mainHandSpeed = (char and char.mainHandSpeed) or DEFAULT_SPEED
   w.offHandSpeed = (char and char.offHandSpeed) or w.mainHandSpeed
+  w.talents = effects
   return w
+end
+
+-- Talents that change what a stat is worth -------------------------------------
+--
+-- classData.talentEffects (Data/<CLASS>/Weights.lua), by talent name:
+--   stat     the weight it changes
+--   amount   the effect at max rank, or per rank when perRank = true; the
+--            player's rank takes its share
+--   kind     "scale": that weight x (1 + amount x share), before Agility and
+--                     Intellect take their share of crit (a bigger crit bonus)
+--            "mult":  the stat's weight x (1 + amount), after (+15% Intellect)
+--            "from":  the stat also gives `amount x weight` of each key in
+--                     `into` (Spirit into healing)
+--   share    "scale" only: the part of your output it touches (default 1)
+--   note     what it does, for the window's header
+
+-- The talents the player has that change a weight, in the order listed:
+-- { { name=, rank=, max=, amount=, effect= }, ... }
+function Weights.TalentEffects(classData, talents)
+  local out = {}
+  if not talents or not classData.talentEffects then return out end
+  for _, e in ipairs(classData.talentEffects) do
+    local t = talents[e.name]
+    if t and (t.rank or 0) > 0 then
+      local max = math.max(t.max or 1, 1)
+      local rank = math.min(t.rank, max)
+      local amount = e.perRank and e.amount * rank or e.amount * rank / max
+      out[#out + 1] = { name = e.name, rank = rank, max = max, amount = amount, effect = e }
+    end
+  end
+  return out
+end
+
+function Weights.ApplyTalents(w, effects, kind)
+  for _, t in ipairs(effects) do
+    local e = t.effect
+    if e.kind == kind then
+      if kind == "scale" then
+        w[e.stat] = (w[e.stat] or 0) * (1 + t.amount * (e.share or 1))
+      elseif kind == "mult" then
+        w[e.stat] = (w[e.stat] or 0) * (1 + t.amount)
+      elseif kind == "from" then
+        for key, k in pairs(e.into) do w[e.stat] = (w[e.stat] or 0) + t.amount * k * (w[key] or 0) end
+      end
+    end
+  end
 end
 
 local function dpsWeight(weights, slot)
