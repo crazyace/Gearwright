@@ -1,5 +1,5 @@
 -- Gearwright: marks upgrades for sale in a vendor's window, with their score;
--- the best you can use gets the arrow badge. One you can't use yet (the
+-- the best you can use gets the arrow. One you can't use yet (the
 -- window tints it red: level, or a weapon skill you haven't trained) shows
 -- its score in grey. Re-done on every page and when items arrive
 -- from the server. (The auction house has no marks: its result list redraws
@@ -41,7 +41,8 @@ function VendorHighlight.Items()
     local button = rawget(_G, "MerchantItem" .. i .. "ItemButton")
     local index = first + i
     if button and index <= (GetMerchantNumItems and GetMerchantNumItems() or 0) then
-      out[#out + 1] = { button = button, index = index, link = ns.API.clean(GetMerchantItemLink(index)) }
+      out[#out + 1] = { button = button, row = rawget(_G, "MerchantItem" .. i), index = index,
+        link = ns.API.clean(GetMerchantItemLink(index)) }
     end
   end
   return out
@@ -68,7 +69,7 @@ function VendorHighlight.Refresh()
     end
   end
   for _, m in ipairs(marked) do
-    ns.QuestHighlight.Set(ns.QuestHighlight.Mark(m.it.button, "vendor"), m == best, false, ("+%.1f"):format(m.delta),
+    ns.QuestHighlight.Set(ns.QuestHighlight.Mark(m.it.button, "vendor", m.it.row), m == best, false, ("+%.1f"):format(m.delta),
       not m.usable)
   end
   return #marked

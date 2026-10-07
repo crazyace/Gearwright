@@ -1,8 +1,8 @@
 -- Gearwright: marks the quest reward to take in the quest window itself.
--- The best upgrade gets a yellow up-arrow badge and its score; other upgrades
--- get their score; with no upgrade, the reward that sells for the most gets a
--- coin. Nothing tints or rings the icon: green or blue there reads as the
--- item's quality.
+-- Each upgrade shows its score in the entry's empty bottom-right corner, the
+-- best with an up arrow; with no upgrade, the reward that sells for the most
+-- gets a coin. Nothing goes on the icon: a ring or tint there reads as the
+-- item's quality, and text covers the picture.
 -- Notices.QuestRewards works out the pick and calls Show.
 local _, ns = ...
 
@@ -10,6 +10,7 @@ local QuestHighlight = {}
 ns.QuestHighlight = QuestHighlight
 
 local ARROW = "Interface\\Buttons\\Arrow-Up-Up"
+local ARROW_ATLAS = "bags-greenarrow"
 local COIN = "Interface\\MoneyFrame\\UI-GoldIcon"
 local marks = {} -- one overlay per reward button, reused
 QuestHighlight.marks = marks
@@ -26,45 +27,46 @@ function QuestHighlight.Button(i)
   return rawget(_G, "QuestInfoRewardsFrameQuestInfoItem" .. i) or rawget(_G, "QuestRewardItem" .. i)
 end
 
--- The overlay on `button` (made once), shared with UI/VendorHighlight.lua.
--- group: who shows it ("quest", "vendor"), so each hides only its own.
-function QuestHighlight.Mark(button, group)
+-- The mark for `button` (made once), shared with UI/VendorHighlight.lua. It
+-- sits in the empty corner at the bottom right of `row` (the whole reward or
+-- vendor entry; default the button), clear of the icon, the name and the
+-- price: "+24.5" with an up arrow on the pick. group: who shows it ("quest",
+-- "vendor"), so each hides only its own.
+function QuestHighlight.Mark(button, group, row)
   local m = marks[button]
   if m then m.group = group; return m end
-  m = CreateFrame("Frame", nil, button)
-  local icon = button.Icon or rawget(_G, (button.GetName and button:GetName() or "") .. "IconTexture") or button
-  m:SetAllPoints(icon)
-  m:SetFrameLevel((button.GetFrameLevel and tonumber(button:GetFrameLevel()) or 0) + 5)
-  -- A badge just outside the icon's top-left corner: a dark disc with an arrow.
-  m.badge = m:CreateTexture(nil, "OVERLAY")
-  m.badge:SetColorTexture(0, 0, 0, 0.75)
-  m.badge:SetSize(16, 16)
-  m.badge:SetPoint("CENTER", m, "TOPLEFT", 1, -1)
-  m.arrow = m:CreateTexture(nil, "OVERLAY", nil, 1)
-  m.arrow:SetTexture(ARROW)
-  m.arrow:SetSize(16, 16)
-  m.arrow:SetPoint("CENTER", m.badge, "CENTER", 0, 1)
+  row = row or button
+  m = CreateFrame("Frame", nil, row)
+  m:SetSize(70, 16)
+  m:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", -6, 4)
+  m:SetFrameLevel((row.GetFrameLevel and tonumber(row:GetFrameLevel()) or 0) + 5)
+  m.score = m:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+  m.score:SetPoint("RIGHT")
+  m.score:SetJustifyH("RIGHT")
+  -- The bags' own "upgrade" arrow where the client has it.
+  m.arrow = m:CreateTexture(nil, "OVERLAY")
+  local ct = rawget(_G, "C_Texture")
+  local atlas = m.arrow.SetAtlas and ct and ct.GetAtlasInfo and ct.GetAtlasInfo(ARROW_ATLAS)
+  if atlas then m.arrow:SetAtlas(ARROW_ATLAS) else m.arrow:SetTexture(ARROW) end
+  m.arrow:SetSize(14, 14)
+  m.arrow:SetPoint("RIGHT", m.score, "LEFT", -2, 0)
   m.coin = m:CreateTexture(nil, "OVERLAY")
   m.coin:SetTexture(COIN)
-  m.coin:SetSize(14, 14)
-  m.coin:SetPoint("TOPRIGHT", 3, 3)
-  -- The score in white, outlined, along the icon's bottom edge.
-  m.score = m:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
-  m.score:SetPoint("BOTTOM", 0, 1)
+  m.coin:SetSize(12, 12)
+  m.coin:SetPoint("RIGHT")
   m.group = group
   marks[button] = m
   return m
 end
 
--- Sets what a mark shows: the arrow badge (the pick), a coin (sells for the
--- most), a score. muted: an upgrade you can't use yet (grey score, no badge).
+-- Sets what a mark shows: the arrow (the pick), a coin (sells for the most),
+-- a score. muted: an upgrade you can't use yet (grey score, no arrow).
 function QuestHighlight.Set(m, pick, sells, label, muted)
   m.pick, m.sells, m.label, m.muted = pick and not muted, sells, label or "", muted
-  m.badge:SetShown(m.pick)
   m.arrow:SetShown(m.pick)
   m.coin:SetShown(sells)
   m.score:SetText(m.label)
-  if muted then m.score:SetTextColor(0.6, 0.6, 0.6) else m.score:SetTextColor(1, 1, 1) end
+  if muted then m.score:SetTextColor(0.6, 0.6, 0.6) else m.score:SetTextColor(0.25, 1, 0.25) end
   m:Show()
 end
 
