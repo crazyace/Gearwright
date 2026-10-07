@@ -273,6 +273,7 @@ end
 
 TABS.settings = {
   label = "Settings", icon = "Interface\\Icons\\Trade_Engineering",
+  quick = true, -- cheap to build, and a click should show its result at once
   build = function()
     if not ns.db then return {}, "Settings aren't loaded yet." end
     local rows = {}
@@ -591,11 +592,47 @@ function UI.Refresh()
     drawRows(f, {}, why(reason))
     return
   end
-  local rows, message = UI.BuildRows(UI.tab)
+  local tab = UI.tab
+  if TABS[tab].quick then return UI.Show(tab, UI.BuildRows(tab)) end
+  -- The other tabs score items (Gear and Crafting every crafted recipe), which
+  -- took long enough to hitch the game on every tab switch. They're built in
+  -- the background a slice per frame; meanwhile the tab shows what it showed
+  -- last time.
+  local last = UI.cache[tab]
+  if last then
+    UI.Show(tab, last.rows, last.message)
+  else
+    drawRows(f, {}, "Working it out...")
+  end
+  UI.Rebuild(tab)
+end
+
+-- What each tab showed last: { rows, message }.
+UI.cache = {}
+
+function UI.Show(tab, rows, message)
+  UI.cache[tab] = { rows = rows, message = message }
+  if tab ~= UI.tab or not (UI.frame and UI.frame:IsShown()) then return end
   UI.shown = { rows = rows, message = message } -- what's on screen; read by tests
   -- Still waiting for items from the server: redraw when they arrive.
   UI.waiting = type(message) == "string" and message:find("^Reading") ~= nil
-  drawRows(f, rows, message)
+  drawRows(UI.frame, rows, message)
+end
+
+-- One build per tab at a time; a refresh asked for meanwhile runs after it.
+local building, again = {}, {}
+function UI.Rebuild(tab)
+  if building[tab] then again[tab] = true; return end
+  building[tab] = true
+  ns.util.Background(function() return UI.BuildRows(tab) end, function(ok, rows, message)
+    building[tab] = false
+    if ok then
+      UI.Show(tab, rows, message)
+    else
+      ns.util.debug("%s tab: %s", tab, tostring(rows))
+    end
+    if again[tab] then again[tab] = false; UI.Rebuild(tab) end
+  end)
 end
 
 function UI.Toggle()
