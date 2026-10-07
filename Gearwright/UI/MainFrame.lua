@@ -280,8 +280,8 @@ TABS.settings = {
     rows[#rows + 1] = { header = true, title = "Display" }
     rows[#rows + 1] = toggleRow("Tooltip line", "Gearwright's score on item tooltips", "showTooltip")
     rows[#rows + 1] = toggleRow("Chat messages", "Quest rewards, loot and rolls", "notices")
-    rows[#rows + 1] = toggleRow("Upgrade marks", "Highlight upgrades in quest rewards and vendors' windows", "questHighlight",
-      function() ns.QuestHighlight.Hide("quest"); ns.VendorHighlight.Refresh() end)
+    rows[#rows + 1] = toggleRow("Upgrade marks", "Mark upgrades in your bags, quest rewards and vendors' windows",
+      "questHighlight", function() ns.QuestHighlight.Hide("quest"); ns.VendorHighlight.Refresh(); ns.BagUpgrades.Changed() end)
     if ns.MinimapButton then
       rows[#rows + 1] = toggleRow("Minimap button", "Your next goal; click it to open this window", "minimap",
         ns.MinimapButton.Update)
@@ -422,6 +422,7 @@ local function makeRow(parent)
       self.onClick(button)
       UI.Refresh()
       ns.MinimapButton.Refresh() -- the wishlist or spec may have changed the next goal
+      ns.BagUpgrades.Changed(true) -- and which bag items are upgrades
     end
   end)
   return row

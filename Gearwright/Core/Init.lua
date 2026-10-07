@@ -37,7 +37,7 @@ local DEFAULTS = {
   schema = 1,
   showTooltip = true,
   notices = true, -- chat lines for quest rewards, loot and rolls
-  questHighlight = true, -- mark upgrades in quest rewards and vendor windows
+  questHighlight = true, -- mark upgrades in bags, quest rewards and vendor windows
   specOverride = false, -- false = auto-detect from talents
   minimap = true, -- minimap button (UI/MinimapButton.lua)
   debug = false,

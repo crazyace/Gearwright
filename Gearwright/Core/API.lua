@@ -250,6 +250,16 @@ function API.GetEquippedLink(slot, unit)
   return API.clean(GetInventoryItemLink(unit or "player", slot))
 end
 
+-- The item in a bag slot, or nil.
+function API.GetContainerItemLink(bag, slot)
+  if not (bag and slot) then return nil end
+  local cc = rawget(_G, "C_Container")
+  local get = (cc and cc.GetContainerItemLink) or rawget(_G, "GetContainerItemLink")
+  if not get then return nil end
+  local ok, link = pcall(get, bag, slot)
+  return ok and API.clean(link) or nil
+end
+
 -- Temporary weapon buffs (stones, oils, poisons): { [16] = minutes left or
 -- false, [17] = ... }, or nil when the client has no GetWeaponEnchantInfo.
 function API.GetWeaponBuffs()

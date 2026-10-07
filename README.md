@@ -5,7 +5,8 @@ Gear, enchant and consumable advice for your build in **World of Warcraft: Forev
 Gearwright reads your talents to work out your spec, scores items with stat weights built
 for your class, level and talents (see [docs/STAT-MODEL.md](docs/STAT-MODEL.md)), and tells you:
 
-- **Gear** - is this item an upgrade, and by how much? (tooltip line), and for every slot the best
+- **Gear** - is this item an upgrade, and by how much? (tooltip line, and an arrow on upgrades in
+  your bags: Blizzard's bags or Baganator), and for every slot the best
   known crafted upgrade and who can make it
 - **Wishlist and next goal** - right-click any upgrade to wishlist it; the minimap button (or your
   info bar, via LibDataBroker) shows the next one you can wear

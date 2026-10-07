@@ -36,6 +36,7 @@ UI\Tooltip.lua
 UI\MainFrame.lua
 UI\QuestHighlight.lua
 UI\VendorHighlight.lua
+UI\BagUpgrades.lua
 UI\Notices.lua
 UI\Options.lua
 UI\MinimapButton.lua

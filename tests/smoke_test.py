@@ -310,6 +310,29 @@ assert vendor() != "- | - | -"
 L.globals().fire("MERCHANT_CLOSED")
 assert vendor() == "- | - | -", vendor()
 L.execute("MerchantFrame = nil")
+# Bags: gear you can wear now that beats yours gets an arrow; the plate helm
+# doesn't. Baganator gets the same answer through its upgrade plugin.
+L.execute("""
+BAG = { "item:1002:0:0", "item:3001:0:0", "item:1003:0:0" }
+C_Container = { GetContainerItemLink = function(bag, slot) return bag == 0 and BAG[slot] or nil end }
+ContainerFrame1 = CreateFrame("Frame", "ContainerFrame1"); ContainerFrame1:Show()
+ContainerFrame1.GetID = function() return 0 end
+ContainerFrame1.EnumerateValidItems = false -- an older client's bag: buttons by name
+ContainerFrame1.GetName = function() return "ContainerFrame1" end
+for j = 1, 3 do
+  local b = CreateFrame("Button", "ContainerFrame1Item" .. j); b:Show()
+  b.GetID = function() return j end; b.GetParent = function() return ContainerFrame1 end; b.GetBagID = false
+  b.CreateTexture = function() local t = CreateFrame("Frame"); return t end
+end
+BAGANATOR_CHECK = nil
+Baganator = { API = { RegisterUpgradePlugin = function(_, _, fn) BAGANATOR_CHECK = fn end, RequestItemButtonsRefresh = function() end } }
+""")
+L.globals().fire("ADDON_LOADED", "Baganator")
+bags = L.eval("""function(ns)
+  local n = ns.BagUpgrades.Refresh()
+  return n, BAGANATOR_CHECK("item:1002:0:0"), BAGANATOR_CHECK("item:3001:0:0") end""")(ns)
+assert bags[0] >= 1 and bags[1] is True and bags[2] is False, bags
+L.execute("ContainerFrame1 = nil; C_Container = nil; Baganator = nil")
 L.execute("QuestInfoFrame = nil")
 # Loot window and need/greed rolls.
 L.execute("""
