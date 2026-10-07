@@ -1,13 +1,15 @@
 -- Gearwright: marks the quest reward to take in the quest window itself.
--- The best upgrade gets a green glow and its score; other upgrades get their
--- score; with no upgrade, the reward that sells for the most gets a coin.
+-- The best upgrade gets a yellow up-arrow badge and its score; other upgrades
+-- get their score; with no upgrade, the reward that sells for the most gets a
+-- coin. Nothing tints or rings the icon: green or blue there reads as the
+-- item's quality.
 -- Notices.QuestRewards works out the pick and calls Show.
 local _, ns = ...
 
 local QuestHighlight = {}
 ns.QuestHighlight = QuestHighlight
 
-local GLOW = "Interface\\Buttons\\UI-ActionButton-Border"
+local ARROW = "Interface\\Buttons\\Arrow-Up-Up"
 local COIN = "Interface\\MoneyFrame\\UI-GoldIcon"
 local marks = {} -- one overlay per reward button, reused
 QuestHighlight.marks = marks
@@ -33,30 +35,36 @@ function QuestHighlight.Mark(button, group)
   local icon = button.Icon or rawget(_G, (button.GetName and button:GetName() or "") .. "IconTexture") or button
   m:SetAllPoints(icon)
   m:SetFrameLevel((button.GetFrameLevel and tonumber(button:GetFrameLevel()) or 0) + 5)
-  m.glow = m:CreateTexture(nil, "OVERLAY")
-  m.glow:SetTexture(GLOW)
-  m.glow:SetBlendMode("ADD")
-  m.glow:SetVertexColor(0.25, 1, 0.25)
-  m.glow:SetPoint("CENTER")
-  m.glow:SetSize(70, 70)
+  -- A badge just outside the icon's top-left corner: a dark disc with an arrow.
+  m.badge = m:CreateTexture(nil, "OVERLAY")
+  m.badge:SetColorTexture(0, 0, 0, 0.75)
+  m.badge:SetSize(16, 16)
+  m.badge:SetPoint("CENTER", m, "TOPLEFT", 1, -1)
+  m.arrow = m:CreateTexture(nil, "OVERLAY", nil, 1)
+  m.arrow:SetTexture(ARROW)
+  m.arrow:SetSize(16, 16)
+  m.arrow:SetPoint("CENTER", m.badge, "CENTER", 0, 1)
   m.coin = m:CreateTexture(nil, "OVERLAY")
   m.coin:SetTexture(COIN)
   m.coin:SetSize(14, 14)
   m.coin:SetPoint("TOPRIGHT", 3, 3)
-  m.score = m:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall")
+  -- The score in white, outlined, along the icon's bottom edge.
+  m.score = m:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
   m.score:SetPoint("BOTTOM", 0, 1)
-  m.score:SetTextColor(0.25, 1, 0.25)
   m.group = group
   marks[button] = m
   return m
 end
 
--- Sets what a mark shows: a glow (the pick), a coin (sells for the most), a score.
-function QuestHighlight.Set(m, pick, sells, label)
-  m.pick, m.sells, m.label = pick, sells, label or ""
-  m.glow:SetShown(pick)
+-- Sets what a mark shows: the arrow badge (the pick), a coin (sells for the
+-- most), a score. muted: an upgrade you can't use yet (grey score, no badge).
+function QuestHighlight.Set(m, pick, sells, label, muted)
+  m.pick, m.sells, m.label, m.muted = pick and not muted, sells, label or "", muted
+  m.badge:SetShown(m.pick)
+  m.arrow:SetShown(m.pick)
   m.coin:SetShown(sells)
   m.score:SetText(m.label)
+  if muted then m.score:SetTextColor(0.6, 0.6, 0.6) else m.score:SetTextColor(1, 1, 1) end
   m:Show()
 end
 

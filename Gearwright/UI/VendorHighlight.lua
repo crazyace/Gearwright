@@ -1,5 +1,7 @@
 -- Gearwright: marks upgrades for sale in a vendor's window, with their score;
--- the best on the page glows. Re-done on every page and when items arrive
+-- the best you can use gets the arrow badge. One you can't use yet (the
+-- window tints it red: level, or a weapon skill you haven't trained) shows
+-- its score in grey. Re-done on every page and when items arrive
 -- from the server. (The auction house has no marks: its result list redraws
 -- rows as you scroll, so the tooltip line there says what's an upgrade.)
 local _, ns = ...
@@ -11,6 +13,23 @@ local UPGRADE = 0.5 -- same threshold as quest rewards and loot
 local waiting = false
 
 local function perPage() return rawget(_G, "MERCHANT_ITEMS_PER_PAGE") or 10 end
+
+-- Whether the vendor window says you can use item `index` (it tints it red
+-- if not). Mainline: C_MerchantFrame.GetItemInfo(index).isUsable; Classic:
+-- GetMerchantItemInfo's 7th return. True when neither answers.
+function VendorHighlight.Usable(index)
+  local cm = rawget(_G, "C_MerchantFrame")
+  if cm and cm.GetItemInfo then
+    local ok, info = pcall(cm.GetItemInfo, index)
+    if ok and type(info) == "table" and info.isUsable ~= nil then return info.isUsable and true or false end
+  end
+  local get = rawget(_G, "GetMerchantItemInfo")
+  if get then
+    local r = { pcall(get, index) }
+    if r[1] and r[8] ~= nil then return r[8] and true or false end
+  end
+  return true
+end
 
 -- The page's buttons: MerchantItem<i>ItemButton for i = 1..10, showing item
 -- (page - 1) * 10 + i. Nothing on the Buyback tab.
@@ -38,8 +57,9 @@ function VendorHighlight.Refresh()
     if it.link then
       local delta, why = ns.Advisor.CompareToEquipped(it.link)
       if type(delta) == "number" and delta > UPGRADE then
-        marked[#marked + 1] = { it = it, delta = delta }
-        if not best or delta > best.delta then best = marked[#marked] end
+        local m = { it = it, delta = delta, usable = VendorHighlight.Usable(it.index) }
+        marked[#marked + 1] = m
+        if m.usable and (not best or delta > best.delta) then best = m end
       elseif why == "stats-unreadable" then
         waiting = true
       end
@@ -48,7 +68,8 @@ function VendorHighlight.Refresh()
     end
   end
   for _, m in ipairs(marked) do
-    ns.QuestHighlight.Set(ns.QuestHighlight.Mark(m.it.button, "vendor"), m == best, false, ("+%.1f"):format(m.delta))
+    ns.QuestHighlight.Set(ns.QuestHighlight.Mark(m.it.button, "vendor"), m == best, false, ("+%.1f"):format(m.delta),
+      not m.usable)
   end
   return #marked
 end
