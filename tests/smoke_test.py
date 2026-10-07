@@ -976,20 +976,6 @@ rec = L.eval("""function() local r = GearwrightProbeDB.scans["tradeskill:Enchant
 assert tuple(rec) == (True, False, 4239, "Permanently enchant"), tuple(rec)
 keys = sorted(L.eval("function() local o={} for k in pairs(GearwrightProbeDB.scans) do o[#o+1]=k end return o end")().values())
 assert keys == ["ej", "items", "tradeskill:3", "tradeskill:Enchanting", "tradeskill:Leatherworking"], keys
-# Loot log: each corpse counts once; the NPC ID comes out of its GUID.
-L.execute("""
-LOOT = { "|cff1eff00|Hitem:5540::::|h[Pearl-handled Dagger]|h|r" }
-function GetLootSourceInfo() return "Creature-0-4618-0-12-1732-000012345", 1 end
-function GetInstanceInfo() return "The Deadmines", "party" end
-function UnitGUID() return "Creature-0-4618-0-12-1732-000012345" end
-function UnitName() return "Defias Squallshaper" end
-""")
-L.globals().fire("LOOT_OPENED"); L.globals().fire("LOOT_OPENED")
-L.execute('function GetLootSourceInfo() return "Creature-0-4618-0-12-1732-000099999", 1 end')
-L.globals().fire("LOOT_OPENED")
-drop = L.eval("""function() local e = GearwrightProbeDB.scans.loot.items["5540"]
-  local f = e.from["Creature:1732"] return e.name, f.count, f.where, f.name end""")()
-assert tuple(drop) == ("Pearl-handled Dagger", 2, "The Deadmines", "Defias Squallshaper"), tuple(drop)
 L.execute("LOOT = {}; GetLootSourceInfo, GetInstanceInfo, UnitGUID = nil, nil, nil; function UnitName() return 'Tester' end")
 # Trainer window: the probe turns on every filter (learned spells too), reads
 # the full list, then puts the player's filter back.

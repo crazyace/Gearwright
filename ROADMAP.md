@@ -16,7 +16,7 @@ Goal: replace every "unconfirmed" in the code with a fact. Data first, features 
 - [x] **SavedVariables**: do they survive a relog? (yes)
 - [x] Dump all three Rogue talent trees (names, ranks, tiers) -> `docs/BETA-FINDINGS.md`
 - [x] Open Enchanting to record recipes and their effects; class and profession trainers
-- [x] Encounter Journal: empty on Forever, so loot tables come from the probe's loot log
+- [x] Encounter Journal: empty on Forever (the probe's loot log that replaced it went with the Dungeons feature)
 - [ ] Inspect other Rogues (`/gwp inspect`) to collect real gear + enchant IDs
 - [ ] Decide: key talents/enchants by name or by ID
 
