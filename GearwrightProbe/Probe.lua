@@ -614,57 +614,6 @@ local function scanTrainer()
   end)
 end
 
--- Loot log: what drops, and from what. The Encounter Journal won't load on
--- Forever (LoadAddOn says WRONG_GAME_TYPE), so dungeon loot tables have to be
--- built from real drops. Each corpse or chest counts once per session.
-local lootSeen = {}
-
--- "Creature-0-4618-0-12-1732-0000123456" -> "Creature", "1732"
-local function sourceID(guid)
-  if type(guid) ~= "string" then return nil end
-  return guid:match("^(%a+)%-[^-]*%-[^-]*%-[^-]*%-[^-]*%-(%d+)")
-end
-
-local function sourceName(guid)
-  for _, unit in ipairs({ "target", "mouseover" }) do
-    if UnitGUID and sanitize(UnitGUID(unit)) == guid then return sanitize(UnitName(unit)) end
-  end
-end
-
-local function recordLoot()
-  if not (GetNumLootItems and GetLootSlotLink) then return end
-  local log = db().scans.loot or { since = now(), items = {} }
-  db().scans.loot = log
-  local inst = capture("GetInstanceInfo")
-  local iv = inst.values or {}
-  local inInstance = iv[2] ~= nil and iv[2] ~= "none"
-  local where = (inInstance and iv[1]) or sanitize(GetRealZoneText and GetRealZoneText()) or "?"
-  local added = 0
-  for slot = 1, GetNumLootItems() or 0 do
-    local link = sanitize(GetLootSlotLink(slot))
-    local itemID = type(link) == "string" and tonumber(link:match("item:(%d+)"))
-    if itemID then
-      local src = GetLootSourceInfo and pack(GetLootSourceInfo(slot)) or { n = 0 }
-      for k = 1, math.max(src.n, 1), 2 do
-        local guid = sanitize(src[k]) or "unknown"
-        if not lootSeen[guid .. ":" .. itemID] then
-          lootSeen[guid .. ":" .. itemID] = true
-          local kind, id = sourceID(guid)
-          local key = kind and (kind .. ":" .. id) or guid
-          local quality = tonumber(link:match("|cnIQ(%d)")) -- Forever links carry the quality
-          local rec = log.items[tostring(itemID)] or { name = link:match("%[(.-)%]"), quality = quality, from = {} }
-          log.items[tostring(itemID)] = rec
-          local e = rec.from[key] or { count = 0, where = where, instance = inInstance or nil, name = sourceName(guid) }
-          e.count = e.count + 1
-          rec.from[key] = e
-          added = added + 1
-        end
-      end
-    end
-  end
-  if added > 0 then say("loot: recorded %d drop(s) in %s", added, tostring(where)) end
-end
-
 local function onInspectReady()
   if not UnitExists("target") then return end
   local gear = dumpInventory("target")
@@ -932,7 +881,6 @@ events:RegisterEvent("TRADE_SKILL_SHOW")
 events:RegisterEvent("TRAINER_SHOW")
 pcall(events.RegisterEvent, events, "TRAINER_UPDATE")
 events:RegisterEvent("INSPECT_READY")
-events:RegisterEvent("LOOT_OPENED")
 for _, e in ipairs({ "AUCTION_HOUSE_SHOW", "AUCTION_HOUSE_CLOSED", "REPLICATE_ITEM_LIST_UPDATE" }) do
   pcall(events.RegisterEvent, events, e)
 end
@@ -949,8 +897,6 @@ events:SetScript("OnEvent", function(_, event, arg1)
   elseif event == "TRAINER_UPDATE" and not trainerBusy and not P.trainerQueued then
     P.trainerQueued = true -- you changed the filter: read it again, once
     C_Timer.After(0.5, function() P.trainerQueued = false; scanTrainer() end)
-  elseif event == "LOOT_OPENED" then
-    recordLoot()
   elseif event == "AUCTION_HOUSE_SHOW" then
     ah.open = true
   elseif event == "AUCTION_HOUSE_CLOSED" then
@@ -1153,7 +1099,6 @@ SlashCmdList.GEARWRIGHTPROBE = function(msg)
   else
     say("usage: /gwp all | env | api | talents | gear | stats | sheet | items [ids] | ej | ah")
     say("       /gwp inspect | persist | export [ah] | clear")
-    say("passive: open your character sheet, a profession window or class trainer and it is recorded automatically;")
-    say("loot you open is logged with what dropped it")
+    say("passive: open your character sheet, a profession window or class trainer and it is recorded automatically")
   end
 end
