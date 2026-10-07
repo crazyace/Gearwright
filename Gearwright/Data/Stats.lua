@@ -180,9 +180,20 @@ function Stats.TokenLabel(token)
   return (words:gsub("^%l", string.upper))
 end
 
+-- A weapon's speed from its tooltip's "Speed 2.20" (not a scored stat: abilities
+-- that hit for weapon damage make a slow weapon worth more; Weights.WeaponHit).
+function Stats.SpeedFromLines(lines)
+  for _, line in ipairs(lines or {}) do
+    local s = tonumber(line:match("^Speed ([%d%.]+)$"))
+    if s then return s end
+  end
+end
+
 function Stats.FromLink(link)
   local raw = ns.API.GetItemStats(link)
   if not raw then return nil end
   local stats = Stats.FromRaw(raw)
-  return Stats.AddTooltipEffects(stats, ns.API.GetItemTooltipLines(link))
+  local lines = ns.API.GetItemTooltipLines(link)
+  if stats.dps then stats.speed = Stats.SpeedFromLines(lines) end
+  return Stats.AddTooltipEffects(stats, lines)
 end

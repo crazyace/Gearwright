@@ -61,6 +61,16 @@ line between two known points.
 
 These are on `docs/BETA-CHECKLIST.md` under "Stat model".
 
+## Weapon speed
+
+Sinister Strike and Backstab hit for the main-hand weapon's damage once per use, however
+fast the weapon swings, so of two weapons with the same DPS the slower one hits harder and
+is worth more. Each Rogue spec has `abilityHits`, main-hand hits a second from abilities
+(0.15: about 60% of 10 energy a second on 40-energy Sinister Strikes, or 60-energy Backstabs
+at 150%). A main-hand weapon scores its DPS plus `DPS x speed x abilityHits` more DPS; flat
+weapon damage (stones) and poison procs count those hits too. Classic's numbers, not measured
+on Forever.
+
 ## Talents that change what a stat is worth
 
 A talent matters to weights only when it changes what **one more point** of a stat is

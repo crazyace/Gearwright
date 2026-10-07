@@ -294,10 +294,14 @@ function API.GetItemTooltipLines(link)
   if not link or not (C_TooltipInfo and C_TooltipInfo.GetHyperlink) then return nil end
   local ok, data = pcall(C_TooltipInfo.GetHyperlink, link)
   if not ok or type(data) ~= "table" or type(data.lines) ~= "table" then return remember("tooltip", link, nil) end
+  -- Left text, then any right-hand text as a line of its own ("Speed 2.20",
+  -- "Dagger"), so patterns anchored at ^ still see a line's start.
   local lines = {}
   for _, line in ipairs(data.lines) do
-    local text = API.clean(line.leftText)
-    if type(text) == "string" and text ~= "" then lines[#lines + 1] = text end
+    for _, side in ipairs({ line.leftText, line.rightText }) do
+      local text = API.clean(side)
+      if type(text) == "string" and text ~= "" then lines[#lines + 1] = text end
+    end
   end
   -- An item not loaded yet shows "Retrieving item information": don't keep that.
   if #lines == 0 or (RETRIEVING_ITEM_INFO and lines[1] == RETRIEVING_ITEM_INFO) then

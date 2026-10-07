@@ -250,7 +250,7 @@ def last_print():
 # The quest window's reward buttons (Mainline keeps them on rewardsFrame).
 L.execute("""
 local buttons = {}
-for i = 1, 3 do local b = CreateFrame("Button"); b.type = "choice"; b.GetID = function() return i end; buttons[i] = b end
+for i = 1, 3 do local b = CreateFrame("Button"); b.type = "choice"; b.GetID = function() return i end; b.Name = CreateFrame("Frame"); buttons[i] = b end
 QuestInfoFrame = { rewardsFrame = { RewardButtons = buttons } }
 """)
 def marks():
@@ -260,6 +260,9 @@ def marks():
       end return table.concat(o, " | ") end""")(ns)
 L.globals().fire("QUEST_COMPLETE")
 assert "take reward 2: item:1002:0:0" in last_print(), last_print()
+# Quest marks sit under the reward's name (so a coin can't look like it's the
+# next reward's); vendor marks sit in the entry's corner.
+assert L.eval("function(ns) return ns.QuestHighlight.marks[ns.QuestHighlight.Button(2)].left end")(ns) is True
 # The pick glows and shows its score in the quest window.
 qm = marks()
 assert qm.startswith("-") and "glow" in qm.split(" | ")[1] and "+" in qm.split(" | ")[1], qm
@@ -625,10 +628,19 @@ assert L.eval("""function(ns) return ns.Stats.FromEnchantLine({"Enchanted: +3 Ag
 assert L.eval("""function(ns) return ns.Stats.FromEnchantLine({"Sword", "+2 Agility"}) end""")(ns) is None
 assert L.eval("""function(ns) local s, t = ns.Stats.FromEnchantLine({"Enchanted: Crusader"}) return next(s), t end""")(ns) == (None, "Crusader")
 
-# Flat weapon damage is DPS divided by the weapon's speed (1.7 s in the mock).
+# Flat weapon damage is DPS divided by the weapon's speed (1.7 s in the mock);
+# in the main hand it also lands on Sinister Strike (0.15 hits a second, x14 AP).
 wd = L.eval("""function(ns) local w = ns.Advisor.Context().weights
   return ns.Weights.For(w, "weaponDamage", 16), ns.Weights.For(w, "weaponDamage", 17) end""")(ns)
-assert abs(wd[0] - 14 / 1.7) < 1e-9 and abs(wd[1] - 7 / 1.7) < 1e-9, wd
+assert abs(wd[0] - (14 / 1.7 + 0.15 * 14)) < 1e-9 and abs(wd[1] - 7 / 1.7) < 1e-9, wd
+# A slow main hand beats a fast one with the same DPS: Jeff's Primitive Hatchet
+# (2.05 DPS, 2.20 speed) over the Primitive Hand Blade (2.06 DPS, 1.70 speed).
+ws = L.eval("""function(ns) local w = ns.Advisor.Context().weights
+  local function score(dps, speed) return ns.Scoring.ScoreStats({ dps = dps, speed = speed }, w, 16) end
+  return score(9 / 2 / 2.2, 2.2), score(7 / 2 / 1.7, 1.7), score(2, 2.6) - score(2, nil),
+    ns.Scoring.ScoreStats({ dps = 2, speed = 2.6 }, w, 17) end""")(ns)
+assert ws[0] > ws[1] and abs(ws[2] - 2 * 2.6 * 0.15 * 14) < 1e-9 and abs(ws[3] - 14) < 1e-9, ws
+assert L.eval("""function(ns) return ns.Stats.SpeedFromLines({ "One-Hand", "Axe", "Speed 2.20" }) end""")(ns) == 2.2
 
 # The data file is what the tool makes from the saved scan: nobody edited it by hand.
 import subprocess, sys
@@ -660,7 +672,7 @@ assert [r[0] for r in rows] == [5, 9, 16], rows
 chest, wrist, mh = rows
 assert chest[1] == "Greater Stats" and abs(chest[4] - (4 * agi + 4 * strw + 4 * sta - 2 * sta)) < 1e-9, chest
 assert wrist[1] == "Agility" and abs(wrist[4] - 6 * agi) < 1e-9 and wrist[5] is False, wrist
-assert mh[1] == "Superior Striking" and mh[3] is False and abs(mh[4] - 5 * 14 / 1.7) < 1e-9, mh
+assert mh[1] == "Superior Striking" and mh[3] is False and abs(mh[4] - 5 * (14 / 1.7 + 0.15 * 14)) < 1e-9, mh
 # Already the best: OK.
 L.execute('ITEMS["item:5001:0:0"].tip = {"Bracers", "Enchanted: Agility +9"}')
 ok = L.eval("function(ns) local rows = ns.Advisor.EnchantReport() return rows[2].ok end")(ns)
@@ -669,8 +681,9 @@ L.execute("INV[9], INV[5] = nil, nil")
 
 # Consumables ------------------------------------------------------------------
 # Level 30 Combat Rogue, 1.7 s daggers. Deadly Poison: a 30% chance per hit of
-# 36 damage, so 0.3 x 36 / 1.7 DPS per hand, worth 14 AP per DPS in either hand.
-DEADLY = 0.3 * 36 / 1.7
+# 36 damage on each of the main hand's hits (a swing every 1.7 s plus 0.15
+# Sinister Strikes a second), worth 14 AP per DPS.
+DEADLY = 0.3 * 36 * (1 / 1.7 + 0.15)
 cons = L.eval("""function(ns) local r = ns.Advisor.ConsumableReport() local o = {}
   for _, w in ipairs(r.weapon) do o[#o + 1] = { w.slot, w.best.item.name, w.best.score, w.active == nil } end
   return o, r.elixirs[1].best.item.name, r.elixirs[1].best.score, #r.potions end""")(ns)
@@ -683,14 +696,14 @@ L.execute("INV[17] = 'item:2003:0:0'")
 cons = L.eval("""function(ns) local c, d = ns.Consumables, ns.Data.CONSUMABLES.poisons[7]
   local r = ns.Advisor.ConsumableReport()
   return r.weapon[2].best.item.name, c.PoisonDps(d, 1.7), c.PoisonDps(d, 0.5), c.PoisonDps(d, 0.5, 2) end""")(ns)
-assert cons[0] == "Deadly Poison" and abs(cons[1] - DEADLY) < 1e-9 and cons[2] == 15 and cons[3] == 2, cons
+assert cons[0] == "Deadly Poison" and abs(cons[1] - 0.3 * 36 / 1.7) < 1e-9 and cons[2] == 15 and cons[3] == 2, cons
 # Below level 20 there are no poisons yet: a sharpening stone, and the poison
 # shows as coming up within the look-ahead. A sword is sharp, a mace blunt.
 L.execute("UnitLevel = function() return 16 end")
 cons = L.eval("""function(ns) local w = ns.Advisor.ConsumableReport().weapon[1]
   return w.best.item.name, w.best.score, w.next and w.next.item.name,
     ns.Consumables.WeaponKind(7), ns.Consumables.WeaponKind(4), ns.Consumables.WeaponKind(19) end""")(ns)
-assert tuple(cons) == ("Heavy Sharpening Stone", 4 * 14 / 1.7, "Instant Poison", "sharp", "blunt", None), cons
+assert tuple(cons) == ("Heavy Sharpening Stone", 4 * (14 / 1.7 + 0.15 * 14), "Instant Poison", "sharp", "blunt", None), cons
 L.execute("UnitLevel = function() return 14 end")  # level 20 is beyond the 5-level look-ahead
 assert L.eval("function(ns) local w = ns.Advisor.ConsumableReport().weapon[1] return w.best.item.name, w.next.item.name end")(ns) == ("Coarse Sharpening Stone", "Heavy Sharpening Stone")
 L.execute("UnitLevel = function() return 30 end")

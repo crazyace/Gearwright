@@ -69,7 +69,9 @@ Goal: a Rogue can install Gearwright on day one and get useful advice.
 - [ ] Refine weights from launch-week feedback and logs
 - [x] Real UI: tabbed window with item rows, icons and tooltips (UI/Theme.lua, UI/MainFrame.lua)
 - [ ] "Why" breakdown per item (`Scoring.Breakdown`), talent tree view
-- [ ] Weapon logic: daggers for Mutilate/Hemorrhage, main-hand vs off-hand speed
+- [x] Weapon speed: a slow main hand scores higher for the Sinister Strike / Backstab hits it
+      adds (`abilityHits`); poisons proc on those hits too
+- [ ] Weapon logic: measure ability hits on Forever; off-hand speed for poison procs
 - [ ] Raid gear + enchants for Barrow Deeps, Hyjal Summit, Onyxia's Lair (Dec 9)
 - [ ] Localization groundwork (IDs instead of English names)
 
