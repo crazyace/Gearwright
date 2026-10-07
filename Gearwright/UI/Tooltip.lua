@@ -8,12 +8,12 @@ ns.Tooltip = Tooltip
 
 local function colored(delta)
   local color = (delta > 0.05 and UP) or (delta < -0.05 and DOWN) or SAME
-  return ("%s%s%.1f|r"):format(color, delta > 0 and "+" or "", delta)
+  return color .. ns.Advisor.FormatScore(delta, delta > 0) .. "|r"
 end
 
 -- The lines Gearwright adds for an item, from Advisor.CompareSlots:
---   Gearwright +123.6 in Main Hand over Pearl-handled Dagger (Assassination)
---   Off Hand: +54.2 over Pearl-handled Dagger
+--   Gearwright +8.83 in Main Hand over Pearl-handled Dagger (Assassination)
+--   Off Hand: +3.87 over Pearl-handled Dagger
 --   Not counted: Intellect, chance on hit effect
 -- The first line is the slot where it helps most; others follow.
 function Tooltip.Lines(link, list)

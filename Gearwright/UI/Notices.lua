@@ -4,7 +4,7 @@ local _, ns = ...
 local Notices = {}
 ns.Notices = Notices
 
-local UPGRADE = 0.5 -- attack-power equivalents; below this it's noise
+local UPGRADE = 0.5 -- attack power (or spell power) points; below this it's noise
 local RETRY_REASONS = { ["stats-unreadable"] = true, ["equipped-unreadable"] = true }
 
 local function enabled() return ns.db and ns.db.notices end
@@ -31,7 +31,8 @@ function Notices.Evaluate(links)
 end
 
 local function describe(row)
-  local s = ("%s |cff40ff40+%.1f|r vs %s"):format(row.link, row.delta, ns.Advisor.SLOT_NAMES[row.slot] or "equipped")
+  local s = ("%s |cff40ff40%s|r vs %s"):format(row.link, ns.Advisor.FormatScore(row.delta, true),
+    ns.Advisor.SLOT_NAMES[row.slot] or "equipped")
   if row.reqLevel then s = s .. (" |cffff9900(at level %d)|r"):format(row.reqLevel) end
   return s
 end
@@ -132,7 +133,7 @@ function Notices.WishlistLevelUp(level)
   local ready = {}
   for _, w in ipairs(ns.Wishlist.Report()) do
     if not w.equipped and w.reqLevel == level and w.delta and w.delta > 0.05 then
-      ready[#ready + 1] = ("%s (|cff40ff40+%.1f|r)"):format(w.link or w.entry.name or "?", w.delta)
+      ready[#ready + 1] = ("%s (|cff40ff40%s|r)"):format(w.link or w.entry.name or "?", ns.Advisor.FormatScore(w.delta, true))
     end
   end
   if #ready > 0 then ns.util.print("wishlist: you can wear %s now", table.concat(ready, ", ")) end

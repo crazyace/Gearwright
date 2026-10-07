@@ -23,8 +23,8 @@ local REASONS = {
 local function why(reason) return REASONS[reason] or ("Unavailable (" .. tostring(reason) .. ")") end
 UI.why = why
 
-local function num(v) return ("%.1f"):format(v) end
-local function plus(v) return (v >= 0 and "+" or "") .. num(v) end
+local function num(v) return ns.Advisor.FormatScore(v) end
+local function plus(v) return ns.Advisor.FormatScore(v, true) end
 local function slotName(slot) return ns.Advisor.SLOT_NAMES[slot] or "?" end
 
 -- Wishlist: right-click any upgrade row to add it (or take it off again);
@@ -347,7 +347,8 @@ function UI.HeaderText()
   if ctx.class.weights._status == "provisional" then
     text = text .. "   " .. Theme.Hex("warn") .. "Stat weights are provisional placeholders.|r"
   end
-  local unit = ctx.class.weights.model == "caster" and "points of your main spell power" or "attack-power equivalents"
+  local unit = ctx.class.weights.model == "caster" and "points of your main spell power"
+    or "damage per second, like the game's own comparison"
   local line = "Scores are in " .. unit .. "."
   local counted = {}
   for _, t in ipairs(ctx.weights.talents or {}) do

@@ -21,7 +21,7 @@ local function goalLines()
   end
   if not goal then return { "No upgrade known yet" } end
   return {
-    ("%s |cff40ff40+%.1f|r"):format(goal.link or goal.name or "?", goal.delta),
+    ("%s |cff40ff40%s|r"):format(goal.link or goal.name or "?", ns.Advisor.FormatScore(goal.delta, true)),
     ns.Wishlist.When(goal.levelsAway) .. (goal.from and (" - " .. goal.from) or ""),
     goal.wished and nil or "|cff999999(best known upgrade; right-click upgrades to wishlist them)|r",
   }

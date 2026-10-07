@@ -218,9 +218,13 @@ ITEMS[INV[17]] = ITEMS['item:2003:0:0']
 """)
 tip = list(L.eval("""function(ns) return ns.Tooltip.Lines('item:2007:0:0', ns.Advisor.CompareSlots('item:2007:0:0')) end""")(ns).values())
 print("tooltip:", tip)
-assert "+140.0|r in Main Hand over equipped" in tip[0] and "(Combat)" in tip[0], tip
-assert tip[1].startswith("|cffaaaaaaOff Hand:|r") and "+56.0|r" in tip[1] and "over Pearl-handled Dagger" in tip[1], tip
+# Melee scores show as DPS (140 AP-equivalents = 10 DPS), like the game's own comparison.
+assert "+10.0|r in Main Hand over equipped" in tip[0] and "(Combat)" in tip[0], tip
+assert tip[1].startswith("|cffaaaaaaOff Hand:|r") and "+4.0|r" in tip[1] and "over Pearl-handled Dagger" in tip[1], tip
 assert tip[2] == "|cffaaaaaaNot counted: Intellect, chance on hit effect|r", tip
+fs = L.eval("function(ns) return ns.Advisor.FormatScore(24.7, true), ns.Advisor.FormatScore(140, true), ns.Advisor.FormatScore(-28), ns.Advisor.FormatScore(3, true) end")(ns)
+# The Tomahawk: +24.7 AP = +1.8 DPS, as the game said. Under 1 DPS, two decimals.
+assert tuple(fs) == ("+1.8", "+10.0", "-2.0", "+0.21"), tuple(fs)
 L.execute("INV[17] = nil")
 # Items above your level still score, and say when you can wear them.
 d = compare("item:1003:0:0")
