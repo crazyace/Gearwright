@@ -6,7 +6,7 @@ Gearwright reads your talents to work out your spec, scores items with stat weig
 for your class, level and talents (see [docs/STAT-MODEL.md](docs/STAT-MODEL.md)), and tells you:
 
 - **Gear** - is this item an upgrade, and by how much? (tooltip line, and an arrow on upgrades in
-  your bags: Blizzard's bags or Baganator), and for every slot the best
+  your bags: Blizzard's bags or a bag addon), and for every slot the best
   known crafted upgrade and who can make it
 - **Wishlist and next goal** - right-click any upgrade to wishlist it; the minimap button (or your
   info bar, via LibDataBroker) shows the next one you can wear
